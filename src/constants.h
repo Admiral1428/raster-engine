@@ -15,5 +15,6 @@ const int WINDOW_HEIGHT = 1080;
 // Opaque colors
 const Color BLACK = {0, 0, 0, 255};
 const Color WHITE = {255, 255, 255, 255};
+const Color RED = {255, 0, 0, 255};
 
 #endif

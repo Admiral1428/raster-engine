@@ -1,6 +1,6 @@
 #include <SDL3/SDL.h>
 #include "constants.h"
-#include "point.h"
+#include "surface.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -16,7 +16,8 @@ int main(int argc, char *argv[])
     }
 
     // Create a window and renderer
-    if (!(SDL_CreateWindowAndRenderer("Raster Engine", WINDOW_WIDTH, WINDOW_HEIGHT, 0, &window, &renderer)))
+    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE);
+    if (!(SDL_CreateWindowAndRenderer("Raster Engine", WINDOW_WIDTH, WINDOW_HEIGHT, window_flags, &window, &renderer)))
     {
         SDL_Log("Could not create window and renderer: %s", SDL_GetError());
         SDL_Quit();
@@ -24,6 +25,8 @@ int main(int argc, char *argv[])
     }
 
     bool quit = false;
+    float width_scale{1.0};
+    float height_scale{1.0};
     SDL_Event event;
 
     // Main game loop
@@ -35,6 +38,11 @@ int main(int argc, char *argv[])
             {
                 quit = true;
             }
+            else if (event.type == SDL_EVENT_WINDOW_RESIZED)
+            {
+                width_scale = static_cast<float>(event.window.data1) / WINDOW_WIDTH;
+                height_scale = static_cast<float>(event.window.data2) / WINDOW_HEIGHT;
+            }
         }
 
         // Black background
@@ -43,13 +51,11 @@ int main(int argc, char *argv[])
         SDL_RenderClear(renderer);
 
         // White dots
-        Point p1{500.0, 300.0, 0.0};
-        Point p2{500.0, 800.0, 0.0};
-        Point p3{1000.0, 800.0, 0.0};
-        SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a);
-        SDL_RenderPoint(renderer, p1.x, p1.y);
-        SDL_RenderPoint(renderer, p2.x, p2.y);
-        SDL_RenderPoint(renderer, p3.x, p3.y);
+        Surface s1{Point{int(500 * width_scale), int(300 * height_scale), 0},
+                   Point{int(500 * width_scale), int(800 * height_scale), 0},
+                   Point{int(1000 * width_scale), int(800 * height_scale), 0}};
+        s1.draw_vertices(*renderer, WHITE);
+        s1.draw_edges(*renderer, RED);
 
         // Update the screen
         SDL_RenderPresent(renderer);
