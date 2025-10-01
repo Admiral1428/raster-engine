@@ -3,9 +3,9 @@
 
 struct Point
 {
-    int x; // + right
-    int y; // + down
-    int z; // + towards the screen
+    float x; // + right
+    float y; // + up
+    float z; // + towards the screen
 };
 
 #endif

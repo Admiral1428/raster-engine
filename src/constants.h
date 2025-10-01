@@ -10,11 +10,16 @@ struct Color
 };
 
 // Window dimensions
-const int WINDOW_WIDTH = 1920;
+const int WINDOW_WIDTH = 1080;
 const int WINDOW_HEIGHT = 1080;
 // Opaque colors
 const Color BLACK = {0, 0, 0, 255};
 const Color WHITE = {255, 255, 255, 255};
 const Color RED = {255, 0, 0, 255};
+const Color BLUE = {0, 0, 255, 255};
+const Color GREEN = {0, 255, 0, 255};
+const Color YELLOW = {255, 255, 0, 255};
+const Color MAGENTA = {255, 0, 255, 255};
+const Color CYAN = {0, 255, 255, 255};
 
 #endif
