@@ -10,8 +10,13 @@ struct Color
 };
 
 // Window dimensions
-const int WINDOW_WIDTH = 1080;
-const int WINDOW_HEIGHT = 1080;
+
+// Default renderer options
+const int WIDTH = 1080;
+const int HEIGHT = 1080;
+const float PLANE_N = 0.1f;   // near clipping plane
+const float PLANE_F = 100.0f; // far clipping plane
+const float FOV = 90.0f;      // field of view in degrees
 // Opaque colors
 const Color BLACK = {0, 0, 0, 255};
 const Color WHITE = {255, 255, 255, 255};

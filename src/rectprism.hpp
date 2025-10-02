@@ -34,7 +34,8 @@ public:
 
 // implementation
 RectPrism::RectPrism() : center_x(0), center_y(0), center_z(0), width(1), height(1), depth(1) {}
-RectPrism::RectPrism(const float &_x, const float &_y, const float &_z, const float &_w, const float &_h, const float &_d) : center_x(_x), center_y(_y), center_z(_z), width(_w), height(_h), depth(_d)
+RectPrism::RectPrism(const float &_x, const float &_y, const float &_z, const float &_w, const float &_h, const float &_d)
+    : center_x(_x), center_y(_y), center_z(_z), width(_w), height(_h), depth(_d)
 {
     make_shape();
 }
@@ -66,42 +67,42 @@ RectPrism &RectPrism::operator=(const RectPrism &r)
 
 void RectPrism::make_shape()
 {
-    Surface front_left(Point{center_x - width / 2, center_y - height / 2, center_z + depth / 2},
-                       Point{center_x - width / 2, center_y + height / 2, center_z + depth / 2},
-                       Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2}, RED);
-    Surface front_right(Point{center_x - width / 2, center_y + height / 2, center_z + depth / 2},
-                        Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2},
-                        Point{center_x + width / 2, center_y + height / 2, center_z + depth / 2}, RED);
-    Surface rear_left(Point{center_x - width / 2, center_y - height / 2, center_z - depth / 2},
-                      Point{center_x - width / 2, center_y + height / 2, center_z - depth / 2},
-                      Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2}, MAGENTA);
-    Surface rear_right(Point{center_x - width / 2, center_y - height / 2, center_z - depth / 2},
-                       Point{center_x + width / 2, center_y - height / 2, center_z - depth / 2},
-                       Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2}, MAGENTA);
-    Surface left_near(Point{center_x - width / 2, center_y - height / 2, center_z + depth / 2},
-                      Point{center_x - width / 2, center_y + height / 2, center_z + depth / 2},
-                      Point{center_x - width / 2, center_y - height / 2, center_z - depth / 2}, BLUE);
-    Surface left_far(Point{center_x - width / 2, center_y - height / 2, center_z - depth / 2},
-                     Point{center_x - width / 2, center_y + height / 2, center_z - depth / 2},
-                     Point{center_x - width / 2, center_y + height / 2, center_z + depth / 2}, BLUE);
-    Surface right_near(Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2},
-                       Point{center_x + width / 2, center_y + height / 2, center_z + depth / 2},
-                       Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2}, CYAN);
-    Surface right_far(Point{center_x + width / 2, center_y - height / 2, center_z - depth / 2},
-                      Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2},
-                      Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2}, CYAN);
-    Surface bottom_near(Point{center_x - width / 2, center_y - height / 2, center_z + depth / 2},
-                        Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2},
-                        Point{center_x + width / 2, center_y - height / 2, center_z - depth / 2}, YELLOW);
-    Surface bottom_far(Point{center_x - width / 2, center_y - height / 2, center_z + depth / 2},
-                       Point{center_x - width / 2, center_y - height / 2, center_z - depth / 2},
-                       Point{center_x + width / 2, center_y - height / 2, center_z - depth / 2}, YELLOW);
-    Surface top_near(Point{center_x - width / 2, center_y + height / 2, center_z + depth / 2},
-                     Point{center_x - width / 2, center_y + height / 2, center_z - depth / 2},
-                     Point{center_x + width / 2, center_y + height / 2, center_z + depth / 2}, GREEN);
-    Surface top_far(Point{center_x - width / 2, center_y + height / 2, center_z - depth / 2},
-                    Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2},
-                    Point{center_x + width / 2, center_y + height / 2, center_z + depth / 2}, GREEN);
+    Surface front_left(Point{center_x - width / 2, center_y - height / 2, center_z + depth / 2, 1.0f},
+                       Point{center_x - width / 2, center_y + height / 2, center_z + depth / 2, 1.0f},
+                       Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2, 1.0f}, RED);
+    Surface front_right(Point{center_x - width / 2, center_y + height / 2, center_z + depth / 2, 1.0f},
+                        Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2, 1.0f},
+                        Point{center_x + width / 2, center_y + height / 2, center_z + depth / 2, 1.0f}, RED);
+    Surface rear_left(Point{center_x - width / 2, center_y - height / 2, center_z - depth / 2, 1.0f},
+                      Point{center_x - width / 2, center_y + height / 2, center_z - depth / 2, 1.0f},
+                      Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2, 1.0f}, MAGENTA);
+    Surface rear_right(Point{center_x - width / 2, center_y - height / 2, center_z - depth / 2, 1.0f},
+                       Point{center_x + width / 2, center_y - height / 2, center_z - depth / 2, 1.0f},
+                       Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2, 1.0f}, MAGENTA);
+    Surface left_near(Point{center_x - width / 2, center_y - height / 2, center_z + depth / 2, 1.0f},
+                      Point{center_x - width / 2, center_y + height / 2, center_z + depth / 2, 1.0f},
+                      Point{center_x - width / 2, center_y - height / 2, center_z - depth / 2, 1.0f}, BLUE);
+    Surface left_far(Point{center_x - width / 2, center_y - height / 2, center_z - depth / 2, 1.0f},
+                     Point{center_x - width / 2, center_y + height / 2, center_z - depth / 2, 1.0f},
+                     Point{center_x - width / 2, center_y + height / 2, center_z + depth / 2, 1.0f}, BLUE);
+    Surface right_near(Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2, 1.0f},
+                       Point{center_x + width / 2, center_y + height / 2, center_z + depth / 2, 1.0f},
+                       Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2, 1.0f}, CYAN);
+    Surface right_far(Point{center_x + width / 2, center_y - height / 2, center_z - depth / 2, 1.0f},
+                      Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2, 1.0f},
+                      Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2, 1.0f}, CYAN);
+    Surface bottom_near(Point{center_x - width / 2, center_y - height / 2, center_z + depth / 2, 1.0f},
+                        Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2, 1.0f},
+                        Point{center_x + width / 2, center_y - height / 2, center_z - depth / 2, 1.0f}, YELLOW);
+    Surface bottom_far(Point{center_x - width / 2, center_y - height / 2, center_z + depth / 2, 1.0f},
+                       Point{center_x - width / 2, center_y - height / 2, center_z - depth / 2, 1.0f},
+                       Point{center_x + width / 2, center_y - height / 2, center_z - depth / 2, 1.0f}, YELLOW);
+    Surface top_near(Point{center_x - width / 2, center_y + height / 2, center_z + depth / 2, 1.0f},
+                     Point{center_x - width / 2, center_y + height / 2, center_z - depth / 2, 1.0f},
+                     Point{center_x + width / 2, center_y + height / 2, center_z + depth / 2, 1.0f}, GREEN);
+    Surface top_far(Point{center_x - width / 2, center_y + height / 2, center_z - depth / 2, 1.0f},
+                    Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2, 1.0f},
+                    Point{center_x + width / 2, center_y + height / 2, center_z + depth / 2, 1.0f}, GREEN);
 
     surfaces.push_back(front_left);
     surfaces.push_back(front_right);

@@ -2,7 +2,7 @@
 #include <iostream>
 #include "constants.h"
 #include "surface.hpp"
-#include "camera.hpp"
+#include "renderer.hpp"
 #include "rectprism.hpp"
 
 using std::cout;
@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 
     // Create a window and renderer
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE);
-    if (!(SDL_CreateWindowAndRenderer("Raster Engine", WINDOW_WIDTH, WINDOW_HEIGHT, window_flags, &window, &renderer)))
+    if (!(SDL_CreateWindowAndRenderer("Raster Engine", WIDTH, HEIGHT, window_flags, &window, &renderer)))
     {
         SDL_Log("Could not create window and renderer: %s", SDL_GetError());
         SDL_Quit();
@@ -30,13 +30,11 @@ int main(int argc, char *argv[])
     }
 
     bool quit = false;
+    bool need_redraw = true;
 
     RectPrism rect(1.5f, 1.5f, -5.0f, 2.0f, 2.0f, 2.0f);
-    // RectPrism rect(0.0f, 0.0f, -0.6f, 1.0f, 1.0f, 1.0f);
 
-    Camera cam(0.1f, 100.0f, 90.0f);
-    float width = WINDOW_WIDTH;
-    float height = WINDOW_HEIGHT;
+    Renderer engine(0.1f, 100.0f, 90.0f, WIDTH, HEIGHT);
     SDL_Event event;
 
     // Main game loop
@@ -50,8 +48,8 @@ int main(int argc, char *argv[])
             }
             else if (event.type == SDL_EVENT_WINDOW_RESIZED)
             {
-                width = static_cast<float>(event.window.data1);
-                height = static_cast<float>(event.window.data2);
+                engine.set_width_height(event.window.data1, event.window.data2);
+                need_redraw = true;
             }
             else if (event.type == SDL_EVENT_KEY_DOWN)
             {
@@ -59,46 +57,57 @@ int main(int argc, char *argv[])
                 if (event.key.key == SDLK_A)
                 {
                     rect.translate(-1 * translate_amount, 0.0f, 0.0f);
+                    need_redraw = true;
                 }
                 else if (event.key.key == SDLK_D)
                 {
                     rect.translate(translate_amount, 0.0f, 0.0f);
+                    need_redraw = true;
                 }
                 else if (event.key.key == SDLK_W)
                 {
                     rect.translate(0.0f, 0.0f, translate_amount);
+                    need_redraw = true;
                 }
                 else if (event.key.key == SDLK_S)
                 {
                     rect.translate(0.0f, 0.0f, -1 * translate_amount);
+                    need_redraw = true;
                 }
                 else if (event.key.key == SDLK_Q)
                 {
                     rect.translate(0.0f, translate_amount, 0.0f);
+                    need_redraw = true;
                 }
                 else if (event.key.key == SDLK_E)
                 {
                     rect.translate(0.0f, -1 * translate_amount, 0.0f);
+                    need_redraw = true;
                 }
             }
         }
 
-        // Black background
-        SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a);
-        // Clear screen
-        SDL_RenderClear(renderer);
+        // rect.translate(0.0f, 0.0f, 0.05f);
+        // need_redraw = true;
 
-        // Draw surface vertices and lines
-        array<array<float, 4>, 4> proj_matrix = cam.get_projection_matrix();
-        for (auto &surface : rect.get_surfaces())
+        if (need_redraw)
         {
-            surface.transform_to_camera(proj_matrix, width, height);
-            surface.draw_vertices(*renderer, width, height);
-            surface.draw_edges(*renderer, width, height);
-        }
+            // Black background
+            SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a);
+            // Clear screen
+            SDL_RenderClear(renderer);
 
-        // Update the screen
-        SDL_RenderPresent(renderer);
+            // vector<Surface> surfaces = {triangle_near, triangle_far};
+            // Draw surfaces
+            engine.draw_surfaces(*renderer, rect.get_surfaces());
+            // engine.draw_surfaces(*renderer, surfaces);
+
+            // Update the screen
+            SDL_RenderPresent(renderer);
+
+            // Reset flag
+            need_redraw = false;
+        }
     }
 
     // Clean up
