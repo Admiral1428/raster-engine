@@ -9,7 +9,7 @@
 
 using std::vector;
 
-// class defining a triangular RectPrism
+// class defining a rectangular prism
 class RectPrism
 {
 private:
@@ -19,11 +19,14 @@ private:
     float width;
     float height;
     float depth;
+    vector<Color> colors; // front, rear, left, right, top, bottom
     vector<Surface> surfaces;
+    bool diminish_light;
 
 public:
     RectPrism(); // default constructor (initializes object to default state with no arguments)
-    RectPrism(const float &_x, const float &_y, const float &_z, const float &_w, const float &_h, const float &_d);
+    RectPrism(const float &_x, const float &_y, const float &_z, const float &_w, const float &_h, const float &_d,
+              const vector<Color> &_colors, const bool &_dim_light = false);
     RectPrism(const RectPrism &);            // copy constructor
     ~RectPrism();                            // destructor
     RectPrism &operator=(const RectPrism &); // copy/assignment operator
@@ -33,9 +36,11 @@ public:
 };
 
 // implementation
-RectPrism::RectPrism() : center_x(0), center_y(0), center_z(0), width(1), height(1), depth(1) {}
-RectPrism::RectPrism(const float &_x, const float &_y, const float &_z, const float &_w, const float &_h, const float &_d)
-    : center_x(_x), center_y(_y), center_z(_z), width(_w), height(_h), depth(_d)
+RectPrism::RectPrism() : center_x(0), center_y(0), center_z(0), width(1), height(1), depth(1),
+                         colors({RED, MAGENTA, BLUE, CYAN, GREEN, YELLOW}), diminish_light(false) {}
+RectPrism::RectPrism(const float &_x, const float &_y, const float &_z, const float &_w, const float &_h, const float &_d,
+                     const vector<Color> &_colors, const bool &_dim_light)
+    : center_x(_x), center_y(_y), center_z(_z), width(_w), height(_h), depth(_d), colors(_colors), diminish_light(_dim_light)
 {
     make_shape();
 }
@@ -47,6 +52,9 @@ RectPrism::RectPrism(const RectPrism &r)
     width = r.width;
     height = r.height;
     depth = r.depth;
+    colors = r.colors;
+    diminish_light = r.diminish_light;
+    make_shape();
 }
 
 RectPrism::~RectPrism() {}
@@ -61,48 +69,59 @@ RectPrism &RectPrism::operator=(const RectPrism &r)
         width = r.width;
         height = r.height;
         depth = r.depth;
+        colors = r.colors;
+        diminish_light = r.diminish_light;
+        make_shape();
     }
     return *this;
 }
 
 void RectPrism::make_shape()
 {
+    float translate_clip = TOL_SHIFT_SURFACE;
+
+    // shift rear surfaces into page to avoid z-fighting
+    // shift left surfaces left in x to avoid z-fighting
+    // shift right surfaces right in x to avoid z-fighting
+    // shift top surface up in y to avoid z-fighting
+    // shift bottom surfaces down in y to avoid z-fighthing
+
     Surface front_left(Point{center_x - width / 2, center_y - height / 2, center_z + depth / 2, 1.0f},
                        Point{center_x - width / 2, center_y + height / 2, center_z + depth / 2, 1.0f},
-                       Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2, 1.0f}, RED);
+                       Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2, 1.0f}, colors[0], diminish_light);
     Surface front_right(Point{center_x - width / 2, center_y + height / 2, center_z + depth / 2, 1.0f},
                         Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2, 1.0f},
-                        Point{center_x + width / 2, center_y + height / 2, center_z + depth / 2, 1.0f}, RED);
-    Surface rear_left(Point{center_x - width / 2, center_y - height / 2, center_z - depth / 2, 1.0f},
-                      Point{center_x - width / 2, center_y + height / 2, center_z - depth / 2, 1.0f},
-                      Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2, 1.0f}, MAGENTA);
+                        Point{center_x + width / 2, center_y + height / 2, center_z + depth / 2, 1.0f}, colors[0], diminish_light);
+    Surface rear_left(Point{center_x - width / 2, center_y - height / 2, center_z - (translate_clip + depth / 2), 1.0f},
+                      Point{center_x - width / 2, center_y + height / 2, center_z - (translate_clip + depth / 2), 1.0f},
+                      Point{center_x + width / 2, center_y + height / 2, center_z - (translate_clip + depth / 2), 1.0f}, colors[1], diminish_light);
     Surface rear_right(Point{center_x - width / 2, center_y - height / 2, center_z - depth / 2, 1.0f},
                        Point{center_x + width / 2, center_y - height / 2, center_z - depth / 2, 1.0f},
-                       Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2, 1.0f}, MAGENTA);
-    Surface left_near(Point{center_x - width / 2, center_y - height / 2, center_z + depth / 2, 1.0f},
-                      Point{center_x - width / 2, center_y + height / 2, center_z + depth / 2, 1.0f},
-                      Point{center_x - width / 2, center_y - height / 2, center_z - depth / 2, 1.0f}, BLUE);
-    Surface left_far(Point{center_x - width / 2, center_y - height / 2, center_z - depth / 2, 1.0f},
-                     Point{center_x - width / 2, center_y + height / 2, center_z - depth / 2, 1.0f},
-                     Point{center_x - width / 2, center_y + height / 2, center_z + depth / 2, 1.0f}, BLUE);
-    Surface right_near(Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2, 1.0f},
-                       Point{center_x + width / 2, center_y + height / 2, center_z + depth / 2, 1.0f},
-                       Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2, 1.0f}, CYAN);
-    Surface right_far(Point{center_x + width / 2, center_y - height / 2, center_z - depth / 2, 1.0f},
-                      Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2, 1.0f},
-                      Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2, 1.0f}, CYAN);
-    Surface bottom_near(Point{center_x - width / 2, center_y - height / 2, center_z + depth / 2, 1.0f},
-                        Point{center_x + width / 2, center_y - height / 2, center_z + depth / 2, 1.0f},
-                        Point{center_x + width / 2, center_y - height / 2, center_z - depth / 2, 1.0f}, YELLOW);
-    Surface bottom_far(Point{center_x - width / 2, center_y - height / 2, center_z + depth / 2, 1.0f},
-                       Point{center_x - width / 2, center_y - height / 2, center_z - depth / 2, 1.0f},
-                       Point{center_x + width / 2, center_y - height / 2, center_z - depth / 2, 1.0f}, YELLOW);
-    Surface top_near(Point{center_x - width / 2, center_y + height / 2, center_z + depth / 2, 1.0f},
-                     Point{center_x - width / 2, center_y + height / 2, center_z - depth / 2, 1.0f},
-                     Point{center_x + width / 2, center_y + height / 2, center_z + depth / 2, 1.0f}, GREEN);
-    Surface top_far(Point{center_x - width / 2, center_y + height / 2, center_z - depth / 2, 1.0f},
-                    Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2, 1.0f},
-                    Point{center_x + width / 2, center_y + height / 2, center_z + depth / 2, 1.0f}, GREEN);
+                       Point{center_x + width / 2, center_y + height / 2, center_z - depth / 2, 1.0f}, colors[1], diminish_light);
+    Surface left_near(Point{center_x - (translate_clip + width / 2), center_y - height / 2, center_z + depth / 2, 1.0f},
+                      Point{center_x - (translate_clip + width / 2), center_y + height / 2, center_z + depth / 2, 1.0f},
+                      Point{center_x - (translate_clip + width / 2), center_y - height / 2, center_z - depth / 2, 1.0f}, colors[2], diminish_light);
+    Surface left_far(Point{center_x - (translate_clip + width / 2), center_y - height / 2, center_z - depth / 2, 1.0f},
+                     Point{center_x - (translate_clip + width / 2), center_y + height / 2, center_z - depth / 2, 1.0f},
+                     Point{center_x - (translate_clip + width / 2), center_y + height / 2, center_z + depth / 2, 1.0f}, colors[2], diminish_light);
+    Surface right_near(Point{center_x + (translate_clip + width / 2), center_y - height / 2, center_z + depth / 2, 1.0f},
+                       Point{center_x + (translate_clip + width / 2), center_y + height / 2, center_z + depth / 2, 1.0f},
+                       Point{center_x + (translate_clip + width / 2), center_y + height / 2, center_z - depth / 2, 1.0f}, colors[3], diminish_light);
+    Surface right_far(Point{center_x + (translate_clip + width / 2), center_y - height / 2, center_z - depth / 2, 1.0f},
+                      Point{center_x + (translate_clip + width / 2), center_y + height / 2, center_z - depth / 2, 1.0f},
+                      Point{center_x + (translate_clip + width / 2), center_y - height / 2, center_z + depth / 2, 1.0f}, colors[3], diminish_light);
+    Surface top_near(Point{center_x - width / 2, center_y + (translate_clip + height / 2), center_z + depth / 2, 1.0f},
+                     Point{center_x - width / 2, center_y + (translate_clip + height / 2), center_z - depth / 2, 1.0f},
+                     Point{center_x + width / 2, center_y + (translate_clip + height / 2), center_z + depth / 2, 1.0f}, colors[4], diminish_light);
+    Surface top_far(Point{center_x - width / 2, center_y + (translate_clip + height / 2), center_z - depth / 2, 1.0f},
+                    Point{center_x + width / 2, center_y + (translate_clip + height / 2), center_z - depth / 2, 1.0f},
+                    Point{center_x + width / 2, center_y + (translate_clip + height / 2), center_z + depth / 2, 1.0f}, colors[4], diminish_light);
+    Surface bottom_near(Point{center_x - width / 2, center_y - (translate_clip + height / 2), center_z + depth / 2, 1.0f},
+                        Point{center_x + width / 2, center_y - (translate_clip + height / 2), center_z + depth / 2, 1.0f},
+                        Point{center_x + width / 2, center_y - (translate_clip + height / 2), center_z - depth / 2, 1.0f}, colors[5], diminish_light);
+    Surface bottom_far(Point{center_x - width / 2, center_y - (translate_clip + height / 2), center_z + depth / 2, 1.0f},
+                       Point{center_x - width / 2, center_y - (translate_clip + height / 2), center_z - depth / 2, 1.0f},
+                       Point{center_x + width / 2, center_y - (translate_clip + height / 2), center_z - depth / 2, 1.0f}, colors[5], diminish_light);
 
     surfaces.push_back(front_left);
     surfaces.push_back(front_right);

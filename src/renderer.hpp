@@ -55,9 +55,11 @@ public:
     void normalize_point(Point &c);
     void rasterize_point(Point &c);
     vector<int> get_bounding_box(const Point &r0, const Point &r1, const Point &r2);
+    float get_area(const Point &r0, const Point &r1, const Point &r2);
     Point get_barycentric_coords(const Point &r0, const Point &r1, const Point &r2, const Point &p);
-    bool point_in_triangle(const Point &barycentric_coords);
-    float get_ndc_depth(const Point &barycentric_coords, const Point &c0, const Point &c1, const Point &c2);
+    bool point_in_triangle(const Point &barycentric_coords, const float &tol);
+    double get_ndc_depth(const Point &barycentric_coords, const Point &c0, const Point &c1, const Point &c2);
+    Color diminish_light(float &z_buffer_val, Color &surf_color);
     void set_width_height(const float &w, const float &h);
 };
 
@@ -138,10 +140,13 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
     Point r1;
     Point r2;
     vector<int> bounding_box;
+    float triangle_area;
     Color surf_color;
+    bool surf_diminish_light;
+    Color pixel_color;
     Point p;
     Point barycentric_coords;
-    float z_ndc;
+    double z_ndc;
 
     // perform drawing for each surface
     for (auto &surface : surfaces)
@@ -179,7 +184,9 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
 
             // set color
             surf_color = surface.get_color();
-            SDL_SetRenderDrawColor(&renderer, surf_color.r, surf_color.g, surf_color.b, surf_color.a);
+
+            // get surface light property
+            surf_diminish_light = surface.get_diminish_light();
 
             // loop through bounding box to determine triangle points
             for (int x{bounding_box[0]}; x <= bounding_box[1]; ++x)
@@ -191,12 +198,19 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
                     // get and process barycentric coordinates
                     barycentric_coords = get_barycentric_coords(r0, r1, r2, p);
 
-                    if (point_in_triangle(barycentric_coords))
+                    if (point_in_triangle(barycentric_coords, TOL_IN_TRIANGLE))
                     {
                         z_ndc = get_ndc_depth(barycentric_coords, homog_points[i], homog_points[i + 1], homog_points[i + 2]);
                         if (z_ndc < z_buffer[x][y])
                         {
                             z_buffer[x][y] = z_ndc;
+                            if (surf_diminish_light)
+                                pixel_color = diminish_light(z_buffer[x][y], surf_color);
+                            else
+                                pixel_color = surf_color;
+
+                            SDL_SetRenderDrawColor(&renderer, pixel_color.r,
+                                                   pixel_color.g, pixel_color.b, pixel_color.a);
                             SDL_RenderPoint(&renderer, x, y);
                         }
                     }
@@ -274,6 +288,12 @@ vector<int> Renderer::get_bounding_box(const Point &r0, const Point &r1, const P
     return {min_x, max_x, min_y, max_y};
 }
 
+float Renderer::get_area(const Point &r0, const Point &r1, const Point &r2)
+{
+    float area = 0.5 * abs(r0.x * (r1.y - r2.y) + r1.x * (r2.y - r0.y) * r2.x * (r0.y - r1.y));
+    return area;
+}
+
 Point Renderer::get_barycentric_coords(const Point &r0, const Point &r1, const Point &r2, const Point &p)
 {
     Point v0 = {r1.x - r0.x, r1.y - r0.y};
@@ -296,23 +316,37 @@ Point Renderer::get_barycentric_coords(const Point &r0, const Point &r1, const P
     return result;
 }
 
-bool Renderer::point_in_triangle(const Point &barycentric_coords)
+bool Renderer::point_in_triangle(const Point &barycentric_coords, const float &tol)
 {
-    float tol = 1e-6f;
-
     /* If all coordinates non-negative, coordinate inside or on edge of triangle...
     Not checking if all add to 1 since this should already be true */
     return (barycentric_coords.x >= -tol && barycentric_coords.y >= -tol && barycentric_coords.z >= -tol);
 }
 
-float Renderer::get_ndc_depth(const Point &barycentric_coords, const Point &c0, const Point &c1, const Point &c2)
+double Renderer::get_ndc_depth(const Point &barycentric_coords, const Point &c0, const Point &c1, const Point &c2)
 {
     if (c0.w != 0.0f && c1.w != 0.0f && c2.w != 0.0f)
     {
-        float interp_z_over_w = barycentric_coords.x * (c0.z / c0.w) + barycentric_coords.y * (c1.z / c1.w) + barycentric_coords.z * (c2.z / c2.w);
+        double interp_z_over_w = barycentric_coords.x * (c0.z / c0.w) + barycentric_coords.y * (c1.z / c1.w) + barycentric_coords.z * (c2.z / c2.w);
         return interp_z_over_w;
     }
-    return 1.0f; // edge case for divide by zero
+    return 1.0; // edge case for divide by zero
+}
+
+Color Renderer::diminish_light(float &z_buffer_val, Color &surf_color)
+{
+    Color final_color = surf_color;
+    float factor{1.0f};
+    if (z_buffer_val > Z_DARK)
+        factor = DARK_FACTOR;
+    else if (z_buffer_val >= Z_BRIGHT)
+        factor = (1.0f - DARK_FACTOR) * (z_buffer_val - Z_DARK) / (Z_BRIGHT - Z_DARK) + DARK_FACTOR;
+
+    final_color.r *= factor;
+    final_color.g *= factor;
+    final_color.b *= factor;
+
+    return final_color;
 }
 
 // Change width and height vars based on screen resize, and resize z_buffer
