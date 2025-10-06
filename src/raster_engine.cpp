@@ -4,6 +4,8 @@
 #include "surface.hpp"
 #include "renderer.hpp"
 #include "rectprism.hpp"
+#include "input.hpp"
+#include "map.hpp"
 
 using std::cout;
 
@@ -32,9 +34,11 @@ int main(int argc, char *argv[])
     bool quit = false;
     bool need_redraw = true;
 
-    RectPrism rect(1.5f, 1.5f, -5.0f, 2.0f, 2.0f, 2.0f);
+    // Initialize map and surfaces vector
+    Map map;
+    vector<Surface> all_surfaces;
 
-    Renderer engine(0.1f, 100.0f, 90.0f, WIDTH, HEIGHT);
+    Renderer engine(0.3f, 100.0f, 90.0f, WIDTH, HEIGHT);
     SDL_Event event;
 
     // Main game loop
@@ -53,54 +57,22 @@ int main(int argc, char *argv[])
             }
             else if (event.type == SDL_EVENT_KEY_DOWN)
             {
-                float translate_amount = 0.05f;
-                if (event.key.key == SDLK_A)
-                {
-                    rect.translate(-1 * translate_amount, 0.0f, 0.0f);
-                    need_redraw = true;
-                }
-                else if (event.key.key == SDLK_D)
-                {
-                    rect.translate(translate_amount, 0.0f, 0.0f);
-                    need_redraw = true;
-                }
-                else if (event.key.key == SDLK_W)
-                {
-                    rect.translate(0.0f, 0.0f, translate_amount);
-                    need_redraw = true;
-                }
-                else if (event.key.key == SDLK_S)
-                {
-                    rect.translate(0.0f, 0.0f, -1 * translate_amount);
-                    need_redraw = true;
-                }
-                else if (event.key.key == SDLK_Q)
-                {
-                    rect.translate(0.0f, translate_amount, 0.0f);
-                    need_redraw = true;
-                }
-                else if (event.key.key == SDLK_E)
-                {
-                    rect.translate(0.0f, -1 * translate_amount, 0.0f);
-                    need_redraw = true;
-                }
+                process_input(event, map.get_rect_prism(0), need_redraw);
             }
         }
 
-        // rect.translate(0.0f, 0.0f, 0.05f);
-        // need_redraw = true;
-
         if (need_redraw)
         {
-            // Black background
-            SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a);
+            // Draw background
+            SDL_SetRenderDrawColor(renderer, BACK_COLOR.r, BACK_COLOR.g, BACK_COLOR.b, BACK_COLOR.a);
             // Clear screen
             SDL_RenderClear(renderer);
 
-            // vector<Surface> surfaces = {triangle_near, triangle_far};
+            // Get map surfaces
+            all_surfaces = map.get_map_surfaces();
+
             // Draw surfaces
-            engine.draw_surfaces(*renderer, rect.get_surfaces());
-            // engine.draw_surfaces(*renderer, surfaces);
+            engine.draw_surfaces(*renderer, all_surfaces);
 
             // Update the screen
             SDL_RenderPresent(renderer);
