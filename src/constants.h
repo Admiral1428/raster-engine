@@ -1,5 +1,5 @@
-#ifndef SURFACE_H
-#define SURFACE_H
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
 
 struct Color
 {
