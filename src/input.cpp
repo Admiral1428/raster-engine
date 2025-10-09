@@ -5,8 +5,7 @@ void mouse_check(Uint64 &last_mouse_time, const float &perf_freq, vector<float> 
     Uint64 cur_mouse_time = SDL_GetPerformanceCounter();
     float mouse_dt = static_cast<float>(cur_mouse_time - last_mouse_time) / perf_freq;
 
-    // reset then get mouse deltas
-    mouse_delta = {0.0f, 0.0f};
+    // get mouse deltas
     if (mouse_dt >= (1.0f / MOUSE_HZ))
     {
         SDL_GetRelativeMouseState(&mouse_delta[0], &mouse_delta[1]);

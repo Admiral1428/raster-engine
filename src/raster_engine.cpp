@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
     SDL_Event event;
 
     // Mouse input variables
+    bool window_focused;
     vector<float> mouse_delta;
     Uint64 last_mouse_time = SDL_GetPerformanceCounter();
 
@@ -77,6 +78,16 @@ int main(int argc, char *argv[])
                 engine.set_width_height(event.window.data1, event.window.data2);
                 need_redraw = true;
             }
+            if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED)
+            {
+                window_focused = true;
+                SDL_SetWindowRelativeMouseMode(window, true);
+            }
+            else if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST)
+            {
+                window_focused = false;
+                SDL_SetWindowRelativeMouseMode(window, false);
+            }
             if (event.type == SDL_EVENT_KEY_DOWN)
             {
                 if (event.key.scancode < SDL_SCANCODE_COUNT)
@@ -93,7 +104,13 @@ int main(int argc, char *argv[])
             }
         }
 
-        mouse_check(last_mouse_time, perf_freq, mouse_delta);
+        // reset mouse delta
+        mouse_delta = {0.0f, 0.0f};
+        // only check mouse input if window active (i.e., not alt-tabbed)
+        if (window_focused)
+        {
+            mouse_check(last_mouse_time, perf_freq, mouse_delta);
+        }
         process_input(key_states, mouse_delta, frame_dt, engine, need_redraw);
 
         if (need_redraw)
