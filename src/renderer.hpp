@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <initializer_list>
 #include <SDL3/SDL.h>
+#include <Eigen/Dense>
 #include "constants.h"
 #include "point.hpp"
 #include "surface.hpp"
@@ -18,14 +19,13 @@
 using std::abs;
 using std::array;
 using std::fill;
+using std::fmod;
 using std::max;
 using std::min;
 using std::size_t;
 using std::tan;
 using std::vector;
 using std::numbers::pi;
-
-using Float2DVector = std::vector<std::vector<float>>;
 
 // class defining Renderer perspective
 class Renderer
@@ -36,9 +36,12 @@ private:
     float fov;  // field of view in degrees
     int width;  // screen width
     int height; // screen height
-    Float2DVector z_buffer;
-    array<array<float, 4>, 4> projection_matrix;
-
+    Eigen::MatrixXf z_buffer;
+    Eigen::Matrix4f projection_matrix;
+    Eigen::Matrix4f view_matrix;
+    float pitch;         // view pitch angle (-90 to 90 degrees)
+    float yaw;           // view yaw angle (0 to 360 degrees)
+    Eigen::Vector3f eye; // view location in x, y, z
 public:
     Renderer(); // default constructor (initializes object to default state with no arguments)
     Renderer(const float &_n, const float &_f, const float &_fov, const float &_width, const float &_height);
@@ -47,8 +50,12 @@ public:
     Renderer &operator=(const Renderer &); // copy/assignment operator
     void resize_z_buffer();
     void calc_projection_matrix();
+    vector<Eigen::Matrix4f> calc_rot_matrices();
+    void calc_view_matrix();
+    vector<Eigen::Vector3f> get_view_directions();
     void draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces);
     void set_width_height(const float &w, const float &h);
+    void move_view(const Eigen::Vector3f &dloc, const float &dpitch, const float &dyaw);
 };
 
 #endif

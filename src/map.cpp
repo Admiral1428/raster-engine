@@ -14,15 +14,15 @@ Map::Map()
     shapes_rect.push_back(Rect(0.0f, -2.0f, -10.0f, 10.0f, 0.0f, 10.0f, {GREEN}, true));
 
     // cloud
-    shapes_triangle.push_back(Surface(Point{0.5f, 10.5f, -15.0f, 1.0f}, Point{4.0f, 11.0f, -15.0f, 1.0f}, Point{2.5f, 9.0f, -15.0f, 1.0f}, WHITE));
-    shapes_triangle.push_back(Surface(Point{0.0f, 10.0f, -15.0f, 1.0f}, Point{2.0f, 12.5f, -15.0f, 1.0f}, Point{3.0f, 10.5f, -15.0f, 1.0f}, WHITE));
-    shapes_triangle.push_back(Surface(Point{1.2f, 10.5f, -15.0f, 1.0f}, Point{3.5f, 12.0f, -15.0f, 1.0f}, Point{4.5f, 10.0f, -15.0f, 1.0f}, WHITE));
+    shapes_triangle.push_back(Surface(Eigen::Vector4f(0.5f, 10.5f, -15.0f, 1.0f), Eigen::Vector4f(4.0f, 11.0f, -15.0f, 1.0f), Eigen::Vector4f(2.5f, 9.0f, -15.0f, 1.0f), WHITE));
+    shapes_triangle.push_back(Surface(Eigen::Vector4f(0.0f, 10.0f, -15.0f, 1.0f), Eigen::Vector4f(2.0f, 12.5f, -15.0f, 1.0f), Eigen::Vector4f(3.0f, 10.5f, -15.0f, 1.0f), WHITE));
+    shapes_triangle.push_back(Surface(Eigen::Vector4f(1.2f, 10.5f, -15.0f, 1.0f), Eigen::Vector4f(3.5f, 12.0f, -15.0f, 1.0f), Eigen::Vector4f(4.5f, 10.0f, -15.0f, 1.0f), WHITE));
 
     // // triangle aligned with x-y plane used for clipping checks (translating 1.0 at a time)
-    // shapes_triangle.push_back(Surface(Point{-20.0f, -10.0f, -90.0f, 1.0f}, Point{20.0f, 10.0f, -90.0f, 1.0f}, Point{40.0f, -25.0f, -90.0f, 1.0f}, RED, true));
+    // shapes_triangle.push_back(Surface(Eigen::Vector4f(-20.0f, -10.0f, -90.0f, 1.0f), Eigen::Vector4f(20.0f, 10.0f, -90.0f, 1.0f), Eigen::Vector4f(40.0f, -25.0f, -90.0f, 1.0f), RED, true));
 
     // triangle aligned with z-y plane used for clipping checks (translating 0.05 at a time)
-    // shapes_triangle.push_back(Surface(Point{-1.0f, 0.0f, -1.0f, 1.0f}, Point{-1.0f, 0.0f, -3.0f, 1.0f}, Point{-1.0f, 2.0f, -3.0f, 1.0f}, RED, true));
+    // shapes_triangle.push_back(Surface(Eigen::Vector4f(-1.0f, 0.0f, -1.0f, 1.0f), Eigen::Vector4f(-1.0f, 0.0f, -3.0f, 1.0f), Eigen::Vector4f(-1.0f, 2.0f, -3.0f, 1.0f), RED, true));
 }
 
 Map::~Map() {}

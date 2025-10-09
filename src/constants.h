@@ -40,5 +40,10 @@ const Color TAN = {210, 180, 140, 255};
 const Color SKY_BLUE = {135, 206, 235, 255};
 // Background color for screen
 const Color BACK_COLOR = SKY_BLUE;
+// Input settings
+const float MOUSE_HZ = 1000.0f;
+const float MOUSE_SENS_FACTOR = 0.1f;
+const float TRANSLATE_SPEED = 5.00f; // game world units per second
+const float ROTATE_SPEED = 60.0f;    // degrees per second
 
 #endif

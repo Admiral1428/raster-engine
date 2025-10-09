@@ -1,6 +1,6 @@
 #include "clipping.hpp"
 
-vector<Point> clip(const Point &c0, const Point &c1, const Point &c2)
+vector<Eigen::Vector4f> clip(const Eigen::Vector4f &c0, const Eigen::Vector4f &c1, const Eigen::Vector4f &c2)
 {
     vector<bool> c0_inside = in_clip_space(c0);
     vector<bool> c1_inside = in_clip_space(c1);
@@ -30,8 +30,8 @@ vector<Point> clip(const Point &c0, const Point &c1, const Point &c2)
     }
     // some points in clip space, so proceed to subsequent logic
 
-    vector<Point> input_points = {c0, c1, c2};
-    vector<Point> result_points = clip_algorithm(input_points);
+    vector<Eigen::Vector4f> input_points = {c0, c1, c2};
+    vector<Eigen::Vector4f> result_points = clip_algorithm(input_points);
 
     if (result_points.size() == 3)
     {
@@ -40,35 +40,35 @@ vector<Point> clip(const Point &c0, const Point &c1, const Point &c2)
     // more than 3 points (polygon)
     else if (result_points.size() > 3)
     {
-        vector<Point> multi_triangle_points = split_polygon(result_points);
+        vector<Eigen::Vector4f> multi_triangle_points = split_polygon(result_points);
         return multi_triangle_points;
     }
 
     return {}; // any other case
 }
 
-vector<bool> in_clip_space(const Point &c)
+vector<bool> in_clip_space(const Eigen::Vector4f &c)
 {
     vector<bool> in_clipping_plane;
 
-    in_clipping_plane.push_back(c.x >= -c.w); // within left boundary
-    in_clipping_plane.push_back(c.x <= c.w);  // within right boundary
-    in_clipping_plane.push_back(c.y >= -c.w); // within bottom boundary
-    in_clipping_plane.push_back(c.y <= c.w);  // within top boundary
-    in_clipping_plane.push_back(c.z >= -c.w); // within near boundary
-    in_clipping_plane.push_back(c.z <= c.w);  // within far boundary
+    in_clipping_plane.push_back(c(0) >= -c(3)); // within left boundary
+    in_clipping_plane.push_back(c(0) <= c(3));  // within right boundary
+    in_clipping_plane.push_back(c(1) >= -c(3)); // within bottom boundary
+    in_clipping_plane.push_back(c(1) <= c(3));  // within top boundary
+    in_clipping_plane.push_back(c(2) >= -c(3)); // within near boundary
+    in_clipping_plane.push_back(c(2) <= c(3));  // within far boundary
 
     return in_clipping_plane;
 }
 
-vector<Point> clip_algorithm(vector<Point> &points)
+vector<Eigen::Vector4f> clip_algorithm(vector<Eigen::Vector4f> &points)
 {
-    vector<Point> result_points_left;
-    vector<Point> result_points_right;
-    vector<Point> result_points_bottom;
-    vector<Point> result_points_top;
-    vector<Point> result_points_near;
-    vector<Point> result_points_far;
+    vector<Eigen::Vector4f> result_points_left;
+    vector<Eigen::Vector4f> result_points_right;
+    vector<Eigen::Vector4f> result_points_bottom;
+    vector<Eigen::Vector4f> result_points_top;
+    vector<Eigen::Vector4f> result_points_near;
+    vector<Eigen::Vector4f> result_points_far;
 
     // clipping against each plane, using results from previous step
     result_points_left = clip_against_plane(points, 0);
@@ -82,13 +82,13 @@ vector<Point> clip_algorithm(vector<Point> &points)
 }
 
 // perform clipping against given plane using Sutherland-Hodgman algorithm
-vector<Point> clip_against_plane(vector<Point> &points, const int &plane)
+vector<Eigen::Vector4f> clip_against_plane(vector<Eigen::Vector4f> &points, const int &plane)
 {
     vector<vector<bool>> points_inside;
-    vector<Point> result_points;
+    vector<Eigen::Vector4f> result_points;
     int first;
     int second;
-    Point pint;
+    Eigen::Vector4f pint;
 
     for (auto &p : points)
     {
@@ -137,7 +137,7 @@ vector<Point> clip_against_plane(vector<Point> &points, const int &plane)
     return result_points;
 }
 
-Point get_intersect_point(const Point &p1, const Point &p2, const int &plane)
+Eigen::Vector4f get_intersect_point(const Eigen::Vector4f &p1, const Eigen::Vector4f &p2, const int &plane)
 {
     float d1;
     float d2;
@@ -147,38 +147,38 @@ Point get_intersect_point(const Point &p1, const Point &p2, const int &plane)
     {
     case 0: // left boundary (w + x = 0)
     {
-        d1 = p1.w + p1.x;
-        d2 = p2.w + p2.x;
+        d1 = p1(3) + p1(0);
+        d2 = p2(3) + p2(0);
         break;
     }
     case 1: // right boundary (w - x = 0)
     {
-        d1 = p1.w - p1.x;
-        d2 = p2.w - p2.x;
+        d1 = p1(3) - p1(0);
+        d2 = p2(3) - p2(0);
         break;
     }
     case 2: // bottom boundary (w + y = 0)
     {
-        d1 = p1.w + p1.y;
-        d2 = p2.w + p2.y;
+        d1 = p1(3) + p1(1);
+        d2 = p2(3) + p2(1);
         break;
     }
     case 3: // top boundary (w - y = 0)
     {
-        d1 = p1.w - p1.y;
-        d2 = p2.w - p2.y;
+        d1 = p1(3) - p1(1);
+        d2 = p2(3) - p2(1);
         break;
     }
     case 4: // near boundary (w + z = 0)
     {
-        d1 = p1.w + p1.z;
-        d2 = p2.w + p2.z;
+        d1 = p1(3) + p1(2);
+        d2 = p2(3) + p2(2);
         break;
     }
     case 5: // far boundary (w - z = 0)
     {
-        d1 = p1.w - p1.z;
-        d2 = p2.w - p2.z;
+        d1 = p1(3) - p1(2);
+        d2 = p2(3) - p2(2);
         break;
     }
     }
@@ -187,23 +187,23 @@ Point get_intersect_point(const Point &p1, const Point &p2, const int &plane)
     float t = d1 / (d1 - d2);
 
     // interpolated final point
-    return Point(p1.x + t * (p2.x - p1.x),
-                 p1.y + t * (p2.y - p1.y),
-                 p1.z + t * (p2.z - p1.z),
-                 p1.w + t * (p2.w - p1.w));
+    return Eigen::Vector4f(p1(0) + t * (p2(0) - p1(0)),
+                           p1(1) + t * (p2(1) - p1(1)),
+                           p1(2) + t * (p2(2) - p1(2)),
+                           p1(3) + t * (p2(3) - p1(3)));
 }
 
 // split polygon into multiple triangles
-vector<Point> split_polygon(vector<Point> &points)
+vector<Eigen::Vector4f> split_polygon(vector<Eigen::Vector4f> &points)
 {
     /* Vertices of polygon already in correct order after
     Sutherland-Hodgman algorithm, so no need to re-order */
 
-    Point p0;
-    Point p1;
-    Point p2;
-    vector<Point> final_points;
-    vector<Point> remaining_points = points;
+    Eigen::Vector4f p0;
+    Eigen::Vector4f p1;
+    Eigen::Vector4f p2;
+    vector<Eigen::Vector4f> final_points;
+    vector<Eigen::Vector4f> remaining_points = points;
 
     while (remaining_points.size() != 3)
     {

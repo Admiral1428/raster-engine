@@ -1,8 +1,8 @@
 #include "surface.hpp"
 
 // implementation
-Surface::Surface() : p0({0.0f, 0.0f, 0.0f}), p1({0.0f, 0.0f, 0.0f}), p2({0.0f, 0.0f, 0.0f}) {}
-Surface::Surface(const Point &_p0, const Point &_p1, const Point &_p2, const Color &_color, const bool &_dim_light)
+Surface::Surface() {}
+Surface::Surface(const Eigen::Vector4f &_p0, const Eigen::Vector4f &_p1, const Eigen::Vector4f &_p2, const Color &_color, const bool &_dim_light)
     : p0(_p0), p1(_p1), p2(_p2), color(_color), diminish_light(_dim_light) {}
 Surface::Surface(const Surface &s)
 {
@@ -40,20 +40,20 @@ const Color Surface::get_color() const
 
 void Surface::translate(float dx, float dy, float dz)
 {
-    p0.x += dx;
-    p0.y += dy;
-    p0.z += dz;
+    p0(0) += dx;
+    p0(1) += dy;
+    p0(2) += dz;
 
-    p1.x += dx;
-    p1.y += dy;
-    p1.z += dz;
+    p1(0) += dx;
+    p1(1) += dy;
+    p1(2) += dz;
 
-    p2.x += dx;
-    p2.y += dy;
-    p2.z += dz;
+    p2(0) += dx;
+    p2(1) += dy;
+    p2(2) += dz;
 }
 
-vector<Point> Surface::get_points()
+vector<Eigen::Vector4f> Surface::get_points()
 {
     return {p0, p1, p2};
 }

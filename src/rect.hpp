@@ -1,6 +1,7 @@
 #ifndef RECT_HPP
 #define RECT_HPP
 
+#include <Eigen/Dense>
 #include "shape.hpp"
 
 // class defining a flat rectangle

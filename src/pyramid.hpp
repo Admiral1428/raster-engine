@@ -1,6 +1,7 @@
 #ifndef PYRAMID_HPP
 #define PYRAMID_HPP
 
+#include <Eigen/Dense>
 #include "shape.hpp"
 
 // class defining a pyramid

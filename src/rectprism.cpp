@@ -34,42 +34,42 @@ void RectPrism::make_shape()
 
     // x, y, z all at shape center
 
-    Surface front_left(Point{x - width / 2, y - height / 2, z + depth / 2, 1.0f},
-                       Point{x - width / 2, y + height / 2, z + depth / 2, 1.0f},
-                       Point{x + width / 2, y - height / 2, z + depth / 2, 1.0f}, colors[0], diminish_light);
-    Surface front_right(Point{x - width / 2, y + height / 2, z + depth / 2, 1.0f},
-                        Point{x + width / 2, y - height / 2, z + depth / 2, 1.0f},
-                        Point{x + width / 2, y + height / 2, z + depth / 2, 1.0f}, colors[0], diminish_light);
-    Surface rear_left(Point{x - width / 2, y - height / 2, z - (translate_clip + depth / 2), 1.0f},
-                      Point{x - width / 2, y + height / 2, z - (translate_clip + depth / 2), 1.0f},
-                      Point{x + width / 2, y + height / 2, z - (translate_clip + depth / 2), 1.0f}, colors[1], diminish_light);
-    Surface rear_right(Point{x - width / 2, y - height / 2, z - depth / 2, 1.0f},
-                       Point{x + width / 2, y - height / 2, z - depth / 2, 1.0f},
-                       Point{x + width / 2, y + height / 2, z - depth / 2, 1.0f}, colors[1], diminish_light);
-    Surface left_near(Point{x - (translate_clip + width / 2), y - height / 2, z + depth / 2, 1.0f},
-                      Point{x - (translate_clip + width / 2), y + height / 2, z + depth / 2, 1.0f},
-                      Point{x - (translate_clip + width / 2), y - height / 2, z - depth / 2, 1.0f}, colors[2], diminish_light);
-    Surface left_far(Point{x - (translate_clip + width / 2), y - height / 2, z - depth / 2, 1.0f},
-                     Point{x - (translate_clip + width / 2), y + height / 2, z - depth / 2, 1.0f},
-                     Point{x - (translate_clip + width / 2), y + height / 2, z + depth / 2, 1.0f}, colors[2], diminish_light);
-    Surface right_near(Point{x + (translate_clip + width / 2), y - height / 2, z + depth / 2, 1.0f},
-                       Point{x + (translate_clip + width / 2), y + height / 2, z + depth / 2, 1.0f},
-                       Point{x + (translate_clip + width / 2), y + height / 2, z - depth / 2, 1.0f}, colors[3], diminish_light);
-    Surface right_far(Point{x + (translate_clip + width / 2), y - height / 2, z - depth / 2, 1.0f},
-                      Point{x + (translate_clip + width / 2), y + height / 2, z - depth / 2, 1.0f},
-                      Point{x + (translate_clip + width / 2), y - height / 2, z + depth / 2, 1.0f}, colors[3], diminish_light);
-    Surface top_near(Point{x - width / 2, y + (translate_clip + height / 2), z + depth / 2, 1.0f},
-                     Point{x - width / 2, y + (translate_clip + height / 2), z - depth / 2, 1.0f},
-                     Point{x + width / 2, y + (translate_clip + height / 2), z + depth / 2, 1.0f}, colors[4], diminish_light);
-    Surface top_far(Point{x - width / 2, y + (translate_clip + height / 2), z - depth / 2, 1.0f},
-                    Point{x + width / 2, y + (translate_clip + height / 2), z - depth / 2, 1.0f},
-                    Point{x + width / 2, y + (translate_clip + height / 2), z + depth / 2, 1.0f}, colors[4], diminish_light);
-    Surface bottom_near(Point{x - width / 2, y - (translate_clip + height / 2), z + depth / 2, 1.0f},
-                        Point{x + width / 2, y - (translate_clip + height / 2), z + depth / 2, 1.0f},
-                        Point{x + width / 2, y - (translate_clip + height / 2), z - depth / 2, 1.0f}, colors[5], diminish_light);
-    Surface bottom_far(Point{x - width / 2, y - (translate_clip + height / 2), z + depth / 2, 1.0f},
-                       Point{x - width / 2, y - (translate_clip + height / 2), z - depth / 2, 1.0f},
-                       Point{x + width / 2, y - (translate_clip + height / 2), z - depth / 2, 1.0f}, colors[5], diminish_light);
+    Surface front_left(Eigen::Vector4f(x - width / 2.0f, y - height / 2.0f, z + depth / 2.0f, 1.0f),
+                       Eigen::Vector4f(x - width / 2.0f, y + height / 2.0f, z + depth / 2.0f, 1.0f),
+                       Eigen::Vector4f(x + width / 2.0f, y - height / 2.0f, z + depth / 2.0f, 1.0f), colors[0], diminish_light);
+    Surface front_right(Eigen::Vector4f(x - width / 2.0f, y + height / 2.0f, z + depth / 2.0f, 1.0f),
+                        Eigen::Vector4f(x + width / 2.0f, y - height / 2.0f, z + depth / 2.0f, 1.0f),
+                        Eigen::Vector4f(x + width / 2.0f, y + height / 2.0f, z + depth / 2.0f, 1.0f), colors[0], diminish_light);
+    Surface rear_left(Eigen::Vector4f(x - width / 2.0f, y - height / 2.0f, z - (translate_clip + depth / 2.0f), 1.0f),
+                      Eigen::Vector4f(x - width / 2.0f, y + height / 2.0f, z - (translate_clip + depth / 2.0f), 1.0f),
+                      Eigen::Vector4f(x + width / 2.0f, y + height / 2.0f, z - (translate_clip + depth / 2.0f), 1.0f), colors[1], diminish_light);
+    Surface rear_right(Eigen::Vector4f(x - width / 2.0f, y - height / 2.0f, z - depth / 2.0f, 1.0f),
+                       Eigen::Vector4f(x + width / 2.0f, y - height / 2.0f, z - depth / 2.0f, 1.0f),
+                       Eigen::Vector4f(x + width / 2.0f, y + height / 2.0f, z - depth / 2.0f, 1.0f), colors[1], diminish_light);
+    Surface left_near(Eigen::Vector4f(x - (translate_clip + width / 2.0f), y - height / 2.0f, z + depth / 2.0f, 1.0f),
+                      Eigen::Vector4f(x - (translate_clip + width / 2.0f), y + height / 2.0f, z + depth / 2.0f, 1.0f),
+                      Eigen::Vector4f(x - (translate_clip + width / 2.0f), y - height / 2.0f, z - depth / 2.0f, 1.0f), colors[2], diminish_light);
+    Surface left_far(Eigen::Vector4f(x - (translate_clip + width / 2.0f), y - height / 2.0f, z - depth / 2.0f, 1.0f),
+                     Eigen::Vector4f(x - (translate_clip + width / 2.0f), y + height / 2.0f, z - depth / 2.0f, 1.0f),
+                     Eigen::Vector4f(x - (translate_clip + width / 2.0f), y + height / 2.0f, z + depth / 2.0f, 1.0f), colors[2], diminish_light);
+    Surface right_near(Eigen::Vector4f(x + (translate_clip + width / 2.0f), y - height / 2.0f, z + depth / 2.0f, 1.0f),
+                       Eigen::Vector4f(x + (translate_clip + width / 2.0f), y + height / 2.0f, z + depth / 2.0f, 1.0f),
+                       Eigen::Vector4f(x + (translate_clip + width / 2.0f), y + height / 2.0f, z - depth / 2.0f, 1.0f), colors[3], diminish_light);
+    Surface right_far(Eigen::Vector4f(x + (translate_clip + width / 2.0f), y - height / 2.0f, z - depth / 2.0f, 1.0f),
+                      Eigen::Vector4f(x + (translate_clip + width / 2.0f), y + height / 2.0f, z - depth / 2.0f, 1.0f),
+                      Eigen::Vector4f(x + (translate_clip + width / 2.0f), y - height / 2.0f, z + depth / 2.0f, 1.0f), colors[3], diminish_light);
+    Surface top_near(Eigen::Vector4f(x - width / 2.0f, y + (translate_clip + height / 2.0f), z + depth / 2.0f, 1.0f),
+                     Eigen::Vector4f(x - width / 2.0f, y + (translate_clip + height / 2.0f), z - depth / 2.0f, 1.0f),
+                     Eigen::Vector4f(x + width / 2.0f, y + (translate_clip + height / 2.0f), z + depth / 2.0f, 1.0f), colors[4], diminish_light);
+    Surface top_far(Eigen::Vector4f(x - width / 2.0f, y + (translate_clip + height / 2.0f), z - depth / 2.0f, 1.0f),
+                    Eigen::Vector4f(x + width / 2.0f, y + (translate_clip + height / 2.0f), z - depth / 2.0f, 1.0f),
+                    Eigen::Vector4f(x + width / 2.0f, y + (translate_clip + height / 2.0f), z + depth / 2.0f, 1.0f), colors[4], diminish_light);
+    Surface bottom_near(Eigen::Vector4f(x - width / 2.0f, y - (translate_clip + height / 2.0f), z + depth / 2.0f, 1.0f),
+                        Eigen::Vector4f(x + width / 2.0f, y - (translate_clip + height / 2.0f), z + depth / 2.0f, 1.0f),
+                        Eigen::Vector4f(x + width / 2.0f, y - (translate_clip + height / 2.0f), z - depth / 2.0f, 1.0f), colors[5], diminish_light);
+    Surface bottom_far(Eigen::Vector4f(x - width / 2.0f, y - (translate_clip + height / 2.0f), z + depth / 2.0f, 1.0f),
+                       Eigen::Vector4f(x - width / 2.0f, y - (translate_clip + height / 2.0f), z - depth / 2.0f, 1.0f),
+                       Eigen::Vector4f(x + width / 2.0f, y - (translate_clip + height / 2.0f), z - depth / 2.0f, 1.0f), colors[5], diminish_light);
 
     surfaces.push_back(front_left);
     surfaces.push_back(front_right);

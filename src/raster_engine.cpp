@@ -1,5 +1,7 @@
 #include <SDL3/SDL.h>
+#include <Eigen/Dense>
 #include <iostream>
+#include <array>
 #include "constants.h"
 #include "surface.hpp"
 #include "renderer.hpp"
@@ -7,11 +9,11 @@
 #include "input.hpp"
 #include "map.hpp"
 
-using std::cout;
+using std::array;
 
 int main(int argc, char *argv[])
 {
-    // Pointers to window and renderer
+    // Eigen::Vector4fers to window and renderer
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
 
@@ -21,6 +23,9 @@ int main(int argc, char *argv[])
         SDL_Log("Could not initialize SDL: %s", SDL_GetError());
         return 1;
     }
+
+    // Initialize key down states
+    array<bool, SDL_SCANCODE_COUNT> key_states = {};
 
     // Create a window and renderer
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE);
@@ -34,16 +39,34 @@ int main(int argc, char *argv[])
     bool quit = false;
     bool need_redraw = true;
 
-    // Initialize map and surfaces vector
+    // Initialize map, surfaces vector, and renderer
     Map map;
     vector<Surface> all_surfaces;
-
     Renderer engine(0.3f, 100.0f, 90.0f, WIDTH, HEIGHT);
+
+    // Set mouse behavior and initialize event
+    SDL_SetWindowRelativeMouseMode(window, true);
     SDL_Event event;
+
+    // Mouse input variables
+    bool window_focused;
+    vector<float> mouse_delta;
+    Uint64 last_mouse_time = SDL_GetPerformanceCounter();
+
+    // Frame timing
+    Uint64 last_frame_time = last_mouse_time;
+    const float perf_freq = static_cast<float>(SDL_GetPerformanceFrequency());
+    Uint64 current_frame_time;
+    float frame_dt;
 
     // Main game loop
     while (!quit)
     {
+        // delta time since last frame
+        current_frame_time = SDL_GetPerformanceCounter();
+        frame_dt = static_cast<float>(current_frame_time - last_frame_time) / perf_freq;
+        last_frame_time = current_frame_time;
+
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_EVENT_QUIT)
@@ -55,11 +78,40 @@ int main(int argc, char *argv[])
                 engine.set_width_height(event.window.data1, event.window.data2);
                 need_redraw = true;
             }
-            else if (event.type == SDL_EVENT_KEY_DOWN)
+            if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED)
             {
-                process_input(event, map.get_rect_prism(0), need_redraw);
+                window_focused = true;
+                SDL_SetWindowRelativeMouseMode(window, true);
+            }
+            else if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST)
+            {
+                window_focused = false;
+                SDL_SetWindowRelativeMouseMode(window, false);
+            }
+            if (event.type == SDL_EVENT_KEY_DOWN)
+            {
+                if (event.key.scancode < SDL_SCANCODE_COUNT)
+                {
+                    key_states[event.key.scancode] = true;
+                }
+            }
+            else if (event.type == SDL_EVENT_KEY_UP)
+            {
+                if (event.key.scancode < SDL_SCANCODE_COUNT)
+                {
+                    key_states[event.key.scancode] = false;
+                }
             }
         }
+
+        // reset mouse delta
+        mouse_delta = {0.0f, 0.0f};
+        // only check mouse input if window active (i.e., not alt-tabbed)
+        if (window_focused)
+        {
+            mouse_check(last_mouse_time, perf_freq, mouse_delta);
+        }
+        process_input(key_states, mouse_delta, frame_dt, engine, need_redraw);
 
         if (need_redraw)
         {
