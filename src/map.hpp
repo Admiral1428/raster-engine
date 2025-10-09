@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <Eigen/Dense>
 #include "surface.hpp"
 #include "rectprism.hpp"
 #include "rect.hpp"

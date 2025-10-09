@@ -1,6 +1,7 @@
 #ifndef RECTPRISM_HPP
 #define RECTPRISM_HPP
 
+#include <Eigen/Dense>
 #include "shape.hpp"
 
 // class defining a rectangular prism

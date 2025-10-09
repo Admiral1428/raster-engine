@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <cstdlib>
+#include <Eigen/Dense>
 #include "point.hpp"
 #include "surface.hpp"
 #include "constants.h"

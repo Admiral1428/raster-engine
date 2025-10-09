@@ -45,32 +45,32 @@ void Rect::make_shape()
         // Flat rectangle aligned with depth-height plane
         if (width == 0.0f)
         {
-            first_half = Surface(Point{x, y - height / 2, z + depth / 2, 1.0f},
-                                 Point{x, y + height / 2, z + depth / 2, 1.0f},
-                                 Point{x, y - height / 2, z - depth / 2, 1.0f}, colors[0], diminish_light);
-            second_half = Surface(Point{x, y + height / 2, z - depth / 2, 1.0f},
-                                  Point{x, y + height / 2, z + depth / 2, 1.0f},
-                                  Point{x, y - height / 2, z - depth / 2, 1.0f}, colors[0], diminish_light);
+            first_half = Surface(Eigen::Vector4f(x, y - height / 2, z + depth / 2, 1.0f),
+                                 Eigen::Vector4f(x, y + height / 2, z + depth / 2, 1.0f),
+                                 Eigen::Vector4f(x, y - height / 2, z - depth / 2, 1.0f), colors[0], diminish_light);
+            second_half = Surface(Eigen::Vector4f(x, y + height / 2, z - depth / 2, 1.0f),
+                                  Eigen::Vector4f(x, y + height / 2, z + depth / 2, 1.0f),
+                                  Eigen::Vector4f(x, y - height / 2, z - depth / 2, 1.0f), colors[0], diminish_light);
         }
         // Flat rectangle aligned with width-depth plane
         else if (height == 0.0f)
         {
-            first_half = Surface(Point{x - width / 2, y, z + depth / 2, 1.0f},
-                                 Point{x + width / 2, y, z + depth / 2, 1.0f},
-                                 Point{x + width / 2, y, z - depth / 2, 1.0f}, colors[0], diminish_light);
-            second_half = Surface(Point{x - width / 2, y, z + depth / 2, 1.0f},
-                                  Point{x - width / 2, y, z - depth / 2, 1.0f},
-                                  Point{x + width / 2, y, z - depth / 2, 1.0f}, colors[0], diminish_light);
+            first_half = Surface(Eigen::Vector4f(x - width / 2, y, z + depth / 2, 1.0f),
+                                 Eigen::Vector4f(x + width / 2, y, z + depth / 2, 1.0f),
+                                 Eigen::Vector4f(x + width / 2, y, z - depth / 2, 1.0f), colors[0], diminish_light);
+            second_half = Surface(Eigen::Vector4f(x - width / 2, y, z + depth / 2, 1.0f),
+                                  Eigen::Vector4f(x - width / 2, y, z - depth / 2, 1.0f),
+                                  Eigen::Vector4f(x + width / 2, y, z - depth / 2, 1.0f), colors[0], diminish_light);
         }
         // Flat rectangle aligned with width-height plane
         else if (depth == 0.0f)
         {
-            first_half = Surface(Point{x - width / 2, y - height / 2, z, 1.0f},
-                                 Point{x + width / 2, y - height / 2, z, 1.0f},
-                                 Point{x + width / 2, y + height / 2, z, 1.0f}, colors[0], diminish_light);
-            second_half = Surface(Point{x - width / 2, y - height / 2, z, 1.0f},
-                                  Point{x - width / 2, y + height / 2, z, 1.0f},
-                                  Point{x + width / 2, y + height / 2, z, 1.0f}, colors[0], diminish_light);
+            first_half = Surface(Eigen::Vector4f(x - width / 2, y - height / 2, z, 1.0f),
+                                 Eigen::Vector4f(x + width / 2, y - height / 2, z, 1.0f),
+                                 Eigen::Vector4f(x + width / 2, y + height / 2, z, 1.0f), colors[0], diminish_light);
+            second_half = Surface(Eigen::Vector4f(x - width / 2, y - height / 2, z, 1.0f),
+                                  Eigen::Vector4f(x - width / 2, y + height / 2, z, 1.0f),
+                                  Eigen::Vector4f(x + width / 2, y + height / 2, z, 1.0f), colors[0], diminish_light);
         }
 
         surfaces.push_back(first_half);

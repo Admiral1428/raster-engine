@@ -2,11 +2,17 @@
 #define INPUT_HPP
 
 #include <SDL3/SDL.h>
-#include "rectprism.hpp"
-#include "surface.hpp"
+#include <Eigen/Dense>
+#include "point.hpp"
+#include "renderer.hpp"
+#include <numbers>
+#include <cmath>
+#include <array>
 
-using std::vector;
+using std::array;
 
-void process_input(SDL_Event &event, RectPrism &rect, bool &need_redraw);
+void mouse_check(Uint64 &last_mouse_time, const float &perf_freq, vector<float> &mouse_delta);
+void process_input(array<bool, SDL_SCANCODE_COUNT> &key_states, const vector<float> &mouse_delta,
+                   const float &frame_dt, Renderer &engine, bool &need_redraw);
 
 #endif
