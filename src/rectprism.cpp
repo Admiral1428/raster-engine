@@ -1,8 +1,8 @@
 #include "rectprism.hpp"
 
 RectPrism::RectPrism(const float &_x, const float &_y, const float &_z, const float &_w, const float &_h, const float &_d,
-                     const vector<Color> &_colors, const bool &_dim_light)
-    : Shape(_x, _y, _z, _w, _h, _d, _colors, _dim_light)
+                     const vector<Color> &_colors, const bool &_dim_light, const vector<string> &_skip_surfs)
+    : Shape(_x, _y, _z, _w, _h, _d, _colors, _dim_light, _skip_surfs)
 {
     make_shape();
 }
@@ -34,53 +34,63 @@ void RectPrism::make_shape()
 
     // x, y, z all at shape center
 
-    Surface front_left(Eigen::Vector4f(x - width / 2.0f, y - height / 2.0f, z + depth / 2.0f, 1.0f),
-                       Eigen::Vector4f(x - width / 2.0f, y + height / 2.0f, z + depth / 2.0f, 1.0f),
-                       Eigen::Vector4f(x + width / 2.0f, y - height / 2.0f, z + depth / 2.0f, 1.0f), colors[0], diminish_light);
-    Surface front_right(Eigen::Vector4f(x - width / 2.0f, y + height / 2.0f, z + depth / 2.0f, 1.0f),
-                        Eigen::Vector4f(x + width / 2.0f, y - height / 2.0f, z + depth / 2.0f, 1.0f),
-                        Eigen::Vector4f(x + width / 2.0f, y + height / 2.0f, z + depth / 2.0f, 1.0f), colors[0], diminish_light);
-    Surface rear_left(Eigen::Vector4f(x - width / 2.0f, y - height / 2.0f, z - (translate_clip + depth / 2.0f), 1.0f),
-                      Eigen::Vector4f(x - width / 2.0f, y + height / 2.0f, z - (translate_clip + depth / 2.0f), 1.0f),
-                      Eigen::Vector4f(x + width / 2.0f, y + height / 2.0f, z - (translate_clip + depth / 2.0f), 1.0f), colors[1], diminish_light);
-    Surface rear_right(Eigen::Vector4f(x - width / 2.0f, y - height / 2.0f, z - depth / 2.0f, 1.0f),
-                       Eigen::Vector4f(x + width / 2.0f, y - height / 2.0f, z - depth / 2.0f, 1.0f),
-                       Eigen::Vector4f(x + width / 2.0f, y + height / 2.0f, z - depth / 2.0f, 1.0f), colors[1], diminish_light);
-    Surface left_near(Eigen::Vector4f(x - (translate_clip + width / 2.0f), y - height / 2.0f, z + depth / 2.0f, 1.0f),
-                      Eigen::Vector4f(x - (translate_clip + width / 2.0f), y + height / 2.0f, z + depth / 2.0f, 1.0f),
-                      Eigen::Vector4f(x - (translate_clip + width / 2.0f), y - height / 2.0f, z - depth / 2.0f, 1.0f), colors[2], diminish_light);
-    Surface left_far(Eigen::Vector4f(x - (translate_clip + width / 2.0f), y - height / 2.0f, z - depth / 2.0f, 1.0f),
-                     Eigen::Vector4f(x - (translate_clip + width / 2.0f), y + height / 2.0f, z - depth / 2.0f, 1.0f),
-                     Eigen::Vector4f(x - (translate_clip + width / 2.0f), y + height / 2.0f, z + depth / 2.0f, 1.0f), colors[2], diminish_light);
-    Surface right_near(Eigen::Vector4f(x + (translate_clip + width / 2.0f), y - height / 2.0f, z + depth / 2.0f, 1.0f),
-                       Eigen::Vector4f(x + (translate_clip + width / 2.0f), y + height / 2.0f, z + depth / 2.0f, 1.0f),
-                       Eigen::Vector4f(x + (translate_clip + width / 2.0f), y + height / 2.0f, z - depth / 2.0f, 1.0f), colors[3], diminish_light);
-    Surface right_far(Eigen::Vector4f(x + (translate_clip + width / 2.0f), y - height / 2.0f, z - depth / 2.0f, 1.0f),
-                      Eigen::Vector4f(x + (translate_clip + width / 2.0f), y + height / 2.0f, z - depth / 2.0f, 1.0f),
-                      Eigen::Vector4f(x + (translate_clip + width / 2.0f), y - height / 2.0f, z + depth / 2.0f, 1.0f), colors[3], diminish_light);
-    Surface top_near(Eigen::Vector4f(x - width / 2.0f, y + (translate_clip + height / 2.0f), z + depth / 2.0f, 1.0f),
-                     Eigen::Vector4f(x - width / 2.0f, y + (translate_clip + height / 2.0f), z - depth / 2.0f, 1.0f),
-                     Eigen::Vector4f(x + width / 2.0f, y + (translate_clip + height / 2.0f), z + depth / 2.0f, 1.0f), colors[4], diminish_light);
-    Surface top_far(Eigen::Vector4f(x - width / 2.0f, y + (translate_clip + height / 2.0f), z - depth / 2.0f, 1.0f),
-                    Eigen::Vector4f(x + width / 2.0f, y + (translate_clip + height / 2.0f), z - depth / 2.0f, 1.0f),
-                    Eigen::Vector4f(x + width / 2.0f, y + (translate_clip + height / 2.0f), z + depth / 2.0f, 1.0f), colors[4], diminish_light);
-    Surface bottom_near(Eigen::Vector4f(x - width / 2.0f, y - (translate_clip + height / 2.0f), z + depth / 2.0f, 1.0f),
-                        Eigen::Vector4f(x + width / 2.0f, y - (translate_clip + height / 2.0f), z + depth / 2.0f, 1.0f),
-                        Eigen::Vector4f(x + width / 2.0f, y - (translate_clip + height / 2.0f), z - depth / 2.0f, 1.0f), colors[5], diminish_light);
-    Surface bottom_far(Eigen::Vector4f(x - width / 2.0f, y - (translate_clip + height / 2.0f), z + depth / 2.0f, 1.0f),
-                       Eigen::Vector4f(x - width / 2.0f, y - (translate_clip + height / 2.0f), z - depth / 2.0f, 1.0f),
-                       Eigen::Vector4f(x + width / 2.0f, y - (translate_clip + height / 2.0f), z - depth / 2.0f, 1.0f), colors[5], diminish_light);
+    // front
+    auto check_front = find(skip_surfaces.begin(), skip_surfaces.end(), "front");
+    if (check_front == skip_surfaces.end())
+    {
+        Rect front(x, y, z + 0.5f * depth, width, height, 0.0f, {colors[0]}, diminish_light);
+        vector<Surface> front_surfaces = front.get_surfaces();
+        surfaces.insert(surfaces.end(), front_surfaces.begin(), front_surfaces.end());
+    }
 
-    surfaces.push_back(front_left);
-    surfaces.push_back(front_right);
-    surfaces.push_back(rear_left);
-    surfaces.push_back(rear_right);
-    surfaces.push_back(left_near);
-    surfaces.push_back(left_far);
-    surfaces.push_back(right_near);
-    surfaces.push_back(right_far);
-    surfaces.push_back(bottom_near);
-    surfaces.push_back(bottom_far);
-    surfaces.push_back(top_near);
-    surfaces.push_back(top_far);
+    // rear
+    auto check_rear = find(skip_surfaces.begin(), skip_surfaces.end(), "rear");
+    if (check_rear == skip_surfaces.end())
+    {
+        Rect rear(0.0f, 0.0f, 0.0f, width, height, 0.0f, {colors[1]}, diminish_light);
+        rear.rotate(180.0f, 0.0f, 0.0f, "roll-pitch-yaw");
+        rear.translate(x, y, z - (translate_clip + 0.5f * depth));
+        vector<Surface> rear_surfaces = rear.get_surfaces();
+        surfaces.insert(surfaces.end(), rear_surfaces.begin(), rear_surfaces.end());
+    }
+
+    // right
+    auto check_right = find(skip_surfaces.begin(), skip_surfaces.end(), "right");
+    if (check_right == skip_surfaces.end())
+    {
+        Rect right(x + (translate_clip + 0.5f * width), y, z, 0.0f, height, depth, {colors[2]}, diminish_light);
+        vector<Surface> right_surfaces = right.get_surfaces();
+        surfaces.insert(surfaces.end(), right_surfaces.begin(), right_surfaces.end());
+    }
+
+    // left
+    auto check_left = find(skip_surfaces.begin(), skip_surfaces.end(), "left");
+    if (check_left == skip_surfaces.end())
+    {
+        Rect left(0.0f, 0.0f, 0.0f, 0.0f, height, depth, {colors[3]}, diminish_light);
+        left.rotate(0.0f, 0.0f, 180.0f, "roll-pitch-yaw");
+        left.translate(x - (translate_clip + 0.5f * width), y, z);
+        vector<Surface> left_surfaces = left.get_surfaces();
+        surfaces.insert(surfaces.end(), left_surfaces.begin(), left_surfaces.end());
+    }
+
+    // top
+    auto check_top = find(skip_surfaces.begin(), skip_surfaces.end(), "top");
+    if (check_top == skip_surfaces.end())
+    {
+        Rect top(x, y + (translate_clip + 0.5f * height), z, width, 0.0f, depth, {colors[4]}, diminish_light);
+        vector<Surface> top_surfaces = top.get_surfaces();
+        surfaces.insert(surfaces.end(), top_surfaces.begin(), top_surfaces.end());
+    }
+
+    // bottom
+    auto check_bottom = find(skip_surfaces.begin(), skip_surfaces.end(), "bottom");
+    if (check_bottom == skip_surfaces.end())
+    {
+        Rect bottom(0.0f, 0.0f, 0.0f, width, 0.0f, depth, {colors[5]}, diminish_light);
+        bottom.rotate(180.0f, 0.0f, 0.0f, "roll-pitch-yaw");
+        bottom.translate(x, y - (translate_clip + 0.5f * height), z);
+        vector<Surface> bottom_surfaces = bottom.get_surfaces();
+        surfaces.insert(surfaces.end(), bottom_surfaces.begin(), bottom_surfaces.end());
+    }
 }

@@ -1,7 +1,4 @@
 #include <iostream>
-#include <fstream>
-#include <chrono>
-#include <iomanip> // Required for std::setprecision and std::fixed
 
 #include "renderer.hpp"
 
@@ -143,6 +140,7 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
     Eigen::Vector4f c0;
     Eigen::Vector4f c1;
     Eigen::Vector4f c2;
+    bool surface_visible;
     vector<Eigen::Vector4f> homog_points;
     Eigen::Vector4f ndc_0;
     Eigen::Vector4f ndc_1;
@@ -170,74 +168,82 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
         v0 = view_matrix * points[0];
         v1 = view_matrix * points[1];
         v2 = view_matrix * points[2];
-        c0 = projection_matrix * v0;
-        c1 = projection_matrix * v1;
-        c2 = projection_matrix * v2;
 
-        // perform clipping and return homogeneous coordinates
-        homog_points = clip(c0, c1, c2);
+        // determine if surface is facing camera
+        surface_visible = is_surface_visible(v0, v1, v2);
 
-        // loop through every third element to get each resulting triangle
-        for (int i{0}; i < homog_points.size(); i += 3)
+        if (surface_visible)
         {
-            // get normalized device coordinates
-            ndc_0 = homog_points[i];
-            ndc_1 = homog_points[i + 1];
-            ndc_2 = homog_points[i + 2];
-            normalize_point(ndc_0);
-            normalize_point(ndc_1);
-            normalize_point(ndc_2);
+            // project into viewing volume
+            c0 = projection_matrix * v0;
+            c1 = projection_matrix * v1;
+            c2 = projection_matrix * v2;
 
-            // rasterize triangle vertices to screen space after normalizing
-            r0 = ndc_0;
-            r1 = ndc_1;
-            r2 = ndc_2;
-            rasterize_point(r0, width, height);
-            rasterize_point(r1, width, height);
-            rasterize_point(r2, width, height);
+            // perform clipping and return homogeneous coordinates
+            homog_points = clip(c0, c1, c2);
 
-            // only render triangle if vertices at least two pixels apart
-            r0_r1_delta = abs(r0(0) - r1(0)) + abs(r0(1) - r1(1));
-            r1_r2_delta = abs(r1(0) - r2(0)) + abs(r1(1) - r2(1));
-            r2_r0_delta = abs(r2(0) - r0(0)) + abs(r2(1) - r0(1));
-
-            if ((r0_r1_delta >= 2.0f) && (r1_r2_delta >= 2.0f) && (r2_r0_delta >= 2.0f))
+            // loop through every third element to get each resulting triangle
+            for (int i{0}; i < homog_points.size(); i += 3)
             {
-                // get bounding box of these screen vertices
-                bounding_box = get_bounding_box(r0, r1, r2, width, height);
+                // get normalized device coordinates
+                ndc_0 = homog_points[i];
+                ndc_1 = homog_points[i + 1];
+                ndc_2 = homog_points[i + 2];
+                normalize_point(ndc_0);
+                normalize_point(ndc_1);
+                normalize_point(ndc_2);
 
-                // set color
-                surf_color = surface.get_color();
+                // rasterize triangle vertices to screen space after normalizing
+                r0 = ndc_0;
+                r1 = ndc_1;
+                r2 = ndc_2;
+                rasterize_point(r0, width, height);
+                rasterize_point(r1, width, height);
+                rasterize_point(r2, width, height);
 
-                // get surface light property
-                surf_diminish_light = surface.get_diminish_light();
+                // only render triangle if vertices at least two pixels apart
+                r0_r1_delta = abs(r0(0) - r1(0)) + abs(r0(1) - r1(1));
+                r1_r2_delta = abs(r1(0) - r2(0)) + abs(r1(1) - r2(1));
+                r2_r0_delta = abs(r2(0) - r0(0)) + abs(r2(1) - r0(1));
 
-                // loop through bounding box to determine triangle points
-                for (int x{bounding_box(0)}; x <= bounding_box(1); ++x)
+                if ((r0_r1_delta >= 2.0f) && (r1_r2_delta >= 2.0f) && (r2_r0_delta >= 2.0f))
                 {
-                    p(0) = static_cast<float>(x);
-                    for (int y{bounding_box(2)}; y <= bounding_box(3); ++y)
+                    // get bounding box of these screen vertices
+                    bounding_box = get_bounding_box(r0, r1, r2, width, height);
+
+                    // set color
+                    surf_color = surface.get_color();
+
+                    // get surface light property
+                    surf_diminish_light = surface.get_diminish_light();
+
+                    // loop through bounding box to determine triangle points
+                    for (int x{bounding_box(0)}; x <= bounding_box(1); ++x)
                     {
-                        p(1) = static_cast<float>(y);
-
-                        // get and process barycentric coordinates
-                        barycentric_coords = get_barycentric_coords(r0, r1, r2, p);
-
-                        if (point_in_triangle(barycentric_coords, TOL_IN_TRIANGLE))
+                        p(0) = static_cast<float>(x);
+                        for (int y{bounding_box(2)}; y <= bounding_box(3); ++y)
                         {
-                            z_ndc = get_ndc_depth(barycentric_coords, homog_points[i], homog_points[i + 1], homog_points[i + 2]);
+                            p(1) = static_cast<float>(y);
 
-                            if (z_ndc < z_buffer(y, x))
+                            // get and process barycentric coordinates
+                            barycentric_coords = get_barycentric_coords(r0, r1, r2, p);
+
+                            if (point_in_triangle(barycentric_coords, TOL_IN_TRIANGLE))
                             {
-                                z_buffer(y, x) = z_ndc;
-                                if (surf_diminish_light)
-                                    pixel_color = diminish_light(z_buffer(y, x), surf_color);
-                                else
-                                    pixel_color = surf_color;
+                                z_ndc = get_ndc_depth(barycentric_coords, homog_points[i], homog_points[i + 1], homog_points[i + 2]);
 
-                                SDL_SetRenderDrawColor(&renderer, pixel_color.r,
-                                                       pixel_color.g, pixel_color.b, pixel_color.a);
-                                SDL_RenderPoint(&renderer, x, y);
+                                if (z_ndc < z_buffer(y, x))
+                                {
+                                    z_buffer(y, x) = z_ndc;
+                                    if (surf_diminish_light)
+                                        pixel_color = diminish_light(z_buffer(y, x), surf_color);
+                                    else
+                                        pixel_color = surf_color;
+
+                                    SDL_SetRenderDrawColor(&renderer, pixel_color.r,
+                                                           pixel_color.g, pixel_color.b, pixel_color.a);
+                                    SDL_RenderPoint(&renderer, x, y);
+                                }
                             }
                         }
                     }
