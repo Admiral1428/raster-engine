@@ -152,13 +152,19 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
     float r1_r2_delta;
     float r2_r0_delta;
     Eigen::Vector4i bounding_box;
+    int num_bounding_pixels;
     float triangle_area;
     Color surf_color;
     bool surf_diminish_light;
+    int grid_ctr;
     Color pixel_color;
-    Eigen::Vector2f p;
-    Eigen::Vector3f barycentric_coords;
-    double z_ndc;
+    vector<Eigen::VectorXf> barycentric_coords;
+    vector<Eigen::VectorXf> barycentric_and_pixels;
+    Eigen::VectorXf px_subset;
+    Eigen::VectorXf py_subset;
+    Eigen::VectorXf z_ndc;
+    int cur_pixel_x;
+    int cur_pixel_y;
 
     // perform drawing for each surface
     for (auto &surface : surfaces)
@@ -201,15 +207,17 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
                 rasterize_point(r1, width, height);
                 rasterize_point(r2, width, height);
 
-                // only render triangle if vertices at least two pixels apart
+                // only render triangle if vertices at least one pixel apart
                 r0_r1_delta = abs(r0(0) - r1(0)) + abs(r0(1) - r1(1));
                 r1_r2_delta = abs(r1(0) - r2(0)) + abs(r1(1) - r2(1));
                 r2_r0_delta = abs(r2(0) - r0(0)) + abs(r2(1) - r0(1));
 
-                if ((r0_r1_delta >= 2.0f) && (r1_r2_delta >= 2.0f) && (r2_r0_delta >= 2.0f))
+                if ((r0_r1_delta >= 1.0f) && (r1_r2_delta >= 1.0f) && (r2_r0_delta >= 1.0f))
                 {
                     // get bounding box of these screen vertices
                     bounding_box = get_bounding_box(r0, r1, r2, width, height);
+                    num_bounding_pixels = (bounding_box(1) - bounding_box(0) + 1) *
+                                          (bounding_box(3) - bounding_box(2) + 1);
 
                     // set color
                     surf_color = surface.get_color();
@@ -217,34 +225,47 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
                     // get surface light property
                     surf_diminish_light = surface.get_diminish_light();
 
-                    // loop through bounding box to determine triangle points
+                    // initialize vectors containing pixel coordinates
+                    Eigen::VectorXf px(num_bounding_pixels);
+                    Eigen::VectorXf py(num_bounding_pixels);
+                    grid_ctr = 0;
                     for (int x{bounding_box(0)}; x <= bounding_box(1); ++x)
                     {
-                        p(0) = static_cast<float>(x);
                         for (int y{bounding_box(2)}; y <= bounding_box(3); ++y)
                         {
-                            p(1) = static_cast<float>(y);
+                            px(grid_ctr) = static_cast<float>(x);
+                            py(grid_ctr) = static_cast<float>(y);
+                            ++grid_ctr;
+                        }
+                    }
 
-                            // get and process barycentric coordinates
-                            barycentric_coords = get_barycentric_coords(r0, r1, r2, p);
+                    // get barycentric coordinates
+                    barycentric_coords = get_barycentric_coords(r0, r1, r2, px, py);
 
-                            if (point_in_triangle(barycentric_coords, TOL_IN_TRIANGLE))
-                            {
-                                z_ndc = get_ndc_depth(barycentric_coords, homog_points[i], homog_points[i + 1], homog_points[i + 2]);
+                    // get subset of coordinates which are inside triangle
+                    barycentric_and_pixels = get_points_in_triangle(barycentric_coords, px, py);
+                    px_subset = barycentric_and_pixels[3];
+                    py_subset = barycentric_and_pixels[4];
 
-                                if (z_ndc < z_buffer(y, x))
-                                {
-                                    z_buffer(y, x) = z_ndc;
-                                    if (surf_diminish_light)
-                                        pixel_color = diminish_light(z_buffer(y, x), surf_color);
-                                    else
-                                        pixel_color = surf_color;
+                    // get ndc depth for reduced set of coordinates
+                    z_ndc = get_ndc_depth(barycentric_and_pixels, homog_points[i], homog_points[i + 1], homog_points[i + 2]);
 
-                                    SDL_SetRenderDrawColor(&renderer, pixel_color.r,
-                                                           pixel_color.g, pixel_color.b, pixel_color.a);
-                                    SDL_RenderPoint(&renderer, x, y);
-                                }
-                            }
+                    for (int pixel{0}; pixel < z_ndc.size(); ++pixel)
+                    {
+                        cur_pixel_x = static_cast<int>(px_subset(pixel));
+                        cur_pixel_y = static_cast<int>(py_subset(pixel));
+
+                        if (z_ndc(pixel) < z_buffer(cur_pixel_y, cur_pixel_x))
+                        {
+                            z_buffer(cur_pixel_y, cur_pixel_x) = z_ndc(pixel);
+                            if (surf_diminish_light)
+                                pixel_color = diminish_light(z_buffer(cur_pixel_y, cur_pixel_x), surf_color);
+                            else
+                                pixel_color = surf_color;
+
+                            SDL_SetRenderDrawColor(&renderer, pixel_color.r,
+                                                   pixel_color.g, pixel_color.b, pixel_color.a);
+                            SDL_RenderPoint(&renderer, px_subset(pixel), py_subset(pixel));
                         }
                     }
                 }

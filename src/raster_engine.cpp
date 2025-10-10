@@ -2,6 +2,7 @@
 #include <Eigen/Dense>
 #include <iostream>
 #include <array>
+#include <string>
 #include "constants.h"
 #include "surface.hpp"
 #include "renderer.hpp"

@@ -62,43 +62,93 @@ Eigen::Vector4i get_bounding_box(const Eigen::Vector4f &r0, const Eigen::Vector4
     return Eigen::Vector4i(min_x, max_x, min_y, max_y);
 }
 
-Eigen::Vector3f get_barycentric_coords(const Eigen::Vector4f &r0, const Eigen::Vector4f &r1, const Eigen::Vector4f &r2, const Eigen::Vector2f &p)
+vector<Eigen::VectorXf> get_barycentric_coords(const Eigen::Vector4f &r0, const Eigen::Vector4f &r1, const Eigen::Vector4f &r2,
+                                               const Eigen::VectorXf &px, const Eigen::VectorXf &py)
 {
-    Eigen::Vector2d v0(r1(0) - r0(0), r1(1) - r0(1));
-    Eigen::Vector2d v1(r2(0) - r0(0), r2(1) - r0(1));
-    Eigen::Vector2d v2(p(0) - r0(0), p(1) - r0(1));
+    Eigen::Vector2f v0(r1(0) - r0(0), r1(1) - r0(1));
+    Eigen::Vector2f v1(r2(0) - r0(0), r2(1) - r0(1));
+    // v2 without vectorization is (p(0) - r0(0), p(1) - r0(1))
 
     // dot products of vectors
     float dot_00 = v0.dot(v0);
     float dot_01 = v0.dot(v1);
     float dot_11 = v1.dot(v1);
-    float dot_20 = v2.dot(v0);
-    float dot_21 = v2.dot(v1);
+
+    // constant vectors
+    Eigen::VectorXf r0_0 = Eigen::VectorXf::Constant(px.size(), r0(0));
+    Eigen::VectorXf r0_1 = Eigen::VectorXf::Constant(px.size(), r0(1));
+    Eigen::VectorXf ones = Eigen::VectorXf::Ones(px.size());
+
+    // dot products requiring vectorized v2
+    Eigen::VectorXf dot_20 = (px - r0_0) * v0(0) + (py - r0_1) * v0(1);
+    Eigen::VectorXf dot_21 = (px - r0_0) * v1(0) + (py - r0_1) * v1(1);
 
     float denom = (dot_00 * dot_11 - dot_01 * dot_01);
-    float beta = (dot_11 * dot_20 - dot_01 * dot_21) / denom;
-    float gamma = (dot_00 * dot_21 - dot_01 * dot_20) / denom;
-    float alpha = 1.0f - beta - gamma;
 
-    Eigen::Vector3f result(alpha, beta, gamma);
+    // get vectors of results
+    Eigen::VectorXf beta = (dot_11 * dot_20 - dot_01 * dot_21) / denom;
+    Eigen::VectorXf gamma = (dot_00 * dot_21 - dot_01 * dot_20) / denom;
+    Eigen::VectorXf alpha = (ones - beta - gamma);
+
+    vector<Eigen::VectorXf> result{alpha, beta, gamma};
     return result;
 }
 
-bool point_in_triangle(const Eigen::Vector3f &barycentric_coords, const float &tol)
+vector<Eigen::VectorXf> get_points_in_triangle(const vector<Eigen::VectorXf> barycentric_coords,
+                                               const Eigen::VectorXf &px, const Eigen::VectorXf &py)
 {
-    /* If all coordinates non-negative, coordinate inside or on edge of triangle...
-    Not checking if all add to 1 since this should already be true */
-    return (barycentric_coords(0) >= -tol && barycentric_coords(1) >= -tol && barycentric_coords(2) >= -tol);
+    Eigen::ArrayX<bool> in_triangle = (barycentric_coords[0].array() >= -TOL_IN_TRIANGLE) &&
+                                      (barycentric_coords[1].array() >= -TOL_IN_TRIANGLE) &&
+                                      (barycentric_coords[2].array() >= -TOL_IN_TRIANGLE);
+
+    // Count the number of positive elements to determine the size of the new vectors
+    int num_valid = in_triangle.count();
+
+    // Initialize new vectors to store the subset
+    Eigen::VectorXf alpha_subset(num_valid);
+    Eigen::VectorXf beta_subset(num_valid);
+    Eigen::VectorXf gamma_subset(num_valid);
+    Eigen::VectorXf px_subset(num_valid);
+    Eigen::VectorXf py_subset(num_valid);
+
+    int counter{0};
+    for (int i{0}; i < px.size(); ++i)
+    {
+        if (in_triangle(i))
+        {
+            alpha_subset(counter) = barycentric_coords[0](i);
+            beta_subset(counter) = barycentric_coords[1](i);
+            gamma_subset(counter) = barycentric_coords[2](i);
+            px_subset(counter) = px(i);
+            py_subset(counter) = py(i);
+            ++counter;
+        }
+    }
+
+    return {alpha_subset, beta_subset, gamma_subset, px_subset, py_subset};
 }
 
-double get_ndc_depth(const Eigen::Vector3f &barycentric_coords, const Eigen::Vector4f &c0, const Eigen::Vector4f &c1, const Eigen::Vector4f &c2)
+// bool point_in_triangle(const Eigen::Vector3f &barycentric_coords, const float &tol)
+// {
+//     /* If all coordinates non-negative, coordinate inside or on edge of triangle...
+//     Not checking if all add to 1 since this should already be true */
+//     return (barycentric_coords(0) >= -tol && barycentric_coords(1) >= -tol && barycentric_coords(2) >= -tol);
+// }
+
+Eigen::VectorXf get_ndc_depth(const vector<Eigen::VectorXf> &barycentric_and_pixels,
+                              const Eigen::Vector4f &c0, const Eigen::Vector4f &c1, const Eigen::Vector4f &c2)
 {
+    // Initialize vector as ones, to handle edge case for divide by zero
+    int vec_size = barycentric_and_pixels[0].size();
+    Eigen::VectorXf interp_z_over_w = Eigen::VectorXf::Ones(vec_size);
+
     if (c0(3) != 0.0f && c1(3) != 0.0f && c2(3) != 0.0f)
     {
-        double interp_z_over_w = barycentric_coords(0) * (c0(2) / c0(3)) + barycentric_coords(1) * (c1(2) / c1(3)) + barycentric_coords(2) * (c2(2) / c2(3));
-        return interp_z_over_w;
+        interp_z_over_w = barycentric_and_pixels[0] * (c0(2) / c0(3)) +
+                          barycentric_and_pixels[1] * (c1(2) / c1(3)) +
+                          barycentric_and_pixels[2] * (c2(2) / c2(3));
     }
-    return 1.0; // edge case for divide by zero
+    return interp_z_over_w;
 }
 
 bool is_surface_visible(const Eigen::Vector4f &v0, const Eigen::Vector4f &v1, const Eigen::Vector4f &v2)
