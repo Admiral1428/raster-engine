@@ -2,11 +2,17 @@
 #define SURFACE_HPP
 
 #include <vector>
+#include <numbers>
+#include <string>
+#include <stdexcept>
 #include <Eigen/Dense>
 #include "constants.h"
 #include "point.hpp"
 
+using std::invalid_argument;
+using std::string;
 using std::vector;
+using std::numbers::pi;
 
 // class defining a triangular surface
 class Surface
@@ -26,7 +32,8 @@ public:
     Surface &operator=(const Surface &); // copy/assignment operator
     void set_color(const Color &c);
     const Color get_color() const;
-    void translate(float dx, float dy, float dz);
+    void translate(const float &dx, const float &dy, const float &dz);
+    void rotate(const float &roll, const float &pitch, const float &yaw, const string &order);
     vector<Eigen::Vector4f> get_points();
     bool &get_diminish_light();
 };
