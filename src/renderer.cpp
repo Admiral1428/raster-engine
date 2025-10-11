@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "renderer.hpp"
 
 Renderer::Renderer() : n(PLANE_N), f(PLANE_F), fov(FOV), width(WIDTH), height(HEIGHT), pitch(0), yaw(0)
