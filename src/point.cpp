@@ -1,9 +1,5 @@
 #include "point.hpp"
 
-// #include <fstream>
-// #include <chrono>
-// #include <iomanip> // Required for std::setprecision and std::fixed
-
 // normalize by w component
 void normalize_point(Eigen::Vector4f &c)
 {
@@ -74,21 +70,25 @@ vector<Eigen::VectorXf> get_barycentric_coords(const Eigen::Vector4f &r0, const 
     float dot_01 = v0.dot(v1);
     float dot_11 = v1.dot(v1);
 
+    int vec_size = px.size();
+
     // constant vectors
-    Eigen::VectorXf r0_0 = Eigen::VectorXf::Constant(px.size(), r0(0));
-    Eigen::VectorXf r0_1 = Eigen::VectorXf::Constant(px.size(), r0(1));
-    Eigen::VectorXf ones = Eigen::VectorXf::Ones(px.size());
+    auto r0_0 = Eigen::VectorXf::Constant(vec_size, r0(0));
+    auto r0_1 = Eigen::VectorXf::Constant(vec_size, r0(1));
+    auto ones = Eigen::VectorXf::Ones(vec_size);
 
     // dot products requiring vectorized v2
-    Eigen::VectorXf dot_20 = (px - r0_0) * v0(0) + (py - r0_1) * v0(1);
-    Eigen::VectorXf dot_21 = (px - r0_0) * v1(0) + (py - r0_1) * v1(1);
+    auto p_minus_r0_x = px - r0_0;
+    auto p_minus_r0_y = py - r0_1;
+    auto dot_20 = p_minus_r0_x * v0(0) + p_minus_r0_y * v0(1);
+    auto dot_21 = p_minus_r0_x * v1(0) + p_minus_r0_y * v1(1);
 
-    float denom = (dot_00 * dot_11 - dot_01 * dot_01);
+    float inv_denom = 1.0f / (dot_00 * dot_11 - dot_01 * dot_01);
 
     // get vectors of results
-    Eigen::VectorXf beta = (dot_11 * dot_20 - dot_01 * dot_21) / denom;
-    Eigen::VectorXf gamma = (dot_00 * dot_21 - dot_01 * dot_20) / denom;
-    Eigen::VectorXf alpha = (ones - beta - gamma);
+    auto beta = (dot_11 * dot_20 - dot_01 * dot_21) * inv_denom;
+    auto gamma = (dot_00 * dot_21 - dot_01 * dot_20) * inv_denom;
+    auto alpha = (ones - beta - gamma);
 
     vector<Eigen::VectorXf> result{alpha, beta, gamma};
     return result;
@@ -127,13 +127,6 @@ vector<Eigen::VectorXf> get_points_in_triangle(const vector<Eigen::VectorXf> bar
 
     return {alpha_subset, beta_subset, gamma_subset, px_subset, py_subset};
 }
-
-// bool point_in_triangle(const Eigen::Vector3f &barycentric_coords, const float &tol)
-// {
-//     /* If all coordinates non-negative, coordinate inside or on edge of triangle...
-//     Not checking if all add to 1 since this should already be true */
-//     return (barycentric_coords(0) >= -tol && barycentric_coords(1) >= -tol && barycentric_coords(2) >= -tol);
-// }
 
 Eigen::VectorXf get_ndc_depth(const vector<Eigen::VectorXf> &barycentric_and_pixels,
                               const Eigen::Vector4f &c0, const Eigen::Vector4f &c1, const Eigen::Vector4f &c2)

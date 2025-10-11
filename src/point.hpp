@@ -23,7 +23,6 @@ vector<Eigen::VectorXf> get_barycentric_coords(const Eigen::Vector4f &r0, const 
                                                const Eigen::VectorXf &px, const Eigen::VectorXf &py);
 vector<Eigen::VectorXf> get_points_in_triangle(const vector<Eigen::VectorXf> barycentric_coords,
                                                const Eigen::VectorXf &px, const Eigen::VectorXf &py);
-// bool point_in_triangle(const Eigen::Vector3f &barycentric_coords, const float &tol);
 Eigen::VectorXf get_ndc_depth(const vector<Eigen::VectorXf> &barycentric_and_pixels,
                               const Eigen::Vector4f &c0, const Eigen::Vector4f &c1, const Eigen::Vector4f &c2);
 bool is_surface_visible(const Eigen::Vector4f &v0, const Eigen::Vector4f &v1, const Eigen::Vector4f &v2);
