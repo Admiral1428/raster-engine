@@ -210,7 +210,7 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
                 r1_r2_delta = abs(r1(0) - r2(0)) + abs(r1(1) - r2(1));
                 r2_r0_delta = abs(r2(0) - r0(0)) + abs(r2(1) - r0(1));
 
-                if ((r0_r1_delta >= 1.0f) && (r1_r2_delta >= 1.0f) && (r2_r0_delta >= 1.0f))
+                if ((r0_r1_delta >= 1.0f) || (r1_r2_delta >= 1.0f) || (r2_r0_delta >= 1.0f))
                 {
                     // get bounding box of these screen vertices
                     bounding_box = get_bounding_box(r0, r1, r2, width, height);

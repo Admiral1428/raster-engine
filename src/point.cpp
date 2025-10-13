@@ -154,7 +154,7 @@ bool is_surface_visible(const Eigen::Vector4f &v0, const Eigen::Vector4f &v1, co
     float sign = normal.dot(towards_triangle);
 
     // surface facing camera
-    if (sign > 0.0f)
+    if (sign > TOL_VISIBLE)
     {
         return true;
     }

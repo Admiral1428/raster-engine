@@ -7,6 +7,7 @@
 #include "surface.hpp"
 #include "rectprism.hpp"
 #include "rect.hpp"
+#include "quad.hpp"
 #include "pyramid.hpp"
 
 using std::string;
@@ -19,6 +20,7 @@ private:
     vector<RectPrism> shapes_rect_prism;
     vector<Pyramid> shapes_pyramid;
     vector<Rect> shapes_rect;
+    vector<Quad> shapes_quad;
     vector<Surface> shapes_triangle;
     vector<Surface> all_surfaces;
 
@@ -32,6 +34,7 @@ public:
     RectPrism &get_rect_prism(const int &index);
     Pyramid &get_pyramid(const int &index);
     Rect &get_rect(const int &index);
+    Quad &get_quad(const int &index);
     Surface &get_triangle(const int &index);
 };
 
