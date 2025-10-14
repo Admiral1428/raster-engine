@@ -9,6 +9,9 @@
 #include "rect.hpp"
 #include "quad.hpp"
 #include "pyramid.hpp"
+#include "tree.hpp"
+#include "house.hpp"
+#include "bridge.hpp"
 
 using std::string;
 using std::vector;
@@ -19,6 +22,9 @@ class Map
 private:
     vector<RectPrism> shapes_rect_prism;
     vector<Pyramid> shapes_pyramid;
+    vector<Tree> shapes_tree;
+    vector<House> shapes_house;
+    vector<Bridge> shapes_bridge;
     vector<Rect> shapes_rect;
     vector<Quad> shapes_quad;
     vector<Surface> shapes_triangle;
@@ -33,6 +39,9 @@ public:
     void push_surfaces(const vector<Surface> &temp_surfaces);
     RectPrism &get_rect_prism(const int &index);
     Pyramid &get_pyramid(const int &index);
+    Tree &get_tree(const int &index);
+    House &get_house(const int &index);
+    Bridge &get_bridge(const int &index);
     Rect &get_rect(const int &index);
     Quad &get_quad(const int &index);
     Surface &get_triangle(const int &index);

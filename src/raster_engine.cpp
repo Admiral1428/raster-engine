@@ -45,6 +45,9 @@ int main(int argc, char *argv[])
     vector<Surface> all_surfaces;
     Renderer engine(0.3f, 100.0f, 90.0f, WIDTH, HEIGHT);
 
+    // Move initial position relative to origin
+    engine.move_view(Eigen::Vector3f(-4.0f, 0.0f, 1.5f), 0.0f, 0.0f);
+
     // Set mouse behavior and initialize event
     SDL_SetWindowRelativeMouseMode(window, true);
     SDL_Event event;

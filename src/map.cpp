@@ -3,18 +3,44 @@
 Map::Map()
 {
     // reserve space for each vector
-    shapes_rect_prism.reserve(2);
-    shapes_pyramid.reserve(12);
-    shapes_triangle.reserve(26);
-    shapes_quad.reserve(30);
+    // shapes_rect_prism.reserve(0);
+    shapes_pyramid.reserve(9);
+    shapes_tree.reserve(13);
+    shapes_house.reserve(1);
+    shapes_bridge.reserve(1);
+    shapes_triangle.reserve(32);
+    shapes_quad.reserve(36);
 
-    // right tree
-    shapes_rect_prism.push_back(RectPrism(2.5f, -1.0f, -4.0f, 0.5f, 2.0f, 0.5f, {BROWN, BROWN, DKBROWN, DKBROWN, BLACK, BLACK}, false, {"top", "bottom"}));
-    shapes_pyramid.push_back(Pyramid(2.5f, 0.0f, -4.0f, 2.0f, 2.0f, 2.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK}));
+    // small trees along river
+    shapes_tree.push_back(Tree(6.5f, -2.0f, -4.0f, "small"));
+    shapes_tree.push_back(Tree(-6.5f, -2.0f, -4.0f, "small"));
+    shapes_tree.push_back(Tree(6.5f, -2.0f, -15.0f, "small"));
+    shapes_tree.push_back(Tree(-6.5f, -2.0f, -15.0f, "small"));
 
-    // left tree
-    shapes_rect_prism.push_back(RectPrism(-5.0f, 0.0f, -15.0f, 0.75f, 4.0f, 0.75f, {BROWN, BROWN, DKBROWN, DKBROWN, BROWN, BROWN}, false, {"top", "bottom"}));
-    shapes_pyramid.push_back(Pyramid(-5.0f, 2.0f, -15.0f, 3.0f, 3.0f, 3.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK}));
+    // small trees on island
+    shapes_tree.push_back(Tree(-50.0f, -3.0f, 34.0f, "small", 0.0f, -15.0f, 0.0f, "roll-pitch-yaw"));
+    shapes_tree.push_back(Tree(-41.0f, -3.0f, 14.0f, "small", 0.0f, -12.0f, 0.0f, "roll-pitch-yaw"));
+    shapes_tree.push_back(Tree(-46.0f, -3.0f, -2.0f, "small", 0.0f, 45.0f, 0.0f, "roll-pitch-yaw"));
+    shapes_tree.push_back(Tree(-42.0f, -3.0f, -17.0f, "small", 0.0f, 25.0f, 0.0f, "roll-pitch-yaw"));
+    shapes_tree.push_back(Tree(-55.0f, -3.0f, -38.0f, "small", 0.0f, 35.0f, 0.0f, "roll-pitch-yaw"));
+
+    // big trees near house
+    shapes_tree.push_back(Tree(-8.0f, -2.0f, -43.0f, "medium", 0.0f, -35.0f, 0.0f, "roll-pitch-yaw"));
+    shapes_tree.push_back(Tree(8.0f, -2.0f, -32.0f, "medium", 0.0f, -35.0f, 0.0f, "roll-pitch-yaw"));
+
+    // trees near waterfall
+    shapes_tree.push_back(Tree(22.0f, -2.0f, -7.0f, "large", 0.0f, 12.5f, 0.0f, "roll-pitch-yaw"));
+    shapes_tree.push_back(Tree(22.0f, -2.0f, -20.0f, "large", 0.0f, 12.5f, 0.0f, "roll-pitch-yaw"));
+
+    // house
+    shapes_house.push_back(House(-1.0f, -2.0f, -36.0f, 0.0f, -35.0f, 0.0f, "roll-pitch-yaw"));
+
+    // bridge across straight river
+    shapes_bridge.push_back(Bridge(0.0f, -2.0f, -9.5f, 0.0f, 0.0f, 0.0f, "roll-pitch-yaw"));
+
+    // walkway from bridge to house
+    shapes_quad.push_back(Quad({-1.4f, -1.99f, -13.0f}, {-5.2f, -1.99f, -30.0f}, {-2.7f, -1.99f, -29.0f}, {1.5f, -1.99f, -13.0f}, {GRAY}, true));
+    shapes_quad.push_back(Quad({-2.7f, -1.99f, -29.0f}, {-5.2f, -1.99f, -30.0f}, {-4.2f, -1.99f, -33.5f}, {-2.4f, -1.99f, -32.3f}, {GRAY}, true));
 
     // main grass surfaces
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-24.0f, -2.0f, -60.0f, 1.0f), Eigen::Vector4f(25.0f, -2.0f, -26.0, 1.0f), Eigen::Vector4f(-24.0f, -2.0f, -26.0f, 1.0f), GREEN, true));
@@ -181,6 +207,21 @@ vector<Surface> &Map::get_map_surfaces()
         push_surfaces(shape.get_surfaces());
     }
 
+    for (auto &shape : shapes_tree)
+    {
+        push_surfaces(shape.get_surfaces());
+    }
+
+    for (auto &shape : shapes_house)
+    {
+        push_surfaces(shape.get_surfaces());
+    }
+
+    for (auto &shape : shapes_bridge)
+    {
+        push_surfaces(shape.get_surfaces());
+    }
+
     return all_surfaces;
 }
 
@@ -202,6 +243,24 @@ RectPrism &Map::get_rect_prism(const int &index)
 Pyramid &Map::get_pyramid(const int &index)
 {
     return shapes_pyramid[index];
+}
+
+// Return reference to Tree object
+Tree &Map::get_tree(const int &index)
+{
+    return shapes_tree[index];
+}
+
+// Return reference to House object
+House &Map::get_house(const int &index)
+{
+    return shapes_house[index];
+}
+
+// Return reference to Bridge object
+Bridge &Map::get_bridge(const int &index)
+{
+    return shapes_bridge[index];
 }
 
 // Return reference to Rect object

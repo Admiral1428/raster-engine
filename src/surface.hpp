@@ -26,7 +26,8 @@ private:
 
 public:
     Surface(); // default constructor (initializes object to default state with no arguments)
-    Surface(const Eigen::Vector4f &_p0, const Eigen::Vector4f &_p1, const Eigen::Vector4f &_p2, const Color &_color = RED, const bool &_dim_light = false);
+    Surface(const Eigen::Vector4f &_p0, const Eigen::Vector4f &_p1, const Eigen::Vector4f &_p2,
+            const Color &_color = RED, const bool &_dim_light = false);
     Surface(const Surface &);            // copy constructor
     ~Surface();                          // destructor
     Surface &operator=(const Surface &); // copy/assignment operator
