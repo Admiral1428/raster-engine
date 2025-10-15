@@ -9,6 +9,7 @@
 #include "rectprism.hpp"
 #include "input.hpp"
 #include "map.hpp"
+#include "boat.hpp"
 
 using std::array;
 
@@ -42,8 +43,15 @@ int main(int argc, char *argv[])
 
     // Initialize map, surfaces vector, and renderer
     Map map;
-    vector<Surface> all_surfaces;
+    vector<Surface> map_surfaces = map.get_map_surfaces();
     Renderer engine(0.3f, 100.0f, 90.0f, WIDTH, HEIGHT);
+
+    // Initialize moving objects
+    vector<Surface> moving_surfaces;
+    Boat boat(-32.0f, -3.0f, 60.0f, "small", 0.0f, 90.0f, 0.0f, "roll-pitch-yaw", -2.0f);
+
+    // Initialize vector to contain all surfaces
+    vector<Surface> all_surfaces;
 
     // Move initial position relative to origin
     engine.move_view(Eigen::Vector3f(-4.0f, 0.0f, 1.5f), 0.0f, 0.0f);
@@ -117,6 +125,11 @@ int main(int argc, char *argv[])
         }
         process_input(key_states, mouse_delta, frame_dt, engine, need_redraw);
 
+        // move objects
+        boat.move(frame_dt);
+        moving_surfaces = boat.get_surfaces();
+        need_redraw = true;
+
         if (need_redraw)
         {
             // Draw background
@@ -124,8 +137,10 @@ int main(int argc, char *argv[])
             // Clear screen
             SDL_RenderClear(renderer);
 
-            // Get map surfaces
-            all_surfaces = map.get_map_surfaces();
+            // Get surfaces
+            all_surfaces.clear();
+            all_surfaces.insert(all_surfaces.end(), map_surfaces.begin(), map_surfaces.end());
+            all_surfaces.insert(all_surfaces.end(), moving_surfaces.begin(), moving_surfaces.end());
 
             // Draw surfaces
             engine.draw_surfaces(*renderer, all_surfaces);

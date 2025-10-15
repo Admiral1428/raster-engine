@@ -1,7 +1,7 @@
 #include "bridge.hpp"
 
 Bridge::Bridge(const float &_x, const float &_y, const float &_z, const float &_rol,
-               const float &_pit, const float &_yaw, const string _rot)
+               const float &_pit, const float &_yaw, const string &_rot)
     : Shape(_x, _y, _z, 0.0f, 0.0f, 0.0f, {}, false, {}),
       roll(_rol), pitch(_pit), yaw(_yaw), rot_order(_rot)
 {

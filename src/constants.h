@@ -45,6 +45,7 @@ const Color MAGENTA = {255, 0, 255, 255};
 const Color CYAN = {0, 255, 255, 255};
 const Color BROWN = {150, 75, 0, 255};
 const Color DKBROWN = {101, 67, 33, 255};
+const Color NIGHTBROWN = {50, 34, 16, 255};
 const Color TAN = {210, 180, 140, 255};
 const Color SKY_BLUE = {135, 206, 235, 255};
 // Background color for screen
