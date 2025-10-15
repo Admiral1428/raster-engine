@@ -18,7 +18,7 @@ private:
 
 public:
     House(const float &_x, const float &_y, const float &_z, const float &_rol = 0.0f,
-          const float &_pit = 0.0f, const float &_yaw = 0.0f, const string _rot = "roll-pitch-yaw");
+          const float &_pit = 0.0f, const float &_yaw = 0.0f, const string &_rot = "roll-pitch-yaw");
     House(const House &p);
     House &operator=(const House &);
     void make_shape() override;
