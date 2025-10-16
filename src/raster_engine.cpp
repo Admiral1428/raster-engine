@@ -86,8 +86,8 @@ int main(int argc, char *argv[])
     float frame_dt;
     float debug_dt;
 
-    // Debug info timing, initialize as 5 seconds later
-    Uint64 last_debug_time = last_frame_time + (5 * perf_freq);
+    // Debug info timing, initialize as 6 seconds prior
+    Uint64 last_debug_time = SDL_GetPerformanceCounter() - (6 * perf_freq);
 
     // Main game loop
     while (!quit)
