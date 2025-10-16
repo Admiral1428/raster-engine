@@ -10,6 +10,8 @@
 #include "input.hpp"
 #include "map.hpp"
 #include "boat.hpp"
+#include "airplane.hpp"
+#include "prop.hpp"
 
 using std::array;
 
@@ -44,11 +46,17 @@ int main(int argc, char *argv[])
     // Initialize map, surfaces vector, and renderer
     Map map;
     vector<Surface> map_surfaces = map.get_map_surfaces();
-    Renderer engine(0.3f, 100.0f, 90.0f, WIDTH, HEIGHT);
+    Renderer engine(0.3f, 1000.0f, 90.0f, WIDTH, HEIGHT);
 
     // Initialize moving objects
-    vector<Surface> moving_surfaces;
+    vector<Surface> boat_surfaces;
+    vector<Surface> airplane_surfaces;
+    vector<Surface> prop_surfaces;
     Boat boat(-32.0f, -3.0f, 60.0f, "small", 0.0f, 90.0f, 0.0f, "roll-pitch-yaw", -2.0f);
+    Airplane airplane(-30.0f, 20.0f, 0.0f, "small", 0.0f, 90.0f, -30.0f, "roll-pitch-yaw", -15.0f);
+
+    // Moving propeller location based on the static airplane defined in the map class
+    Prop prop(-5.0f, -1.25f, 18.5f, "small", 0.0f, -240.0f, 16.0f, "yaw-pitch-roll", 540.0f);
 
     // Initialize vector to contain all surfaces
     vector<Surface> all_surfaces;
@@ -127,7 +135,12 @@ int main(int argc, char *argv[])
 
         // move objects
         boat.move(frame_dt);
-        moving_surfaces = boat.get_surfaces();
+        airplane.move(frame_dt);
+        prop.move(frame_dt);
+        boat_surfaces = boat.get_surfaces();
+        airplane_surfaces = airplane.get_surfaces();
+        prop_surfaces = prop.get_surfaces();
+
         need_redraw = true;
 
         if (need_redraw)
@@ -140,7 +153,9 @@ int main(int argc, char *argv[])
             // Get surfaces
             all_surfaces.clear();
             all_surfaces.insert(all_surfaces.end(), map_surfaces.begin(), map_surfaces.end());
-            all_surfaces.insert(all_surfaces.end(), moving_surfaces.begin(), moving_surfaces.end());
+            all_surfaces.insert(all_surfaces.end(), boat_surfaces.begin(), boat_surfaces.end());
+            all_surfaces.insert(all_surfaces.end(), airplane_surfaces.begin(), airplane_surfaces.end());
+            all_surfaces.insert(all_surfaces.end(), prop_surfaces.begin(), prop_surfaces.end());
 
             // Draw surfaces
             engine.draw_surfaces(*renderer, all_surfaces);

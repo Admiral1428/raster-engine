@@ -1,4 +1,4 @@
-#include "Tree.hpp"
+#include "tree.hpp"
 
 Tree::Tree(const float &_x, const float &_y, const float &_z, const string _size,
            const float &_rol, const float &_pit, const float &_yaw, const string _rot)
@@ -40,44 +40,53 @@ void Tree::make_shape()
     // pitch = rotation about y-axis
     // yaw = rotation about z-axis
 
+    // Initialize vectors to store shapes of each type
+    vector<RectPrism> rect_prisms;
+    vector<Pyramid> pyramids;
+
+    // Reserve space for vectors
+    rect_prisms.reserve(1);
+    pyramids.reserve(3);
+
     if (size == "small")
     {
-        RectPrism trunk(0.0f, 1.0f, 0.0f, 0.5f, 2.0f, 0.5f, {BROWN, BROWN, DKBROWN, DKBROWN, {}, {}},
-                        false, {"top", "bottom"});
-        Pyramid leaves(0.0f, 2.0f, 0.0f, 2.0f, 2.0f, 2.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK});
-
-        vector<Surface> trunk_surfaces = trunk.get_surfaces();
-        surfaces.insert(surfaces.end(), trunk_surfaces.begin(), trunk_surfaces.end());
-        vector<Surface> leaves_surfaces = leaves.get_surfaces();
-        surfaces.insert(surfaces.end(), leaves_surfaces.begin(), leaves_surfaces.end());
+        // trunk and leaves
+        rect_prisms.push_back(RectPrism(0.0f, 1.0f, 0.0f, 0.5f, 2.0f, 0.5f, {BROWN, BROWN, DKBROWN, DKBROWN, {}, {}},
+                                        false, {"top", "bottom"}));
+        pyramids.push_back(Pyramid(0.0f, 2.0f, 0.0f, 2.0f, 2.0f, 2.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK}));
     }
     else if (size == "medium")
     {
-        RectPrism trunk(0.0f, 2.0f, 0.0f, 0.75f, 4.0f, 0.75f, {BROWN, BROWN, DKBROWN, DKBROWN, {}, {}},
-                        false, {"top", "bottom"});
-        Pyramid leaves(0.0f, 4.0f, 0.0f, 3.0f, 3.0f, 3.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK});
-
-        vector<Surface> trunk_surfaces = trunk.get_surfaces();
-        surfaces.insert(surfaces.end(), trunk_surfaces.begin(), trunk_surfaces.end());
-        vector<Surface> leaves_surfaces = leaves.get_surfaces();
-        surfaces.insert(surfaces.end(), leaves_surfaces.begin(), leaves_surfaces.end());
+        // trunk and leaves
+        rect_prisms.push_back(RectPrism(0.0f, 2.0f, 0.0f, 0.75f, 4.0f, 0.75f, {BROWN, BROWN, DKBROWN, DKBROWN, {}, {}},
+                                        false, {"top", "bottom"}));
+        pyramids.push_back(Pyramid(0.0f, 4.0f, 0.0f, 3.0f, 3.0f, 3.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK}));
     }
     else if (size == "large")
     {
-        RectPrism trunk(0.0f, 1.0f, 0.0f, 1.0f, 2.0f, 1.0f, {BROWN, BROWN, DKBROWN, DKBROWN, {}, {}},
-                        false, {"top", "bottom"});
-        Pyramid leaves_low(0.0f, 2.0f, 0.0f, 4.0f, 4.0f, 4.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK});
-        Pyramid leaves_mid(0.0f, 4.0f, 0.0f, 3.0f, 3.0f, 3.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK});
-        Pyramid leaves_high(0.0f, 5.75f, 0.0f, 2.0f, 2.0f, 2.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK});
+        // trunk
+        rect_prisms.push_back(RectPrism(0.0f, 1.0f, 0.0f, 1.0f, 2.0f, 1.0f, {BROWN, BROWN, DKBROWN, DKBROWN, {}, {}},
+                                        false, {"top", "bottom"}));
 
-        vector<Surface> trunk_surfaces = trunk.get_surfaces();
-        surfaces.insert(surfaces.end(), trunk_surfaces.begin(), trunk_surfaces.end());
-        vector<Surface> leaves_low_surfaces = leaves_low.get_surfaces();
-        surfaces.insert(surfaces.end(), leaves_low_surfaces.begin(), leaves_low_surfaces.end());
-        vector<Surface> leaves_mid_surfaces = leaves_mid.get_surfaces();
-        surfaces.insert(surfaces.end(), leaves_mid_surfaces.begin(), leaves_mid_surfaces.end());
-        vector<Surface> leaves_high_surfaces = leaves_high.get_surfaces();
-        surfaces.insert(surfaces.end(), leaves_high_surfaces.begin(), leaves_high_surfaces.end());
+        // leaves (low, mid, high)
+        pyramids.push_back(Pyramid(0.0f, 2.0f, 0.0f, 4.0f, 4.0f, 4.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK}));
+        pyramids.push_back(Pyramid(0.0f, 4.0f, 0.0f, 3.0f, 3.0f, 3.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK}));
+        pyramids.push_back(Pyramid(0.0f, 5.75f, 0.0f, 2.0f, 2.0f, 2.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK}));
+    }
+
+    // Populate the surfaces vector with all surfaces
+    vector<Surface> shape_surfaces;
+    for (auto &shape : rect_prisms)
+    {
+        shape_surfaces.clear();
+        shape_surfaces = shape.get_surfaces();
+        surfaces.insert(surfaces.end(), shape_surfaces.begin(), shape_surfaces.end());
+    }
+    for (auto &shape : pyramids)
+    {
+        shape_surfaces.clear();
+        shape_surfaces = shape.get_surfaces();
+        surfaces.insert(surfaces.end(), shape_surfaces.begin(), shape_surfaces.end());
     }
 
     // apply rotations

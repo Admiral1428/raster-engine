@@ -12,6 +12,9 @@
 #include "tree.hpp"
 #include "house.hpp"
 #include "bridge.hpp"
+#include "airplane.hpp"
+#include "runway.hpp"
+#include "hangar.hpp"
 
 using std::string;
 using std::vector;
@@ -25,6 +28,9 @@ private:
     vector<Tree> shapes_tree;
     vector<House> shapes_house;
     vector<Bridge> shapes_bridge;
+    vector<Airplane> shapes_airplane;
+    vector<Runway> shapes_runway;
+    vector<Hangar> shapes_hangar;
     vector<Rect> shapes_rect;
     vector<Quad> shapes_quad;
     vector<Surface> shapes_triangle;
@@ -37,14 +43,6 @@ public:
     Map &operator=(const Map &) = delete; // prevent copy/assignment
     vector<Surface> &get_map_surfaces();
     void push_surfaces(const vector<Surface> &temp_surfaces);
-    RectPrism &get_rect_prism(const int &index);
-    Pyramid &get_pyramid(const int &index);
-    Tree &get_tree(const int &index);
-    House &get_house(const int &index);
-    Bridge &get_bridge(const int &index);
-    Rect &get_rect(const int &index);
-    Quad &get_quad(const int &index);
-    Surface &get_triangle(const int &index);
 };
 
 #endif

@@ -5,11 +5,14 @@ Map::Map()
     // reserve space for each vector
     // shapes_rect_prism.reserve(0);
     shapes_pyramid.reserve(9);
-    shapes_tree.reserve(13);
+    shapes_tree.reserve(15);
     shapes_house.reserve(1);
     shapes_bridge.reserve(1);
+    shapes_airplane.reserve(1);
+    shapes_runway.reserve(1);
+    shapes_hangar.reserve(1);
     shapes_triangle.reserve(32);
-    shapes_quad.reserve(36);
+    shapes_quad.reserve(37);
 
     // small trees along river
     shapes_tree.push_back(Tree(6.5f, -2.0f, -4.0f, "small"));
@@ -24,11 +27,15 @@ Map::Map()
     shapes_tree.push_back(Tree(-42.0f, -3.0f, -17.0f, "small", 0.0f, 25.0f, 0.0f, "roll-pitch-yaw"));
     shapes_tree.push_back(Tree(-55.0f, -3.0f, -38.0f, "small", 0.0f, 35.0f, 0.0f, "roll-pitch-yaw"));
 
-    // big trees near house
+    // medium trees near house
     shapes_tree.push_back(Tree(-8.0f, -2.0f, -43.0f, "medium", 0.0f, -35.0f, 0.0f, "roll-pitch-yaw"));
     shapes_tree.push_back(Tree(8.0f, -2.0f, -32.0f, "medium", 0.0f, -35.0f, 0.0f, "roll-pitch-yaw"));
 
-    // trees near waterfall
+    // medium trees near runway
+    shapes_tree.push_back(Tree(10.0f, -2.0f, 15.0f, "medium", 0.0f, -25.0f, 0.0f, "roll-pitch-yaw"));
+    shapes_tree.push_back(Tree(18.0f, -2.0f, 10.0f, "medium", 0.0f, 0.0f, 0.0f, "roll-pitch-yaw"));
+
+    // big trees near waterfall
     shapes_tree.push_back(Tree(22.0f, -2.0f, -7.0f, "large", 0.0f, 12.5f, 0.0f, "roll-pitch-yaw"));
     shapes_tree.push_back(Tree(22.0f, -2.0f, -20.0f, "large", 0.0f, 12.5f, 0.0f, "roll-pitch-yaw"));
 
@@ -42,6 +49,15 @@ Map::Map()
     shapes_quad.push_back(Quad({-1.4f, -1.99f, -13.0f}, {-5.2f, -1.99f, -30.0f}, {-2.7f, -1.99f, -29.0f}, {1.5f, -1.99f, -13.0f}, {GRAY}, true));
     shapes_quad.push_back(Quad({-2.7f, -1.99f, -29.0f}, {-5.2f, -1.99f, -30.0f}, {-4.2f, -1.99f, -33.5f}, {-2.4f, -1.99f, -32.3f}, {GRAY}, true));
 
+    // static airplane
+    shapes_airplane.push_back(Airplane(-5.0f, -1.25f, 18.5f, "small", 0.0f, -240.0f, 16.0f, "yaw-pitch-roll", 0.0f));
+
+    // runway
+    shapes_runway.push_back(Runway(0.0f, -1.98f, 10.0f, "normal", 0.0f, 30.0f, 0.0f, "roll-pitch-yaw"));
+
+    // hangar
+    shapes_hangar.push_back(Hangar(-2.0f, -1.99f, 25.0f, 0.0f, -150.0f, 0.0f, "roll-pitch-yaw"));
+
     // main grass surfaces
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-24.0f, -2.0f, -60.0f, 1.0f), Eigen::Vector4f(25.0f, -2.0f, -26.0, 1.0f), Eigen::Vector4f(-24.0f, -2.0f, -26.0f, 1.0f), GREEN, true));
     // shapes_quad.push_back(Quad({-24.0f, -2.0f, -60.0f}, {25.0f, -2.0f, -60.0f}, {25.0f, -2.0f, -26.0f}, {-24.0f, -2.0f, -26.0f}, {GREEN}, true));
@@ -54,10 +70,11 @@ Map::Map()
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-24.0f, -2.0f, -26.0f, 1.0f), Eigen::Vector4f(-14.0f, -2.0f, -26.0f, 1.0f), Eigen::Vector4f(-14.0f, -2.0f, -12.0f, 1.0f), GREEN, true));
 
     // ocean water surfaces
-    shapes_quad.push_back(Quad({-150.0f, -3.0f, -185.0f}, {-25.0f, -3.0f, -185.0f}, {-25.0f, -3.0f, -50.0f}, {-150.0f, -3.0f, -50.0f}, {BLUE}, true));
-    shapes_quad.push_back(Quad({-150.0f, -3.0f, 40.0f}, {-25.0f, -3.0f, 40.0f}, {-25.0f, -3.0f, 185.0f}, {-150.0f, -3.0f, 185.0f}, {BLUE}, true));
-    shapes_triangle.push_back(Surface(Eigen::Vector4f(-150.0f, -3.0f, -50.0f, 1.0f), Eigen::Vector4f(-60.0f, -3.0f, -50.0f, 1.0f), Eigen::Vector4f(-150.0f, -3.0f, -10.0f, 1.0f), BLUE, true));
-    shapes_triangle.push_back(Surface(Eigen::Vector4f(-150.0f, -3.0f, 40.0f, 1.0f), Eigen::Vector4f(-150.0f, -3.0f, 10.0f, 1.0f), Eigen::Vector4f(-50.0f, -3.0f, 40.0f, 1.0f), BLUE, true));
+    shapes_quad.push_back(Quad({-800.0f, -3.0f, -800.0f}, {-25.0f, -3.0f, -800.0f}, {-25.0f, -3.0f, -50.0f}, {-800.0f, -3.0f, -50.0f}, {BLUE}, true));
+    shapes_quad.push_back(Quad({-800.0f, -3.0f, 40.0f}, {-25.0f, -3.0f, 40.0f}, {-25.0f, -3.0f, 800.0f}, {-800.0f, -3.0f, 800.0f}, {BLUE}, true));
+    shapes_triangle.push_back(Surface(Eigen::Vector4f(-100.0f, -3.0f, -50.0f, 1.0f), Eigen::Vector4f(-60.0f, -3.0f, -50.0f, 1.0f), Eigen::Vector4f(-100.0f, -3.0f, -10.0f, 1.0f), BLUE, true));
+    shapes_triangle.push_back(Surface(Eigen::Vector4f(-100.0f, -3.0f, 40.0f, 1.0f), Eigen::Vector4f(-100.0f, -3.0f, 10.0f, 1.0f), Eigen::Vector4f(-50.0f, -3.0f, 40.0f, 1.0f), BLUE, true));
+    shapes_quad.push_back(Quad({-100.0f, -3.0f, 40.0f}, {-800.0f, -3.0f, 40.0f}, {-800.0f, -3.0f, -50.0f}, {-100.0f, -3.0f, -50.0f}, {BLUE}, true));
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-37.0f, -3.0f, 40.0f, 1.0f), Eigen::Vector4f(-50.0f, -3.0f, 40.0f, 1.0f), Eigen::Vector4f(-37.0f, -3.0f, 15.0f, 1.0f), BLUE, true));
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-37.0f, -3.0f, 15.0f, 1.0f), Eigen::Vector4f(-45.0f, -3.0f, 0.0f, 1.0f), Eigen::Vector4f(-37.0f, -3.0f, -15.0f, 1.0f), BLUE, true));
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-37.0f, -3.0f, -15.0f, 1.0f), Eigen::Vector4f(-60.0f, -3.0f, -50.0f, 1.0f), Eigen::Vector4f(-37.0f, -3.0f, -50.0f, 1.0f), BLUE, true));
@@ -67,8 +84,8 @@ Map::Map()
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-25.0f, -3.0f, -8.0f, 1.0f), Eigen::Vector4f(-16.0f, -3.0f, -8.0f, 1.0f), Eigen::Vector4f(-25.0f, -3.0f, 9.5f, 1.0f), BLUE, true));
 
     // distant water surfaces (far and near)
-    shapes_quad.push_back(Quad({-25.0f, -3.0f, -60.0f}, {-25.0f, -3.0f, -185.0f}, {-25.0f, -3.0f, -185.0f}, {25.0f, -3.0f, -90.0f}, {BLUE}, true));
-    shapes_quad.push_back(Quad({25.0f, -3.0f, 90.0f}, {-25.0f, -3.0f, 185.0f}, {-25.0f, -3.0f, 185.0f}, {-25.0f, -3.0f, 60.0f}, {BLUE}, true));
+    shapes_quad.push_back(Quad({-25.0f, -3.0f, -60.0f}, {-25.0f, -3.0f, -800.0f}, {800.0f, -3.0f, -800.0f}, {800.0f, -3.0f, -90.0f}, {BLUE}, true));
+    shapes_quad.push_back(Quad({800.0f, -3.0f, 30.0f}, {800.0f, -3.0f, 800.0f}, {-25.0f, -3.0f, 800.0f}, {-25.0f, -3.0f, 60.0f}, {BLUE}, true));
 
     // top beach surfaces
     shapes_quad.push_back(Quad({-25.0f, -3.0f, -60.0f}, {-24.0f, -2.0f, -60.0f}, {-24.0f, -2.0f, -26.0f}, {-25.0f, -3.0f, -26.0f}, {YELLOW}, false));
@@ -129,9 +146,9 @@ Map::Map()
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-12.0f, 8.0f, 49.0f, 1.0f), Eigen::Vector4f(-10.0f, 15.0f, 52.0f, 1.0f), Eigen::Vector4f(-17.0f, 8.0f, 54.0f, 1.0f), {GREEN}, false));
 
     // island
-    shapes_quad.push_back(Quad({-150.0f, -3.0f, 10.0f}, {-45.0f, -3.0f, 0.0f}, {-37.0f, -3.0f, 15.0f}, {-50.0f, -3.0f, 40.0f}, {MEDGREEN}, false));
-    shapes_quad.push_back(Quad({-150.0f, -3.0f, -10.0f}, {-60.0f, -3.0f, -50.0f}, {-37.0f, -3.0f, -15.0f}, {-45.0f, -3.0f, 0.0f}, {MEDGREEN}, false));
-    shapes_triangle.push_back(Surface(Eigen::Vector4f(-45.0f, -3.0f, 0.0f, 1.0f), Eigen::Vector4f(-150.0f, -3.0f, 10.0f, 1.0f), Eigen::Vector4f(-150.0f, -3.0f, -10.0f, 1.0f), MEDGREEN, false));
+    shapes_quad.push_back(Quad({-100.0f, -3.0f, 10.0f}, {-45.0f, -3.0f, 0.0f}, {-37.0f, -3.0f, 15.0f}, {-50.0f, -3.0f, 40.0f}, {MEDGREEN}, false));
+    shapes_quad.push_back(Quad({-100.0f, -3.0f, -10.0f}, {-60.0f, -3.0f, -50.0f}, {-37.0f, -3.0f, -15.0f}, {-45.0f, -3.0f, 0.0f}, {MEDGREEN}, false));
+    shapes_triangle.push_back(Surface(Eigen::Vector4f(-45.0f, -3.0f, 0.0f, 1.0f), Eigen::Vector4f(-100.0f, -3.0f, 10.0f, 1.0f), Eigen::Vector4f(-100.0f, -3.0f, -10.0f, 1.0f), MEDGREEN, false));
 
     // island mountains
     shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 15.0f, 10.0f, 15.0f, {DKGREEN, DKGREEN, NIGHTGREEN, NIGHTGREEN, BLACK}, false, {"bottom"}));
@@ -169,11 +186,6 @@ Map::Map()
     shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 15.0f, 44.0f, 15.0f, {WHITE, WHITE, GRAY, GRAY, BLACK}, false, {"bottom"}));
     shapes_pyramid.back().rotate(0.0f, 45.0f, 0.0f, "roll-pitch-yaw");
     shapes_pyramid.back().translate(-78.0f, -2.0, -4.0f);
-
-    // // cloud
-    // shapes_triangle.push_back(Surface(Eigen::Vector4f(0.5f, 10.5f, -15.0f, 1.0f), Eigen::Vector4f(4.0f, 11.0f, -15.0f, 1.0f), Eigen::Vector4f(2.5f, 9.0f, -15.0f, 1.0f), WHITE));
-    // shapes_triangle.push_back(Surface(Eigen::Vector4f(0.0f, 10.0f, -15.0f, 1.0f), Eigen::Vector4f(2.0f, 12.5f, -15.0f, 1.0f), Eigen::Vector4f(3.0f, 10.5f, -15.0f, 1.0f), WHITE));
-    // shapes_triangle.push_back(Surface(Eigen::Vector4f(1.2f, 10.5f, -15.0f, 1.0f), Eigen::Vector4f(3.5f, 12.0f, -15.0f, 1.0f), Eigen::Vector4f(4.5f, 10.0f, -15.0f, 1.0f), WHITE));
 }
 
 Map::~Map() {}
@@ -222,6 +234,21 @@ vector<Surface> &Map::get_map_surfaces()
         push_surfaces(shape.get_surfaces());
     }
 
+    for (auto &shape : shapes_airplane)
+    {
+        push_surfaces(shape.get_surfaces());
+    }
+
+    for (auto &shape : shapes_runway)
+    {
+        push_surfaces(shape.get_surfaces());
+    }
+
+    for (auto &shape : shapes_hangar)
+    {
+        push_surfaces(shape.get_surfaces());
+    }
+
     return all_surfaces;
 }
 
@@ -231,52 +258,4 @@ void Map::push_surfaces(const vector<Surface> &temp_surfaces)
     {
         all_surfaces.push_back(surface);
     }
-}
-
-// Return reference to RectPrism object
-RectPrism &Map::get_rect_prism(const int &index)
-{
-    return shapes_rect_prism[index];
-}
-
-// Return reference to Pyramid object
-Pyramid &Map::get_pyramid(const int &index)
-{
-    return shapes_pyramid[index];
-}
-
-// Return reference to Tree object
-Tree &Map::get_tree(const int &index)
-{
-    return shapes_tree[index];
-}
-
-// Return reference to House object
-House &Map::get_house(const int &index)
-{
-    return shapes_house[index];
-}
-
-// Return reference to Bridge object
-Bridge &Map::get_bridge(const int &index)
-{
-    return shapes_bridge[index];
-}
-
-// Return reference to Rect object
-Rect &Map::get_rect(const int &index)
-{
-    return shapes_rect[index];
-}
-
-// Return reference to Quad object
-Quad &Map::get_quad(const int &index)
-{
-    return shapes_quad[index];
-}
-
-// Return reference to Surface (triangle) object
-Surface &Map::get_triangle(const int &index)
-{
-    return shapes_triangle[index];
 }
