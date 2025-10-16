@@ -31,14 +31,20 @@ int main(int argc, char *argv[])
     // Initialize key down states
     array<bool, SDL_SCANCODE_COUNT> key_states = {};
 
+    // Initialize function key states
+    array<bool, 13> f_keys_pressed = {};
+
     // Create a window and renderer
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE);
-    if (!(SDL_CreateWindowAndRenderer("Raster Engine", WIDTH, HEIGHT, window_flags, &window, &renderer)))
+    if (!(SDL_CreateWindowAndRenderer("Raster Engine", WIDTH * 3, HEIGHT * 3, window_flags, &window, &renderer)))
     {
         SDL_Log("Could not create window and renderer: %s", SDL_GetError());
         SDL_Quit();
         return 1;
     }
+
+    // Set logical presentation resolution
+    SDL_SetRenderLogicalPresentation(renderer, WIDTH, HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
     bool quit = false;
     bool need_redraw = true;
@@ -78,6 +84,10 @@ int main(int argc, char *argv[])
     const float perf_freq = static_cast<float>(SDL_GetPerformanceFrequency());
     Uint64 current_frame_time;
     float frame_dt;
+    float debug_dt;
+
+    // Debug info timing, initialize as 6 seconds prior
+    Uint64 last_debug_time = SDL_GetPerformanceCounter() - (6 * perf_freq);
 
     // Main game loop
     while (!quit)
@@ -87,6 +97,9 @@ int main(int argc, char *argv[])
         frame_dt = static_cast<float>(current_frame_time - last_frame_time) / perf_freq;
         last_frame_time = current_frame_time;
 
+        // delta time since performance counter
+        debug_dt = static_cast<float>(current_frame_time - last_debug_time) / perf_freq;
+
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_EVENT_QUIT)
@@ -95,8 +108,22 @@ int main(int argc, char *argv[])
             }
             else if (event.type == SDL_EVENT_WINDOW_RESIZED)
             {
-                engine.set_width_height(event.window.data1, event.window.data2);
-                need_redraw = true;
+                float aspect_ratio = (float)WIDTH / HEIGHT;
+                int new_width = event.window.data1;
+                int new_height = event.window.data2;
+
+                // Calculate height based on new width, maintaining aspect ratio
+                int calculated_height = (int)(new_width / aspect_ratio);
+                if (calculated_height <= new_height)
+                {
+                    new_height = calculated_height;
+                }
+                else
+                {
+                    new_width = (int)(new_height * aspect_ratio);
+                }
+
+                SDL_SetWindowSize(window, new_width, new_height);
             }
             if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED)
             {
@@ -114,9 +141,12 @@ int main(int argc, char *argv[])
                 {
                     key_states[event.key.scancode] = true;
                 }
+                process_f_key_down(key_states, engine, *renderer, need_redraw,
+                                   f_keys_pressed, last_debug_time);
             }
             else if (event.type == SDL_EVENT_KEY_UP)
             {
+                process_f_key_up(key_states, f_keys_pressed);
                 if (event.key.scancode < SDL_SCANCODE_COUNT)
                 {
                     key_states[event.key.scancode] = false;
@@ -159,6 +189,12 @@ int main(int argc, char *argv[])
 
             // Draw surfaces
             engine.draw_surfaces(*renderer, all_surfaces);
+
+            // Draw settings if recently changed
+            if (debug_dt < 5.0f)
+            {
+                draw_settings_info(engine, *renderer, *window, frame_dt);
+            }
 
             // Update the screen
             SDL_RenderPresent(renderer);

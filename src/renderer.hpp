@@ -55,6 +55,10 @@ public:
     vector<Eigen::Vector3f> get_view_directions();
     void draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces);
     void set_width_height(const float &w, const float &h);
+    void cycle_fov();
+    float get_fov();
+    float get_width();
+    float get_height();
     void move_view(const Eigen::Vector3f &dloc, const float &dpitch, const float &dyaw);
 };
 

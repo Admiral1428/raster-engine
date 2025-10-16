@@ -13,10 +13,10 @@ struct Color
 
 // Default renderer options
 const int WIDTH{640};
-const int HEIGHT{480};
+const int HEIGHT{360};
 const float PLANE_N{0.3f};   // near clipping plane
 const float PLANE_F{100.0f}; // far clipping plane
-const float FOV{90.0f};      // field of view in degrees
+const float FOV{90.0f};      // horizontal field of view in degrees
 // Tolerances for rendering
 const float TOL_VISIBLE{1e-3};       // tolerance check for triangle being visible
 const float TOL_IN_TRIANGLE{1e-3};   // tolerance check for coordinate in triangle
