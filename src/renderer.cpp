@@ -54,9 +54,10 @@ void Renderer::resize_z_buffer()
 
 void Renderer::calc_projection_matrix()
 {
-    float S = 1.0f / tan(fov * 0.5f * pi / 180.0f); // scaling factor
-    projection_matrix << S, 0.0f, 0.0f, 0.0f,
-        0.0f, S, 0.0f, 0.0f,
+    float Sx = 1.0f / tan(fov * 0.5f * pi / 180.0f); // horizontal scaling factor using horz fov
+    float Sy = Sx * (width / height);                // vertical scaling factor using aspect ratio
+    projection_matrix << Sx, 0.0f, 0.0f, 0.0f,
+        0.0f, Sy, 0.0f, 0.0f,
         0.0f, 0.0f, -f / (f - n), -(f * n) / (f - n),
         0.0f, 0.0f, -1.0f, 0.0f;
 }
@@ -278,6 +279,30 @@ void Renderer::set_width_height(const float &w, const float &h)
     width = static_cast<int>(w);
     height = static_cast<int>(h);
     resize_z_buffer();
+}
+
+void Renderer::cycle_fov()
+{
+    fov += 5.0f;
+    if (fov > 130.0f)
+    {
+        fov = 70.0f;
+    }
+}
+
+float Renderer::get_fov()
+{
+    return fov;
+}
+
+float Renderer::get_width()
+{
+    return width;
+}
+
+float Renderer::get_height()
+{
+    return height;
 }
 
 // Move the view position and angle

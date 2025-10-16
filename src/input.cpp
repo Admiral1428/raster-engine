@@ -72,3 +72,81 @@ void process_input(array<bool, SDL_SCANCODE_COUNT> &key_states, const vector<flo
         need_redraw = true;
     }
 }
+
+void process_f_key_down(array<bool, SDL_SCANCODE_COUNT> &key_states, Renderer &engine, SDL_Renderer &renderer,
+                        bool &need_redraw, array<bool, 13> &f_keys_pressed, Uint64 &last_debug_time)
+{
+    if (key_states[SDL_SCANCODE_F1] && !f_keys_pressed[1])
+    {
+        engine.cycle_fov();
+        need_redraw = true;
+        f_keys_pressed[1] = true;
+
+        last_debug_time = SDL_GetPerformanceCounter();
+    }
+    else if (key_states[SDL_SCANCODE_F2] && !f_keys_pressed[2])
+    {
+        float new_width = engine.get_width() + WIDTH;
+        float new_height = engine.get_height() + HEIGHT;
+
+        // if first option (half of default), change to default
+        if ((new_width == WIDTH / 2 + WIDTH) || (new_height == HEIGHT / 2 + HEIGHT))
+        {
+            new_width = WIDTH;
+            new_height = HEIGHT;
+        }
+
+        // if exceeding 1920 x 1080 render resolution, cycle back to first option
+        if ((new_width > 1920.0f) || new_height > 1080.0f)
+        {
+            new_width = WIDTH / 2;
+            new_height = HEIGHT / 2;
+        }
+
+        engine.set_width_height(new_width, new_height);
+        SDL_SetRenderLogicalPresentation(&renderer, new_width, new_height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+        last_debug_time = SDL_GetPerformanceCounter();
+    }
+}
+
+void process_f_key_up(array<bool, SDL_SCANCODE_COUNT> &key_states, array<bool, 13> &f_keys_pressed)
+{
+    if (key_states[SDL_SCANCODE_F1])
+    {
+        f_keys_pressed[1] = false;
+    }
+}
+
+void draw_settings_info(Renderer &engine, SDL_Renderer &renderer, SDL_Window &window, const float &frame_dt)
+{
+    // Field of view
+    string fov_string = "Field of view = " + to_string(engine.get_fov());
+    const char *fov_c_str = fov_string.c_str();
+    SDL_SetRenderDrawColor(&renderer, 0, 0, 0, 255); // BLACK text
+    SDL_RenderDebugText(&renderer, 0, 0, fov_c_str);
+
+    // Render resolution
+    string render_res = "Render resolution = " +
+                        to_string(static_cast<int>(engine.get_width())) + " x " +
+                        to_string(static_cast<int>(engine.get_height()));
+    const char *render_res_c_str = render_res.c_str();
+    SDL_RenderDebugText(&renderer, 0, 10, render_res_c_str);
+
+    // Window resolution
+    int window_width, window_height;
+    SDL_GetWindowSize(&window, &window_width, &window_height);
+
+    string window_res = "Window resolution = " +
+                        to_string(window_width) + " x " +
+                        to_string(window_height);
+    const char *window_res_c_str = window_res.c_str();
+    SDL_RenderDebugText(&renderer, 0, 20, window_res_c_str);
+
+    // Frametime and framerate
+    string frame_time = "Frametime (ms): " + to_string(frame_dt * 1000.0f);
+    string fps = "Frames per second: " + to_string(1.0f / frame_dt);
+    const char *frame_time_c_str = frame_time.c_str();
+    const char *fps_c_str = fps.c_str();
+    SDL_RenderDebugText(&renderer, 0, 30, frame_time_c_str);
+    SDL_RenderDebugText(&renderer, 0, 40, fps_c_str);
+}
