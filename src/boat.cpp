@@ -1,4 +1,4 @@
-#include "Boat.hpp"
+#include "boat.hpp"
 
 Boat::Boat(const float &_x, const float &_y, const float &_z, const string &_size,
            const float &_rol, const float &_pit, const float &_yaw, const string &_rot,
@@ -9,26 +9,28 @@ Boat::Boat(const float &_x, const float &_y, const float &_z, const string &_siz
     make_shape();
 }
 
-Boat::Boat(const Boat &t) : Shape(t)
+Boat::Boat(const Boat &b) : Shape(b)
 {
-    size = t.size;
-    yaw = t.yaw;
-    pitch = t.pitch;
-    roll = t.roll;
-    rot_order = t.rot_order;
+    size = b.size;
+    yaw = b.yaw;
+    pitch = b.pitch;
+    roll = b.roll;
+    rot_order = b.rot_order;
+    speed = b.speed;
     make_shape();
 }
 
-Boat &Boat::operator=(const Boat &t)
+Boat &Boat::operator=(const Boat &b)
 {
-    if (this != &t)
+    if (this != &b)
     {
-        Shape::operator=(t);
-        size = t.size;
-        yaw = t.yaw;
-        pitch = t.pitch;
-        roll = t.roll;
-        rot_order = t.rot_order;
+        Shape::operator=(b);
+        size = b.size;
+        yaw = b.yaw;
+        pitch = b.pitch;
+        roll = b.roll;
+        rot_order = b.rot_order;
+        speed = b.speed;
         make_shape();
     }
     return *this;
@@ -43,69 +45,78 @@ void Boat::make_shape()
 
     if (size == "small")
     {
+        // Initialize vectors to store shapes of each type
+        vector<RectPrism> rect_prisms;
+        vector<Surface> triangles;
+        vector<Quad> quads;
+
+        // Reserve space for vectors
+        rect_prisms.reserve(2);
+        triangles.reserve(8);
+        quads.reserve(4);
+
         // Boat base
-        RectPrism base(0.0f, 0.75f, 0.0f, 4.5f, 1.5f, 2.25f, {BROWN, BROWN, {}, {}, NIGHTBROWN, {}},
-                       false, {"left", "right", "bottom"});
+        rect_prisms.push_back(RectPrism(0.0f, 0.75f, 0.0f, 4.5f, 1.5f, 2.25f, {BROWN, BROWN, {}, {}, NIGHTBROWN, {}},
+                                        false, {"left", "right", "bottom"}));
 
-        // Bow wedge (front of boat)
-        Surface bow_left(Eigen::Vector4f(2.25f, 1.5f, -1.125f, 1.0f),
-                         Eigen::Vector4f(2.25f, 0.0f, -1.125f, 1.0f),
-                         Eigen::Vector4f(3.375f, 1.5f, -1.125f, 1.0f), {BROWN});
-        Surface bow_right(Eigen::Vector4f(3.375f, 1.5f, 1.125f, 1.0f),
-                          Eigen::Vector4f(2.25f, 0.0f, 1.125f, 1.0f),
-                          Eigen::Vector4f(2.25f, 1.5f, 1.125f, 1.0f), {BROWN});
-        Quad bow_slope({2.25f, 0.0f, -1.125f}, {2.25f, 0.0f, 1.125f}, {3.375f, 1.5f, 1.125f}, {3.375f, 1.5f, -1.125f}, {DKBROWN});
-        Quad bow_top({2.25f, 1.5f, 1.125f}, {2.25f, 1.5f, -1.125f}, {3.375f, 1.5f, -1.125f}, {3.375f, 1.5f, 1.125f}, {NIGHTBROWN});
+        // Bow (front) wedge (left, right, slope, top)
+        triangles.push_back(Surface(Eigen::Vector4f(2.25f, 1.5f, -1.125f, 1.0f),
+                                    Eigen::Vector4f(2.25f, 0.0f, -1.125f, 1.0f),
+                                    Eigen::Vector4f(3.375f, 1.5f, -1.125f, 1.0f), {BROWN}));
+        triangles.push_back(Surface(Eigen::Vector4f(3.375f, 1.5f, 1.125f, 1.0f),
+                                    Eigen::Vector4f(2.25f, 0.0f, 1.125f, 1.0f),
+                                    Eigen::Vector4f(2.25f, 1.5f, 1.125f, 1.0f), {BROWN}));
+        quads.push_back(Quad({2.25f, 0.0f, -1.125f}, {2.25f, 0.0f, 1.125f}, {3.375f, 1.5f, 1.125f}, {3.375f, 1.5f, -1.125f}, {DKBROWN}));
+        quads.push_back(Quad({2.25f, 1.5f, 1.125f}, {2.25f, 1.5f, -1.125f}, {3.375f, 1.5f, -1.125f}, {3.375f, 1.5f, 1.125f}, {NIGHTBROWN}));
 
-        // Stern wedge (rear of boat)
-        Surface stern_left(Eigen::Vector4f(-3.375f, 1.5f, -1.125f, 1.0f),
-                           Eigen::Vector4f(-2.25f, 0.0f, -1.125f, 1.0f),
-                           Eigen::Vector4f(-2.25f, 1.5f, -1.125f, 1.0f), {BROWN});
-        Surface stern_right(Eigen::Vector4f(-2.25f, 1.5f, 1.125f, 1.0f),
-                            Eigen::Vector4f(-2.25f, 0.0f, 1.125f, 1.0f),
-                            Eigen::Vector4f(-3.375f, 1.5f, 1.125f, 1.0f), {BROWN});
-        Quad stern_slope({-3.375f, 1.5f, -1.125f}, {-3.375f, 1.5f, 1.125f}, {-2.25f, 0.0f, 1.125f}, {-2.25f, 0.0f, -1.125f}, {DKBROWN});
-        Quad stern_top({-3.375f, 1.5f, 1.125f}, {-3.375f, 1.5f, -1.125f}, {-2.25f, 1.5f, -1.125f}, {-2.25f, 1.5f, 1.125f}, {NIGHTBROWN});
+        // Stern (rear) wedge (left, right, slope, top)
+        triangles.push_back(Surface(Eigen::Vector4f(-3.375f, 1.5f, -1.125f, 1.0f),
+                                    Eigen::Vector4f(-2.25f, 0.0f, -1.125f, 1.0f),
+                                    Eigen::Vector4f(-2.25f, 1.5f, -1.125f, 1.0f), {BROWN}));
+        triangles.push_back(Surface(Eigen::Vector4f(-2.25f, 1.5f, 1.125f, 1.0f),
+                                    Eigen::Vector4f(-2.25f, 0.0f, 1.125f, 1.0f),
+                                    Eigen::Vector4f(-3.375f, 1.5f, 1.125f, 1.0f), {BROWN}));
+        quads.push_back(Quad({-3.375f, 1.5f, -1.125f}, {-3.375f, 1.5f, 1.125f}, {-2.25f, 0.0f, 1.125f}, {-2.25f, 0.0f, -1.125f}, {DKBROWN}));
+        quads.push_back(Quad({-3.375f, 1.5f, 1.125f}, {-3.375f, 1.5f, -1.125f}, {-2.25f, 1.5f, -1.125f}, {-2.25f, 1.5f, 1.125f}, {NIGHTBROWN}));
 
         // mast
-        RectPrism mast(1.0f, 4.0f, 0.0f, 0.2f, 5.0f, 0.2f, {DKGRAY, DKGRAY, NIGHTGRAY, NIGHTGRAY, GRAY, {}}, false, {"bottom"});
+        rect_prisms.push_back(RectPrism(1.0f, 4.0f, 0.0f, 0.2f, 5.0f, 0.2f,
+                                        {DKGRAY, DKGRAY, NIGHTGRAY, NIGHTGRAY, GRAY, {}}, false, {"bottom"}));
 
-        // headsail (front bow, smaller triangle)
-        Surface head_left(Eigen::Vector4f(1.1f, 6.3f, 0.0f, 1.0f),
-                          Eigen::Vector4f(2.8f, 1.9f, 0.0f, 1.0f),
-                          Eigen::Vector4f(1.1f, 1.9f, -0.1f, 1.0f), {WHITE});
-        Surface head_right(Eigen::Vector4f(1.1f, 1.9f, 0.1f, 1.0f),
-                           Eigen::Vector4f(2.8f, 1.9f, 0.0f, 1.0f),
-                           Eigen::Vector4f(1.1f, 6.3f, 0.0f, 1.0f), {WHITE});
+        // headsail (left and right)
+        triangles.push_back(Surface(Eigen::Vector4f(1.1f, 6.3f, 0.0f, 1.0f),
+                                    Eigen::Vector4f(2.8f, 1.9f, 0.0f, 1.0f),
+                                    Eigen::Vector4f(1.1f, 1.9f, -0.1f, 1.0f), {WHITE}));
+        triangles.push_back(Surface(Eigen::Vector4f(1.1f, 1.9f, 0.1f, 1.0f),
+                                    Eigen::Vector4f(2.8f, 1.9f, 0.0f, 1.0f),
+                                    Eigen::Vector4f(1.1f, 6.3f, 0.0f, 1.0f), {WHITE}));
 
-        // mainsail (rear stern, larger triangle)
-        Surface main_left(Eigen::Vector4f(0.9f, 1.9f, -0.1f, 1.0f),
-                          Eigen::Vector4f(-2.8f, 1.9f, 0.0f, 1.0f),
-                          Eigen::Vector4f(0.9f, 6.3f, 0.0f, 1.0f), {WHITE});
-        Surface main_right(Eigen::Vector4f(0.9f, 6.3f, 0.0f, 1.0f),
-                           Eigen::Vector4f(-2.8f, 1.9f, 0.0f, 1.0f),
-                           Eigen::Vector4f(0.9f, 1.9f, 0.1f, 1.0f), {WHITE});
+        // mainsail (left and right)
+        triangles.push_back(Surface(Eigen::Vector4f(0.9f, 1.9f, -0.1f, 1.0f),
+                                    Eigen::Vector4f(-2.8f, 1.9f, 0.0f, 1.0f),
+                                    Eigen::Vector4f(0.9f, 6.3f, 0.0f, 1.0f), {WHITE}));
+        triangles.push_back(Surface(Eigen::Vector4f(0.9f, 6.3f, 0.0f, 1.0f),
+                                    Eigen::Vector4f(-2.8f, 1.9f, 0.0f, 1.0f),
+                                    Eigen::Vector4f(0.9f, 1.9f, 0.1f, 1.0f), {WHITE}));
 
-        vector<Surface> base_surfaces = base.get_surfaces();
-        surfaces.insert(surfaces.end(), base_surfaces.begin(), base_surfaces.end());
-        surfaces.insert(surfaces.end(), bow_left);
-        surfaces.insert(surfaces.end(), bow_right);
-        vector<Surface> bow_slope_surfaces = bow_slope.get_surfaces();
-        surfaces.insert(surfaces.end(), bow_slope_surfaces.begin(), bow_slope_surfaces.end());
-        vector<Surface> bow_top_surfaces = bow_top.get_surfaces();
-        surfaces.insert(surfaces.end(), bow_top_surfaces.begin(), bow_top_surfaces.end());
-        surfaces.insert(surfaces.end(), stern_left);
-        surfaces.insert(surfaces.end(), stern_right);
-        vector<Surface> stern_slope_surfaces = stern_slope.get_surfaces();
-        surfaces.insert(surfaces.end(), stern_slope_surfaces.begin(), stern_slope_surfaces.end());
-        vector<Surface> stern_top_surfaces = stern_top.get_surfaces();
-        surfaces.insert(surfaces.end(), stern_top_surfaces.begin(), stern_top_surfaces.end());
-        vector<Surface> mast_surfaces = mast.get_surfaces();
-        surfaces.insert(surfaces.end(), mast_surfaces.begin(), mast_surfaces.end());
-        surfaces.insert(surfaces.end(), head_left);
-        surfaces.insert(surfaces.end(), head_right);
-        surfaces.insert(surfaces.end(), main_left);
-        surfaces.insert(surfaces.end(), main_right);
+        // Populate the surfaces vector with all surfaces
+        vector<Surface> shape_surfaces;
+        for (auto &shape : rect_prisms)
+        {
+            shape_surfaces.clear();
+            shape_surfaces = shape.get_surfaces();
+            surfaces.insert(surfaces.end(), shape_surfaces.begin(), shape_surfaces.end());
+        }
+        for (auto &shape : triangles)
+        {
+            surfaces.push_back(shape);
+        }
+        for (auto &shape : quads)
+        {
+            shape_surfaces.clear();
+            shape_surfaces = shape.get_surfaces();
+            surfaces.insert(surfaces.end(), shape_surfaces.begin(), shape_surfaces.end());
+        }
     }
 
     // apply rotations
