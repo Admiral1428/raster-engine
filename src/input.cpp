@@ -74,7 +74,8 @@ void process_input(array<bool, SDL_SCANCODE_COUNT> &key_states, const vector<flo
 }
 
 void process_f_key_down(array<bool, SDL_SCANCODE_COUNT> &key_states, Renderer &engine, SDL_Renderer &renderer,
-                        bool &need_redraw, array<bool, 13> &f_keys_pressed, Uint64 &last_debug_time)
+                        bool &need_redraw, array<bool, 13> &f_keys_pressed, Uint64 &last_debug_time, int &cur_res_index,
+                        int &render_mode_index)
 {
     if (key_states[SDL_SCANCODE_F1] && !f_keys_pressed[1])
     {
@@ -86,25 +87,34 @@ void process_f_key_down(array<bool, SDL_SCANCODE_COUNT> &key_states, Renderer &e
     }
     else if (key_states[SDL_SCANCODE_F2] && !f_keys_pressed[2])
     {
-        float new_width = engine.get_width() + WIDTH;
-        float new_height = engine.get_height() + HEIGHT;
-
-        // if first option (half of default), change to default
-        if ((new_width == WIDTH / 2 + WIDTH) || (new_height == HEIGHT / 2 + HEIGHT))
+        if (cur_res_index < RENDER_RES_OPTS.size() - 1)
         {
-            new_width = WIDTH;
-            new_height = HEIGHT;
+            cur_res_index += 1;
+        }
+        else
+        {
+            cur_res_index = 0;
         }
 
-        // if exceeding 1920 x 1080 render resolution, cycle back to first option
-        if ((new_width > 1920.0f) || new_height > 1080.0f)
-        {
-            new_width = WIDTH / 2;
-            new_height = HEIGHT / 2;
-        }
+        float new_width = RENDER_RES_OPTS[cur_res_index].width;
+        float new_height = RENDER_RES_OPTS[cur_res_index].height;
 
         engine.set_width_height(new_width, new_height);
         SDL_SetRenderLogicalPresentation(&renderer, new_width, new_height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+        last_debug_time = SDL_GetPerformanceCounter();
+    }
+    else if (key_states[SDL_SCANCODE_F3] && !f_keys_pressed[3])
+    {
+        if (render_mode_index < RENDER_MODES.size() - 1)
+        {
+            render_mode_index += 1;
+        }
+        else
+        {
+            render_mode_index = 0;
+        }
+        engine.set_render_mode(RENDER_MODES[render_mode_index]);
+
         last_debug_time = SDL_GetPerformanceCounter();
     }
 }
@@ -114,6 +124,16 @@ void process_f_key_up(array<bool, SDL_SCANCODE_COUNT> &key_states, array<bool, 1
     if (key_states[SDL_SCANCODE_F1])
     {
         f_keys_pressed[1] = false;
+    }
+
+    if (key_states[SDL_SCANCODE_F2])
+    {
+        f_keys_pressed[2] = false;
+    }
+
+    if (key_states[SDL_SCANCODE_F3])
+    {
+        f_keys_pressed[3] = false;
     }
 }
 
@@ -149,4 +169,9 @@ void draw_settings_info(Renderer &engine, SDL_Renderer &renderer, SDL_Window &wi
     const char *fps_c_str = fps.c_str();
     SDL_RenderDebugText(&renderer, 0, 30, frame_time_c_str);
     SDL_RenderDebugText(&renderer, 0, 40, fps_c_str);
+
+    // Render mode
+    string render_mode_text = "Render mode: " + engine.get_render_mode();
+    const char *render_mode_c_str = render_mode_text.c_str();
+    SDL_RenderDebugText(&renderer, 0, 50, render_mode_c_str);
 }

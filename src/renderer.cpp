@@ -1,12 +1,12 @@
 #include "renderer.hpp"
 
-Renderer::Renderer() : n(PLANE_N), f(PLANE_F), fov(FOV), width(WIDTH), height(HEIGHT), pitch(0), yaw(0)
+Renderer::Renderer() : n(PLANE_N), f(PLANE_F), fov(FOV), width(RENDER_RES_OPTS[0].width), height(RENDER_RES_OPTS[0].height), pitch(0), yaw(0), render_mode("Textures")
 {
     eye << 0.0f, 0.0f, 0.0f;
     resize_z_buffer();
 }
-Renderer::Renderer(const float &_n, const float &_f, const float &_fov, const float &_width, const float &_height)
-    : n(_n), f(_f), fov(_fov), width(_width), height(_height), pitch(0.0f), yaw(0.0f)
+Renderer::Renderer(const float &_n, const float &_f, const float &_fov, const float &_width, const float &_height, const string &_render_mode)
+    : n(_n), f(_f), fov(_fov), width(_width), height(_height), pitch(0.0f), yaw(0.0f), render_mode(_render_mode)
 {
     eye << 0.0f, 0.0f, 0.0f;
     resize_z_buffer();
@@ -19,11 +19,13 @@ Renderer::Renderer(const Renderer &c)
     width = c.width;
     height = c.height;
     z_buffer = c.z_buffer;
+    pixel_grid = c.pixel_grid;
     projection_matrix = c.projection_matrix;
     view_matrix = c.view_matrix;
     pitch = c.pitch;
     yaw = c.yaw;
     eye = c.eye;
+    render_mode = c.render_mode;
 }
 
 Renderer::~Renderer() {}
@@ -38,11 +40,13 @@ Renderer &Renderer::operator=(const Renderer &c)
         width = c.width;
         height = c.height;
         z_buffer = c.z_buffer;
+        pixel_grid = c.pixel_grid;
         projection_matrix = c.projection_matrix;
         view_matrix = c.view_matrix;
         pitch = c.pitch;
         yaw = c.yaw;
         eye = c.eye;
+        render_mode = c.render_mode;
     }
     return *this;
 }
@@ -50,6 +54,7 @@ Renderer &Renderer::operator=(const Renderer &c)
 void Renderer::resize_z_buffer()
 {
     z_buffer.resize(height, width);
+    pixel_grid = PixelMatrix(height, width);
 }
 
 void Renderer::calc_projection_matrix()
@@ -127,6 +132,19 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
     // initialize z buffer with 1.0 depth values
     z_buffer.setConstant(1.0f);
 
+    // initialize pixel buffer to sky blue
+    pixel_grid.setConstant(convert_color(BACK_COLOR));
+
+    // Initialize pixel grid as SDL texture
+    SDL_Texture *sdl_texture = SDL_CreateTexture(&renderer, SDL_PIXELFORMAT_BGRA8888,
+                                                 SDL_TEXTUREACCESS_STREAMING, width, height);
+    void *sdl_pixels;
+    int pitch; // Number of bytes in a row
+    SDL_LockTexture(sdl_texture, NULL, &sdl_pixels, &pitch);
+
+    // Cast pixels to a usable Uint32 format
+    Uint32 *texture_pixels = (Uint32 *)sdl_pixels;
+
     // calculate view and projection matrices
     calc_view_matrix();
     calc_projection_matrix();
@@ -140,10 +158,16 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
     Eigen::Vector4f c1;
     Eigen::Vector4f c2;
     bool surface_visible;
-    vector<Eigen::Vector4f> homog_points;
+    vector<Eigen::Vector2f> uv_coords;
+    string suface_texture_name;
+    bool has_texture;
+    vector<Vertex> homog_points;
     Eigen::Vector4f ndc_0;
     Eigen::Vector4f ndc_1;
     Eigen::Vector4f ndc_2;
+    Eigen::Vector2f uv0;
+    Eigen::Vector2f uv1;
+    Eigen::Vector2f uv2;
     Eigen::Vector4f r0;
     Eigen::Vector4f r1;
     Eigen::Vector4f r2;
@@ -153,6 +177,7 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
     Eigen::Vector4i bounding_box;
     int num_bounding_pixels;
     float triangle_area;
+    vector<Color> surf_colors;
     Color surf_color;
     bool surf_diminish_light;
     int grid_ctr;
@@ -162,6 +187,8 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
     Eigen::VectorXf px_subset;
     Eigen::VectorXf py_subset;
     Eigen::VectorXf z_ndc;
+    Texture &surface_texture = TEXTURES.at("test");
+    Eigen::MatrixXf uv_texture;
     int cur_pixel_x;
     int cur_pixel_y;
 
@@ -184,19 +211,28 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
             c1 = projection_matrix * v1;
             c2 = projection_matrix * v2;
 
+            uv_coords = surface.get_uv_coords();
+            suface_texture_name = surface.get_texture_name();
+            has_texture = suface_texture_name != "";
+
             // perform clipping and return homogeneous coordinates
-            homog_points = clip(c0, c1, c2);
+            homog_points = clip(c0, c1, c2, uv_coords[0], uv_coords[1], uv_coords[2]);
 
             // loop through every third element to get each resulting triangle
             for (int i{0}; i < homog_points.size(); i += 3)
             {
                 // get normalized device coordinates
-                ndc_0 = homog_points[i];
-                ndc_1 = homog_points[i + 1];
-                ndc_2 = homog_points[i + 2];
+                ndc_0 = homog_points[i].position;
+                ndc_1 = homog_points[i + 1].position;
+                ndc_2 = homog_points[i + 2].position;
                 normalize_point(ndc_0);
                 normalize_point(ndc_1);
                 normalize_point(ndc_2);
+
+                // Get texture coordinates
+                uv0 = homog_points[i].uv;
+                uv1 = homog_points[i + 1].uv;
+                uv2 = homog_points[i + 2].uv;
 
                 // rasterize triangle vertices to screen space after normalizing
                 r0 = ndc_0;
@@ -218,9 +254,6 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
                     num_bounding_pixels = (bounding_box(1) - bounding_box(0) + 1) *
                                           (bounding_box(3) - bounding_box(2) + 1);
 
-                    // set color
-                    surf_color = surface.get_color();
-
                     // get surface light property
                     surf_diminish_light = surface.get_diminish_light();
 
@@ -241,36 +274,68 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
                     // get barycentric coordinates
                     barycentric_coords = get_barycentric_coords(r0, r1, r2, px, py);
 
-                    // get subset of coordinates which are inside triangle
-                    barycentric_and_pixels = get_points_in_triangle(barycentric_coords, px, py);
+                    // get subset of coordinates which are inside or on triangle boundary
+                    if (render_mode == "Triangles")
+                    {
+                        barycentric_and_pixels = get_points_on_triangle_boundary(barycentric_coords, px, py);
+                    }
+                    else
+                    {
+                        barycentric_and_pixels = get_points_in_triangle(barycentric_coords, px, py);
+                    }
                     px_subset = barycentric_and_pixels[3];
                     py_subset = barycentric_and_pixels[4];
 
                     // get ndc depth for reduced set of coordinates
-                    z_ndc = get_ndc_depth(barycentric_and_pixels, homog_points[i], homog_points[i + 1], homog_points[i + 2]);
+                    z_ndc = get_ndc_depth(barycentric_and_pixels, homog_points[i].position,
+                                          homog_points[i + 1].position, homog_points[i + 2].position);
 
+                    if (has_texture && render_mode == "Textures")
+                    {
+                        uv_texture = get_uv_texture(barycentric_and_pixels,
+                                                    homog_points[i].position,
+                                                    homog_points[i + 1].position,
+                                                    homog_points[i + 2].position,
+                                                    uv0, uv1, uv2);
+                        surface_texture = TEXTURES.at(suface_texture_name);
+                    }
+                    else
+                    {
+                        surf_color = surface.get_color();
+                    }
+
+#pragma omp parallel for
                     for (int pixel{0}; pixel < z_ndc.size(); ++pixel)
                     {
-                        cur_pixel_x = static_cast<int>(px_subset(pixel));
-                        cur_pixel_y = static_cast<int>(py_subset(pixel));
+                        int cur_pixel_x = static_cast<int>(px_subset(pixel));
+                        int cur_pixel_y = static_cast<int>(py_subset(pixel));
 
                         if (z_ndc(pixel) < z_buffer(cur_pixel_y, cur_pixel_x))
                         {
                             z_buffer(cur_pixel_y, cur_pixel_x) = z_ndc(pixel);
-                            if (surf_diminish_light)
+
+                            if (has_texture && render_mode == "Textures")
+                            {
+                                surf_color = surface_texture.get_color(uv_texture(pixel, 0), uv_texture(pixel, 1));
+                            }
+                            if (surf_diminish_light && render_mode != "Triangles")
                                 pixel_color = diminish_light(z_buffer(cur_pixel_y, cur_pixel_x), surf_color);
                             else
                                 pixel_color = surf_color;
 
-                            SDL_SetRenderDrawColor(&renderer, pixel_color.r,
-                                                   pixel_color.g, pixel_color.b, pixel_color.a);
-                            SDL_RenderPoint(&renderer, px_subset(pixel), py_subset(pixel));
+                            pixel_grid(cur_pixel_y, cur_pixel_x) = convert_color(pixel_color);
                         }
                     }
                 }
             }
         }
     }
+
+    // Render the final pixel grid after looping through all surfaces
+    const Uint32 *pixel_color_data = pixel_grid.data();
+    memcpy(texture_pixels, pixel_color_data, width * height * sizeof(Uint32));
+    SDL_UnlockTexture(sdl_texture);
+    SDL_RenderTexture(&renderer, sdl_texture, NULL, NULL);
 }
 
 // Change width and height vars based on screen resize, and resize z_buffer
@@ -279,6 +344,17 @@ void Renderer::set_width_height(const float &w, const float &h)
     width = static_cast<int>(w);
     height = static_cast<int>(h);
     resize_z_buffer();
+}
+
+// Convert color struct to Uint32
+Uint32 Renderer::convert_color(const Color &c)
+{
+    Uint32 result = 0;
+    result |= static_cast<Uint32>(c.b) << 24;
+    result |= static_cast<Uint32>(c.g) << 16;
+    result |= static_cast<Uint32>(c.r) << 8;
+    result |= static_cast<Uint32>(c.a);
+    return result;
 }
 
 void Renderer::cycle_fov()
@@ -334,4 +410,14 @@ void Renderer::move_view(const Eigen::Vector3f &dloc, const float &dpitch, const
     eye(0) += dloc(0);
     eye(1) += dloc(1);
     eye(2) += dloc(2);
+}
+
+void Renderer::set_render_mode(const string &mode)
+{
+    render_mode = mode;
+}
+
+string Renderer::get_render_mode()
+{
+    return render_mode;
 }

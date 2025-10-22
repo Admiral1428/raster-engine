@@ -12,6 +12,10 @@ Surface::Surface(const Surface &s)
     p2 = s.p2;
     color = s.color;
     diminish_light = s.diminish_light;
+    texture_name = s.texture_name;
+    uv0 = s.uv0;
+    uv1 = s.uv1;
+    uv2 = s.uv2;
 }
 
 Surface::~Surface() {}
@@ -25,6 +29,10 @@ Surface &Surface::operator=(const Surface &s)
         p2 = s.p2;
         color = s.color;
         diminish_light = s.diminish_light;
+        texture_name = s.texture_name;
+        uv0 = s.uv0;
+        uv1 = s.uv1;
+        uv2 = s.uv2;
     }
     return *this;
 }
@@ -32,6 +40,15 @@ Surface &Surface::operator=(const Surface &s)
 void Surface::set_color(const Color &c)
 {
     color = c;
+}
+
+void Surface::set_texture_properties(const string &_texture_name, const Eigen::Vector2f &_uv0,
+                                     const Eigen::Vector2f &_uv1, const Eigen::Vector2f &_uv2)
+{
+    texture_name = _texture_name;
+    uv0 = _uv0;
+    uv1 = _uv1;
+    uv2 = _uv2;
 }
 
 const Color Surface::get_color() const
@@ -128,6 +145,16 @@ void Surface::rotate(const float &roll, const float &pitch, const float &yaw, co
 vector<Eigen::Vector4f> Surface::get_points()
 {
     return {p0, p1, p2};
+}
+
+vector<Eigen::Vector2f> Surface::get_uv_coords()
+{
+    return {uv0, uv1, uv2};
+}
+
+string &Surface::get_texture_name()
+{
+    return texture_name;
 }
 
 bool &Surface::get_diminish_light()
