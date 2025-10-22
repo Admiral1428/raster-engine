@@ -128,6 +128,53 @@ vector<Eigen::VectorXf> get_points_in_triangle(const vector<Eigen::VectorXf> bar
     return {alpha_subset, beta_subset, gamma_subset, px_subset, py_subset};
 }
 
+vector<Eigen::VectorXf> get_points_on_triangle_boundary(const vector<Eigen::VectorXf> &barycentric_coords,
+                                                        const Eigen::VectorXf &px, const Eigen::VectorXf &py)
+{
+    float adjusted_tol = TOL_IN_TRIANGLE * 5.0f;
+
+    // Condition for a point to be within or on the boundary of the triangle
+    Eigen::ArrayX<bool> on_or_in_triangle =
+        (barycentric_coords[0].array() >= -adjusted_tol) &&
+        (barycentric_coords[1].array() >= -adjusted_tol) &&
+        (barycentric_coords[2].array() >= -adjusted_tol);
+
+    // Condition for a point to be strictly inside the triangle
+    Eigen::ArrayX<bool> strictly_in_triangle =
+        (barycentric_coords[0].array() > adjusted_tol) &&
+        (barycentric_coords[1].array() > adjusted_tol) &&
+        (barycentric_coords[2].array() > adjusted_tol);
+
+    // Combine conditions to find points only on the boundary
+    Eigen::ArrayX<bool> on_boundary = on_or_in_triangle && (!strictly_in_triangle);
+
+    // Count the number of valid elements to determine the size of the new vectors
+    int num_valid = on_boundary.count();
+
+    // Initialize new vectors to store the subset
+    Eigen::VectorXf alpha_subset(num_valid);
+    Eigen::VectorXf beta_subset(num_valid);
+    Eigen::VectorXf gamma_subset(num_valid);
+    Eigen::VectorXf px_subset(num_valid);
+    Eigen::VectorXf py_subset(num_valid);
+
+    int counter{0};
+    for (int i{0}; i < px.size(); ++i)
+    {
+        if (on_boundary(i))
+        {
+            alpha_subset(counter) = barycentric_coords[0](i);
+            beta_subset(counter) = barycentric_coords[1](i);
+            gamma_subset(counter) = barycentric_coords[2](i);
+            px_subset(counter) = px(i);
+            py_subset(counter) = py(i);
+            ++counter;
+        }
+    }
+
+    return {alpha_subset, beta_subset, gamma_subset, px_subset, py_subset};
+}
+
 Eigen::VectorXf get_ndc_depth(const vector<Eigen::VectorXf> &barycentric_and_pixels,
                               const Eigen::Vector4f &c0, const Eigen::Vector4f &c1, const Eigen::Vector4f &c2)
 {
@@ -142,6 +189,37 @@ Eigen::VectorXf get_ndc_depth(const vector<Eigen::VectorXf> &barycentric_and_pix
                           barycentric_and_pixels[2] * (c2(2) / c2(3));
     }
     return interp_z_over_w;
+}
+
+Eigen::MatrixXf get_uv_texture(const vector<Eigen::VectorXf> &barycentric_and_pixels,
+                               const Eigen::Vector4f &c0, const Eigen::Vector4f &c1, const Eigen::Vector4f &c2,
+                               const Eigen::Vector2f uv0, const Eigen::Vector2f uv1, const Eigen::Vector2f uv2)
+{
+    // Pre-compute to reduce number of divisions
+    float one_over_w0 = 1.0f / c0(3);
+    float one_over_w1 = 1.0f / c1(3);
+    float one_over_w2 = 1.0f / c2(3);
+
+    auto u_interp = barycentric_and_pixels[0] * uv0(0) * one_over_w0 +
+                    barycentric_and_pixels[1] * uv1(0) * one_over_w1 +
+                    barycentric_and_pixels[2] * uv2(0) * one_over_w2;
+    auto v_interp = barycentric_and_pixels[0] * uv0(1) * one_over_w0 +
+                    barycentric_and_pixels[1] * uv1(1) * one_over_w1 +
+                    barycentric_and_pixels[2] * uv2(1) * one_over_w2;
+
+    auto one_over_wp_interp = barycentric_and_pixels[0] * one_over_w0 +
+                              barycentric_and_pixels[1] * one_over_w1 +
+                              barycentric_and_pixels[2] * one_over_w2;
+    auto wp_interp = one_over_wp_interp.array().inverse();
+
+    auto u_interp_corrected = u_interp.array() * wp_interp;
+    auto v_interp_corrected = v_interp.array() * wp_interp;
+
+    Eigen::MatrixXf uv_result(u_interp_corrected.size(), 2);
+    uv_result.col(0) = u_interp_corrected.matrix();
+    uv_result.col(1) = v_interp_corrected.matrix();
+
+    return uv_result;
 }
 
 bool is_surface_visible(const Eigen::Vector4f &v0, const Eigen::Vector4f &v1, const Eigen::Vector4f &v2)

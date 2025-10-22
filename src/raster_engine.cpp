@@ -12,6 +12,7 @@
 #include "boat.hpp"
 #include "airplane.hpp"
 #include "prop.hpp"
+#include "map_textures.hpp"
 
 using std::array;
 
@@ -34,9 +35,16 @@ int main(int argc, char *argv[])
     // Initialize function key states
     array<bool, 13> f_keys_pressed = {};
 
+    // Initialize chosen render resolution
+    int cur_res_index = 0;
+
+    // Initialize render mode
+    int render_mode_index = 0;
+    string render_mode = RENDER_MODES[render_mode_index];
+
     // Create a window and renderer
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE);
-    if (!(SDL_CreateWindowAndRenderer("Raster Engine", WIDTH * 3, HEIGHT * 3, window_flags, &window, &renderer)))
+    if (!(SDL_CreateWindowAndRenderer("Raster Engine", RENDER_RES_OPTS[2].width, RENDER_RES_OPTS[2].height, window_flags, &window, &renderer)))
     {
         SDL_Log("Could not create window and renderer: %s", SDL_GetError());
         SDL_Quit();
@@ -44,15 +52,18 @@ int main(int argc, char *argv[])
     }
 
     // Set logical presentation resolution
-    SDL_SetRenderLogicalPresentation(renderer, WIDTH, HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    SDL_SetRenderLogicalPresentation(renderer, RENDER_RES_OPTS[cur_res_index].width,
+                                     RENDER_RES_OPTS[cur_res_index].height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
     bool quit = false;
     bool need_redraw = true;
 
-    // Initialize map, surfaces vector, and renderer
+    // Initialize textures, map, surfaces vector, and renderer
+    load_textures();
     Map map;
     vector<Surface> map_surfaces = map.get_map_surfaces();
-    Renderer engine(0.3f, 1000.0f, 90.0f, WIDTH, HEIGHT);
+    Renderer engine(0.3f, 1000.0f, 90.0f, RENDER_RES_OPTS[cur_res_index].width,
+                    RENDER_RES_OPTS[cur_res_index].height, render_mode);
 
     // Initialize moving objects
     vector<Surface> boat_surfaces;
@@ -108,7 +119,7 @@ int main(int argc, char *argv[])
             }
             else if (event.type == SDL_EVENT_WINDOW_RESIZED)
             {
-                float aspect_ratio = (float)WIDTH / HEIGHT;
+                float aspect_ratio = (float)RENDER_RES_OPTS[2].width / RENDER_RES_OPTS[2].height;
                 int new_width = event.window.data1;
                 int new_height = event.window.data2;
 
@@ -142,7 +153,8 @@ int main(int argc, char *argv[])
                     key_states[event.key.scancode] = true;
                 }
                 process_f_key_down(key_states, engine, *renderer, need_redraw,
-                                   f_keys_pressed, last_debug_time);
+                                   f_keys_pressed, last_debug_time, cur_res_index,
+                                   render_mode_index);
             }
             else if (event.type == SDL_EVENT_KEY_UP)
             {
@@ -175,7 +187,7 @@ int main(int argc, char *argv[])
 
         if (need_redraw)
         {
-            // Draw background
+            // // Draw background
             SDL_SetRenderDrawColor(renderer, BACK_COLOR.r, BACK_COLOR.g, BACK_COLOR.b, BACK_COLOR.a);
             // Clear screen
             SDL_RenderClear(renderer);
@@ -186,6 +198,10 @@ int main(int argc, char *argv[])
             all_surfaces.insert(all_surfaces.end(), boat_surfaces.begin(), boat_surfaces.end());
             all_surfaces.insert(all_surfaces.end(), airplane_surfaces.begin(), airplane_surfaces.end());
             all_surfaces.insert(all_surfaces.end(), prop_surfaces.begin(), prop_surfaces.end());
+
+            // Update animations
+            TEXTURES.at("water").update_animation();
+            TEXTURES.at("waterfall").update_animation();
 
             // Draw surfaces
             engine.draw_surfaces(*renderer, all_surfaces);

@@ -14,6 +14,9 @@ Map::Map()
     shapes_triangle.reserve(32);
     shapes_quad.reserve(37);
 
+    // shapes_triangle.push_back(Surface(Eigen::Vector4f(-5.0f, -5.0f, -15.0f, 1.0f), Eigen::Vector4f(0.0f, 5.0f, -15.0f, 1.0f), Eigen::Vector4f(5.0f, -5.0f, -15.0f, 1.0f), BLUE, false));
+    // shapes_triangle.back().set_texture_properties("waterfall", Eigen::Vector2f(0, 1), Eigen::Vector2f(0.5, 0), Eigen::Vector2f(1, 1));
+
     // small trees along river
     shapes_tree.push_back(Tree(6.5f, -2.0f, -4.0f, "small"));
     shapes_tree.push_back(Tree(-6.5f, -2.0f, -4.0f, "small"));
@@ -80,8 +83,12 @@ Map::Map()
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-37.0f, -3.0f, -15.0f, 1.0f), Eigen::Vector4f(-60.0f, -3.0f, -50.0f, 1.0f), Eigen::Vector4f(-37.0f, -3.0f, -50.0f, 1.0f), BLUE, true));
     shapes_quad.push_back(Quad({-37.0f, -3.0f, 40.0f}, {-37.0f, -3.0f, -50.0f}, {-25.0f, -3.0f, -50.0f}, {-25.0f, -3.0f, 40.0f}, {BLUE}, true));
     shapes_quad.push_back(Quad({-25.0f, -3.0f, -11.0f}, {-16.0f, -3.0f, -11.0f}, {-16.0f, -3.0f, -8.0f}, {-25.0f, -3.0f, -8.0f}, {BLUE}, true));
+
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-25.0f, -3.0f, -25.5f, 1.0f), Eigen::Vector4f(-16.0f, -3.0f, -11.0f, 1.0f), Eigen::Vector4f(-25.0f, -3.0f, -11.0f, 1.0f), BLUE, true));
+    shapes_triangle.back().set_texture_properties("water", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(4.5f, 18.25f), Eigen::Vector2f(0.0f, 18.25f));
+
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-25.0f, -3.0f, -8.0f, 1.0f), Eigen::Vector4f(-16.0f, -3.0f, -8.0f, 1.0f), Eigen::Vector4f(-25.0f, -3.0f, 9.5f, 1.0f), BLUE, true));
+    shapes_triangle.back().set_texture_properties("water", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(4.5f, 0.0f), Eigen::Vector2f(0.0f, 18.25f));
 
     // distant water surfaces (far and near)
     shapes_quad.push_back(Quad({-25.0f, -3.0f, -60.0f}, {-25.0f, -3.0f, -800.0f}, {800.0f, -3.0f, -800.0f}, {800.0f, -3.0f, -90.0f}, {BLUE}, true));

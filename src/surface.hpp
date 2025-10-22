@@ -23,6 +23,10 @@ private:
     Eigen::Vector4f p2;
     Color color;
     bool diminish_light;
+    string texture_name = "";
+    Eigen::Vector2f uv0 = Eigen::Vector2f::Zero(); // texture coordinates
+    Eigen::Vector2f uv1 = Eigen::Vector2f::Zero();
+    Eigen::Vector2f uv2 = Eigen::Vector2f::Zero();
 
 public:
     Surface(); // default constructor (initializes object to default state with no arguments)
@@ -32,10 +36,14 @@ public:
     ~Surface();                          // destructor
     Surface &operator=(const Surface &); // copy/assignment operator
     void set_color(const Color &c);
+    void set_texture_properties(const string &_texture_name, const Eigen::Vector2f &_uv0,
+                                const Eigen::Vector2f &_uv1, const Eigen::Vector2f &_uv2);
     const Color get_color() const;
     void translate(const float &dx, const float &dy, const float &dz);
     void rotate(const float &roll, const float &pitch, const float &yaw, const string &order);
     vector<Eigen::Vector4f> get_points();
+    vector<Eigen::Vector2f> get_uv_coords();
+    string &get_texture_name();
     bool &get_diminish_light();
 };
 

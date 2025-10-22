@@ -15,6 +15,8 @@
 #include "airplane.hpp"
 #include "runway.hpp"
 #include "hangar.hpp"
+#include "texture.hpp"
+#include "map_textures.hpp"
 
 using std::string;
 using std::vector;
