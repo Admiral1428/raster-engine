@@ -117,13 +117,13 @@ vector<Eigen::Vector3f> Renderer::get_view_directions()
     Eigen::MatrixXf mat_sub_rx = mats_rot[0].block<3, 3>(0, 0);
     Eigen::MatrixXf mat_sub_ry = mats_rot[1].block<3, 3>(0, 0);
 
-    // original forward and up view directions (as percieved by player)
+    // original forward and left view directions (as percieved by player)
     Eigen::Vector3f forward_dir(0.0f, 0.0f, -1.0f);
-    Eigen::Vector3f up_dir(0.0f, 1.0f, 0.0f);
+    Eigen::Vector3f left_dir(-1.0f, 0.0f, 0.0f);
 
     // new directions
     Eigen::Vector3f new_forward_dir = mat_sub_ry * mat_sub_rx * forward_dir;
-    Eigen::Vector3f new_left_dir = up_dir.cross(new_forward_dir);
+    Eigen::Vector3f new_left_dir = mat_sub_ry * mat_sub_rx * left_dir;
     return {new_forward_dir, new_left_dir};
 }
 
@@ -336,6 +336,8 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
     memcpy(texture_pixels, pixel_color_data, width * height * sizeof(Uint32));
     SDL_UnlockTexture(sdl_texture);
     SDL_RenderTexture(&renderer, sdl_texture, NULL, NULL);
+    SDL_DestroyTexture(sdl_texture);
+    sdl_texture = NULL;
 }
 
 // Change width and height vars based on screen resize, and resize z_buffer
