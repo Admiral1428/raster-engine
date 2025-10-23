@@ -19,6 +19,8 @@ public:
     Quad(const Quad &p);
     Quad &operator=(const Quad &);
     void make_shape() override;
+    void set_texture_properties(const string &texture_name, const Eigen::Vector2f &uv0, const Eigen::Vector2f &uv1,
+                                const Eigen::Vector2f &uv2, const Eigen::Vector2f &uv3);
 };
 
 #endif

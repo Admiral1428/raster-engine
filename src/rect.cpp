@@ -77,3 +77,53 @@ void Rect::make_shape()
         surfaces.push_back(second_half);
     }
 }
+
+// If width factor and height factor are 1.0f, then texture will be stretched to full dimensions of rectangle
+void Rect::set_texture_properties(const string &texture_name, const float &width_factor, const float &height_factor)
+{
+    // Flat rectangle aligned with depth-height plane (normal facing +x right)
+    if (width == 0.0f)
+    {
+        // Horizontal component of texture along depth, vertical along height (aligned near-top corner)
+        // First half is near triangle
+        surfaces.front().set_texture_properties(texture_name,
+                                                Eigen::Vector2f(0.0f, 1.0f * height_factor),
+                                                Eigen::Vector2f(0.0f, 0.0f),
+                                                Eigen::Vector2f(1.0f * width_factor, 1.0f * height_factor));
+        // Second half is far triangle
+        surfaces.back().set_texture_properties(texture_name,
+                                               Eigen::Vector2f(1.0f * width_factor, 1.0f * height_factor),
+                                               Eigen::Vector2f(0.0f, 0.0f),
+                                               Eigen::Vector2f(1.0f * width_factor, 0.0f));
+    }
+    // Flat rectangle aligned with width-depth plane (normal facing +y up)
+    else if (height == 0.0f)
+    {
+        // Horizontal component of texture along width, vertical along depth (aligned left-far corner)
+        // First half is near triangle
+        surfaces.front().set_texture_properties(texture_name,
+                                                Eigen::Vector2f(1.0f * width_factor, 0.0f),
+                                                Eigen::Vector2f(1.0f * width_factor, 1.0f * height_factor),
+                                                Eigen::Vector2f(0.0f, 1.0f * height_factor));
+        // Second half is far triangle
+        surfaces.back().set_texture_properties(texture_name,
+                                               Eigen::Vector2f(0.0f, 1.0f * height_factor),
+                                               Eigen::Vector2f(0.0f, 0.0f),
+                                               Eigen::Vector2f(1.0f * width_factor, 0.0f));
+    }
+    // Flat rectangle aligned with width-height plane (normal facing +z out)
+    else if (depth == 0.0f)
+    {
+        // Horizontal component of texture along width, vertical along height (aligned top-left corner)
+        // First half is right triangle
+        surfaces.front().set_texture_properties(texture_name,
+                                                Eigen::Vector2f(1.0f * width_factor, 0.0f),
+                                                Eigen::Vector2f(1.0f * width_factor, 1.0f * height_factor),
+                                                Eigen::Vector2f(0.0f, 1.0f * height_factor));
+        // Second half is left triangle
+        surfaces.back().set_texture_properties(texture_name,
+                                               Eigen::Vector2f(0.0f, 1.0f * height_factor),
+                                               Eigen::Vector2f(0.0f, 0.0f),
+                                               Eigen::Vector2f(1.0f * width_factor, 0.0f));
+    }
+}

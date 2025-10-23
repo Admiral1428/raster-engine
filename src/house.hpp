@@ -5,6 +5,7 @@
 #include "shape.hpp"
 #include "rect.hpp"
 #include "rectprism.hpp"
+#include "octprism.hpp"
 
 // class defining a house shape
 class House : public Shape

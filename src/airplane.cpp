@@ -53,55 +53,104 @@ void Airplane::make_shape()
         vector<OctPrism> octs;
 
         // Reserve space for vectors
-        rect_prisms.reserve(6);
+        rect_prisms.reserve(7);
         triangles.reserve(8);
         quads.reserve(1);
         pyramids.reserve(1);
         octs.reserve(8);
 
-        // Fuselage (bottom, top, glass right, glass left, glass mid, nose)
-        rect_prisms.push_back(RectPrism(0.0f, 0.0f, 0.0f, 1.5f, 0.5f, 0.5f, {MEDYELLOW, MEDYELLOW, HIGHYELLOW, {}, {}, DKYELLOW}, false, {"left", "top"}));
-        rect_prisms.push_back(RectPrism(-0.25f, 0.45f, 0.0f, 1.0f, 0.4f, 0.5f, {MEDYELLOW, MEDYELLOW, {}, {}, YELLOW, {}}, false, {"left", "right", "bottom"}));
-        triangles.push_back(Surface(Eigen::Vector4f(0.25f, 0.25f, 0.25f, 1.0f), Eigen::Vector4f(0.25f, 0.65f, 0.25f, 1.0f), Eigen::Vector4f(0.75f, 0.25f, 0.25f, 1.0f), BLUE));
-        triangles.push_back(Surface(Eigen::Vector4f(0.75f, 0.25f, -0.25f, 1.0f), Eigen::Vector4f(0.25f, 0.65f, -0.25f, 1.0f), Eigen::Vector4f(0.25f, 0.25f, -0.25f, 1.0f), BLUE));
-        quads.push_back(Quad({0.75f, 0.25f, 0.25f}, {0.25f, 0.65f, 0.25f}, {0.25f, 0.65f, -0.25f}, {0.75f, 0.25f, -0.25f}, {BLUE}));
-        rect_prisms.push_back(RectPrism(0.8f, 0.0f, 0.0f, 0.25f, 0.35f, 0.3f, {MEDYELLOW, MEDYELLOW, HIGHYELLOW, {}, YELLOW, DKYELLOW}, false, {"left"}));
+        // Fuselage (bottom section)
+        rect_prisms.push_back(RectPrism(0.0f, 0.0f, 0.0f, 1.5f, 0.5f, 0.5f, {MEDYELLOW, MEDYELLOW, HIGHYELLOW, {}, {}, DKYELLOW},
+                                        false, {"left", "top"}));
+        rect_prisms.back().set_texture_properties("plane_right", 1.0f, 1.0f, "front");
+        rect_prisms.back().set_texture_properties("plane_left", 1.0f, 1.0f, "rear");
+
+        // Fuselage (top section)
+        rect_prisms.push_back(RectPrism(-0.25f, 0.45f, 0.0f, 1.0f, 0.4f, 0.5f, {MEDYELLOW, MEDYELLOW, {}, {}, YELLOW, {}},
+                                        false, {"left", "right", "bottom"}));
+        rect_prisms.back().set_texture_properties("plane", 1.0f, 0.5f, "front");
+        rect_prisms.back().set_texture_properties("plane", 1.0f, 0.5f, "rear");
+
+        // Right window
+        triangles.push_back(Surface(Eigen::Vector4f(0.25f, 0.25f, 0.25f, 1.0f), Eigen::Vector4f(0.25f, 0.65f, 0.25f, 1.0f),
+                                    Eigen::Vector4f(0.75f, 0.25f, 0.25f, 1.0f), BLUE));
+        triangles.back().set_texture_properties("plane_glass_side", Eigen::Vector2f(0.0f, 1.0f),
+                                                Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(1.0f, 1.0f));
+
+        // Left window
+        triangles.push_back(Surface(Eigen::Vector4f(0.75f, 0.25f, -0.25f, 1.0f), Eigen::Vector4f(0.25f, 0.65f, -0.25f, 1.0f),
+                                    Eigen::Vector4f(0.25f, 0.25f, -0.25f, 1.0f), BLUE));
+        triangles.back().set_texture_properties("plane_glass_side", Eigen::Vector2f(0.0f, 1.0f),
+                                                Eigen::Vector2f(1.0f, 0.0f), Eigen::Vector2f(1.0f, 1.0f));
+
+        // Front window
+        quads.push_back(Quad({0.75f, 0.25f, 0.25f}, {0.25f, 0.65f, 0.25f},
+                             {0.25f, 0.65f, -0.25f}, {0.75f, 0.25f, -0.25f}, {BLUE}));
+        quads.back().set_texture_properties("plane_glass", Eigen::Vector2f(0.0f, 1.0f), Eigen::Vector2f(0.0f, 0.0f),
+                                            Eigen::Vector2f(1.0f, 0.0f), Eigen::Vector2f(1.0f, 1.0f));
+
+        // Fuselage (nose)
+        rect_prisms.push_back(RectPrism(0.8f, 0.0f, 0.0f, 0.25f, 0.35f, 0.3f, {YELLOW, YELLOW, HIGHYELLOW, {}, YELLOW, YELLOW},
+                                        false, {"left"}));
+
+        // Engine block
+        rect_prisms.push_back(RectPrism(0.83f, 0.0f, 0.0f, 0.12f, 0.1f, 0.35f, {BLACK, BLACK, NIGHTGRAY, NIGHTGRAY, NIGHTGRAY, NIGHTGRAY},
+                                        false, {"left"}));
+        rect_prisms.back().set_texture_properties("plane_engine", 1.0f, 1.0f, "front");
+        rect_prisms.back().set_texture_properties("plane_engine", 1.0f, 1.0f, "rear");
 
         // Aft fuselage
-        pyramids.push_back(Pyramid(0.0f, 0.0f, 0.0f, 0.9f, 1.8f, 0.5f, {MEDYELLOW, MEDYELLOW, DKYELLOW, YELLOW, {}}, false, {"bottom"}));
+        pyramids.push_back(Pyramid(0.0f, 0.0f, 0.0f, 0.9f, 1.8f, 0.48f, {MEDYELLOW, MEDYELLOW, DKYELLOW, YELLOW, {}},
+                                   false, {"bottom"}));
         pyramids.back().rotate(0.0f, 0.0f, 90.0f, "roll-pitch-yaw");
         pyramids.back().translate(-0.65f, 0.2f, 0.0f);
+        pyramids.back().set_texture_properties("plane_back", 1.0f, 1.0f, "front");
+        pyramids.back().set_texture_properties("plane_back", 1.0f, 1.0f, "rear");
 
         // Wing
         rect_prisms.push_back(RectPrism(-0.25f, 0.65f, 0.0f, 0.7f, 0.1f, 4.0f, {MEDYELLOW, MEDYELLOW, MEDYELLOW, MEDYELLOW, YELLOW, DKYELLOW}));
+        rect_prisms.back().set_texture_properties("plane_wing", 1.0f, 10.0f, "top");
+        rect_prisms.back().set_texture_properties("plane_wing", 1.0f, 10.0f, "bottom");
 
-        // Horizontal and vertical tail
+        // Horizontal tail
         rect_prisms.push_back(RectPrism(-2.25f, 0.2f, 0.0f, 0.5f, 0.05f, 1.5f, {MEDYELLOW, MEDYELLOW, MEDYELLOW, MEDYELLOW, YELLOW, DKYELLOW}));
+        rect_prisms.back().set_texture_properties("plane_wing", 1.0f, 5.0f, "top");
+        rect_prisms.back().set_texture_properties("plane_wing", 1.0f, 5.0f, "bottom");
+
+        // Vertical tail
         rect_prisms.push_back(RectPrism(-2.35f, 0.70f, 0.0f, 0.3f, 1.1f, 0.05f, {MEDYELLOW, MEDYELLOW, MEDYELLOW, MEDYELLOW, YELLOW, DKYELLOW}));
+        rect_prisms.back().set_texture_properties("plane_wing", 1.0f, 5.0f, "front");
+        rect_prisms.back().set_texture_properties("plane_wing", 1.0f, 5.0f, "rear");
 
-        // Vertical tail fairing (right and left)
-        triangles.push_back(Surface(Eigen::Vector4f(-2.2f, 0.12f, 0.01f, 1.0f), Eigen::Vector4f(-2.2f, 1.25f, 0.0f, 1.0f), Eigen::Vector4f(-1.5f, 0.12f, 0.0f, 1.0f), MEDYELLOW));
-        triangles.push_back(Surface(Eigen::Vector4f(-1.5f, 0.12f, 0.0f, 1.0f), Eigen::Vector4f(-2.2f, 1.25f, 0.0f, 1.0f), Eigen::Vector4f(-2.2f, 0.12f, -0.01f, 1.0f), MEDYELLOW));
+        // Vertical tail fairings (right and left)
+        triangles.push_back(Surface(Eigen::Vector4f(-2.2f, 0.12f, 0.01f, 1.0f), Eigen::Vector4f(-2.2f, 1.25f, 0.0f, 1.0f),
+                                    Eigen::Vector4f(-1.5f, 0.12f, 0.0f, 1.0f), YELLOW));
+        triangles.push_back(Surface(Eigen::Vector4f(-1.5f, 0.12f, 0.0f, 1.0f), Eigen::Vector4f(-2.2f, 1.25f, 0.0f, 1.0f),
+                                    Eigen::Vector4f(-2.2f, 0.12f, -0.01f, 1.0f), YELLOW));
 
-        // left tire and rim
+        // Left tire and hubcap
         octs.push_back(OctPrism(0.25f, -0.55f, -0.4f, 0.3f, 0.3f, 0.15f, {BLACK, BLACK}));
         octs.push_back(OctPrism(0.25f, -0.55f, -0.45f, 0.1f, 0.1f, 0.1f, {WHITE, WHITE}, false, {"far"}));
 
-        // right tire and rim
+        // Light tire and hubcap
         octs.push_back(OctPrism(0.25f, -0.55f, 0.4f, 0.3f, 0.3f, 0.15f, {BLACK, BLACK}));
         octs.push_back(OctPrism(0.25f, -0.55f, 0.45f, 0.1f, 0.1f, 0.1f, {GRAY, WHITE}, false, {"near"}));
 
-        // aft tire and rim
+        // Aft tire and hubcap
         octs.push_back(OctPrism(-2.25f, 0.0f, 0.0f, 0.2f, 0.2f, 0.1f, {BLACK, BLACK}));
         octs.push_back(OctPrism(-2.25f, 0.0f, 0.0f, 0.08f, 0.08f, 0.12f, {GRAY, WHITE}));
 
-        // Right wheel strut (near and far)
-        triangles.push_back(Surface(Eigen::Vector4f(0.1f, -0.25f, 0.0f, 1.0f), Eigen::Vector4f(0.4f, -0.25f, 0.0f, 1.0f), Eigen::Vector4f(0.25f, -0.55f, 0.35f, 1.0f), YELLOW));
-        triangles.push_back(Surface(Eigen::Vector4f(0.4f, -0.25f, 0.0f, 1.0f), Eigen::Vector4f(0.1f, -0.25f, 0.0f, 1.0f), Eigen::Vector4f(0.25f, -0.55f, 0.34f, 1.0f), DKYELLOW));
+        // Right wheel strut (near and far sides)
+        triangles.push_back(Surface(Eigen::Vector4f(0.1f, -0.25f, 0.0f, 1.0f), Eigen::Vector4f(0.4f, -0.25f, 0.0f, 1.0f),
+                                    Eigen::Vector4f(0.25f, -0.55f, 0.35f, 1.0f), YELLOW));
+        triangles.push_back(Surface(Eigen::Vector4f(0.4f, -0.25f, 0.0f, 1.0f), Eigen::Vector4f(0.1f, -0.25f, 0.0f, 1.0f),
+                                    Eigen::Vector4f(0.25f, -0.55f, 0.34f, 1.0f), DKYELLOW));
 
-        // Left wheel strut (near and far)
-        triangles.push_back(Surface(Eigen::Vector4f(0.1f, -0.25f, 0.0f, 1.0f), Eigen::Vector4f(0.4f, -0.25f, 0.0f, 1.0f), Eigen::Vector4f(0.25f, -0.55f, -0.34f, 1.0f), DKYELLOW));
-        triangles.push_back(Surface(Eigen::Vector4f(0.4f, -0.25f, 0.0f, 1.0f), Eigen::Vector4f(0.1f, -0.25f, 0.0f, 1.0f), Eigen::Vector4f(0.25f, -0.55f, -0.35f, 1.0f), YELLOW));
+        // Left wheel strut (near and far sides)
+        triangles.push_back(Surface(Eigen::Vector4f(0.1f, -0.25f, 0.0f, 1.0f), Eigen::Vector4f(0.4f, -0.25f, 0.0f, 1.0f),
+                                    Eigen::Vector4f(0.25f, -0.55f, -0.34f, 1.0f), DKYELLOW));
+        triangles.push_back(Surface(Eigen::Vector4f(0.4f, -0.25f, 0.0f, 1.0f), Eigen::Vector4f(0.1f, -0.25f, 0.0f, 1.0f),
+                                    Eigen::Vector4f(0.25f, -0.55f, -0.35f, 1.0f), YELLOW));
 
         // only include "blurred" propeller if airplane has movement
         if (rot_speed != 0.0f)

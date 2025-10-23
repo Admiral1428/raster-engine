@@ -131,24 +131,24 @@ vector<Eigen::VectorXf> get_points_in_triangle(const vector<Eigen::VectorXf> bar
 vector<Eigen::VectorXf> get_points_on_triangle_boundary(const vector<Eigen::VectorXf> &barycentric_coords,
                                                         const Eigen::VectorXf &px, const Eigen::VectorXf &py)
 {
-    float adjusted_tol = TOL_IN_TRIANGLE * 5.0f;
+    float tol_boundary = 1e-9;
+    float tol_strictly_in = 1e-2;
 
     // Condition for a point to be within or on the boundary of the triangle
     Eigen::ArrayX<bool> on_or_in_triangle =
-        (barycentric_coords[0].array() >= -adjusted_tol) &&
-        (barycentric_coords[1].array() >= -adjusted_tol) &&
-        (barycentric_coords[2].array() >= -adjusted_tol);
+        (barycentric_coords[0].array() >= -tol_boundary) &&
+        (barycentric_coords[1].array() >= -tol_boundary) &&
+        (barycentric_coords[2].array() >= -tol_boundary);
 
     // Condition for a point to be strictly inside the triangle
     Eigen::ArrayX<bool> strictly_in_triangle =
-        (barycentric_coords[0].array() > adjusted_tol) &&
-        (barycentric_coords[1].array() > adjusted_tol) &&
-        (barycentric_coords[2].array() > adjusted_tol);
+        (barycentric_coords[0].array() > tol_strictly_in) &&
+        (barycentric_coords[1].array() > tol_strictly_in) &&
+        (barycentric_coords[2].array() > tol_strictly_in);
 
     // Combine conditions to find points only on the boundary
     Eigen::ArrayX<bool> on_boundary = on_or_in_triangle && (!strictly_in_triangle);
 
-    // Count the number of valid elements to determine the size of the new vectors
     int num_valid = on_boundary.count();
 
     // Initialize new vectors to store the subset

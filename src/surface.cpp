@@ -12,6 +12,7 @@ Surface::Surface(const Surface &s)
     p2 = s.p2;
     color = s.color;
     diminish_light = s.diminish_light;
+    surface_name = s.surface_name;
     texture_name = s.texture_name;
     uv0 = s.uv0;
     uv1 = s.uv1;
@@ -29,12 +30,18 @@ Surface &Surface::operator=(const Surface &s)
         p2 = s.p2;
         color = s.color;
         diminish_light = s.diminish_light;
+        surface_name = s.surface_name;
         texture_name = s.texture_name;
         uv0 = s.uv0;
         uv1 = s.uv1;
         uv2 = s.uv2;
     }
     return *this;
+}
+
+void Surface::set_name(const string &s)
+{
+    surface_name = s;
 }
 
 void Surface::set_color(const Color &c)
@@ -150,6 +157,11 @@ vector<Eigen::Vector4f> Surface::get_points()
 vector<Eigen::Vector2f> Surface::get_uv_coords()
 {
     return {uv0, uv1, uv2};
+}
+
+string &Surface::get_name()
+{
+    return surface_name;
 }
 
 string &Surface::get_texture_name()

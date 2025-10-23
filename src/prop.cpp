@@ -51,12 +51,12 @@ void Prop::make_shape()
         // Reserve space for vectors
         octs.reserve(2);
 
-        // prop
+        // Propeller
         octs.push_back(OctPrism(0.0f, 0.0f, 0.0f, 0.8f, 0.1f, 0.05f, {BLACK, GRAY}));
         octs.back().rotate(0.0f, 90.0f, 0.0f, "roll-pitch-yaw");
         octs.back().translate(0.95f, 0.0f, 0.0f);
 
-        // spinner
+        // Spinner
         octs.push_back(OctPrism(0.0f, 0.0f, 0.0f, 0.07f, 0.07f, 0.06f, {GRAY, WHITE}));
         octs.back().rotate(0.0f, 90.0f, 0.0f, "roll-pitch-yaw");
         octs.back().translate(0.98f, 0.0f, 0.0f);
@@ -70,6 +70,8 @@ void Prop::make_shape()
             surfaces.insert(surfaces.end(), shape_surfaces.begin(), shape_surfaces.end());
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // apply rotations
     rotate(roll, pitch, yaw, rot_order);

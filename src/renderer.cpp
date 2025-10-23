@@ -133,7 +133,14 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
     z_buffer.setConstant(1.0f);
 
     // initialize pixel buffer to sky blue
-    pixel_grid.setConstant(convert_color(BACK_COLOR));
+    if (render_mode == "Triangles_Black_White")
+    {
+        pixel_grid.setConstant(convert_color(WHITE));
+    }
+    else
+    {
+        pixel_grid.setConstant(convert_color(BACK_COLOR));
+    }
 
     // Initialize pixel grid as SDL texture
     SDL_Texture *sdl_texture = SDL_CreateTexture(&renderer, SDL_PIXELFORMAT_BGRA8888,
@@ -275,7 +282,7 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
                     barycentric_coords = get_barycentric_coords(r0, r1, r2, px, py);
 
                     // get subset of coordinates which are inside or on triangle boundary
-                    if (render_mode == "Triangles")
+                    if (render_mode == "Triangles" || render_mode == "Triangles_Black_White")
                     {
                         barycentric_and_pixels = get_points_on_triangle_boundary(barycentric_coords, px, py);
                     }
@@ -299,6 +306,10 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
                                                     uv0, uv1, uv2);
                         surface_texture = TEXTURES.at(suface_texture_name);
                     }
+                    else if (render_mode == "Triangles_Black_White")
+                    {
+                        surf_color = BLACK;
+                    }
                     else
                     {
                         surf_color = surface.get_color();
@@ -318,10 +329,14 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
                             {
                                 surf_color = surface_texture.get_color(uv_texture(pixel, 0), uv_texture(pixel, 1));
                             }
-                            if (surf_diminish_light && render_mode != "Triangles")
+                            if (surf_diminish_light && render_mode != "Triangles" && render_mode != "Triangles_Black_White")
+                            {
                                 pixel_color = diminish_light(z_buffer(cur_pixel_y, cur_pixel_x), surf_color);
+                            }
                             else
+                            {
                                 pixel_color = surf_color;
+                            }
 
                             pixel_grid(cur_pixel_y, cur_pixel_x) = convert_color(pixel_color);
                         }

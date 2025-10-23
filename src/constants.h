@@ -80,6 +80,6 @@ const float MOUSE_SENS_FACTOR = 0.1f;
 const float TRANSLATE_SPEED = 5.00f; // game world units per second
 const float ROTATE_SPEED = 60.0f;    // degrees per second
 // Render modes
-const vector<string> RENDER_MODES = {"Textures", "Colors", "Triangles"};
+const vector<string> RENDER_MODES = {"Textures", "Colors", "Triangles", "Triangles_Black_White"};
 
 #endif
