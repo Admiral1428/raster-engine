@@ -14,6 +14,8 @@ public:
     Pyramid(const Pyramid &p);
     Pyramid &operator=(const Pyramid &);
     void make_shape() override;
+    void set_texture_properties(const string &texture_name, const float &width_factor, const float &height_factor,
+                                const string &face);
 };
 
 #endif

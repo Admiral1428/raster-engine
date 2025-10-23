@@ -50,6 +50,7 @@ void Runway::make_shape()
 
         // main surface
         rects.push_back(Rect(0.0f, 0.0f, 0.0f, 40.0f, 0.0f, 5.0f, {NIGHTGRAY}, true));
+        rects.back().set_texture_properties("runway", 40.0f, 5.0f);
 
         // threshold markings (left side)
         rects.push_back(Rect(-18.0f, 0.01f, -0.5f, 2.0f, 0.0f, 0.5f, {WHITE}));
@@ -75,6 +76,11 @@ void Runway::make_shape()
         rects.push_back(Rect(9.0f, 0.01f, 0.0f, 2.0f, 0.0f, 0.25f, {WHITE}));
         rects.push_back(Rect(12.0f, 0.01f, 0.0f, 2.0f, 0.0f, 0.25f, {WHITE}));
         rects.push_back(Rect(15.0f, 0.01f, 0.0f, 2.0f, 0.0f, 0.25f, {WHITE}));
+
+        for (size_t i{1}; i < rects.size(); ++i)
+        {
+            rects[i].set_texture_properties("runway_marking", 3.0f, 2.0f);
+        }
 
         // Populate the surfaces vector with all surfaces
         vector<Surface> shape_surfaces;

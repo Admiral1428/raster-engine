@@ -42,6 +42,7 @@ void Pyramid::make_shape()
                       Eigen::Vector4f(x + width / 2, y, z + depth / 2, 1.0f),
                       Eigen::Vector4f(x - width / 2, y, z + depth / 2, 1.0f), colors[0], diminish_light);
         surfaces.push_back(front);
+        surfaces.back().set_name("front");
     }
 
     // rear surface of pyramid
@@ -52,6 +53,7 @@ void Pyramid::make_shape()
                      Eigen::Vector4f(x + width / 2, y, z - (translate_clip + depth / 2), 1.0f),
                      Eigen::Vector4f(x, y + height, (z - translate_clip), 1.0f), colors[1], diminish_light);
         surfaces.push_back(rear);
+        surfaces.back().set_name("rear");
     }
 
     // left surface of pyramid
@@ -63,6 +65,7 @@ void Pyramid::make_shape()
                      Eigen::Vector4f(x - translate_clip, y + height, z, 1.0f), colors[2], diminish_light);
         auto check_front = find(skip_surfaces.begin(), skip_surfaces.end(), "front");
         surfaces.push_back(left);
+        surfaces.back().set_name("left");
     }
 
     // right surface of pyramid
@@ -73,6 +76,7 @@ void Pyramid::make_shape()
                       Eigen::Vector4f(x + (translate_clip + width / 2), y, z - depth / 2, 1.0f),
                       Eigen::Vector4f(x + (translate_clip + width / 2), y, z + depth / 2, 1.0f), colors[3], diminish_light);
         surfaces.push_back(right);
+        surfaces.back().set_name("right");
     }
 
     // bottom surface of pyramid (a rectangle)
@@ -83,6 +87,68 @@ void Pyramid::make_shape()
         bottom.rotate(180.0f, 0.0f, 0.0f, "roll-pitch-yaw");
         bottom.translate(x, y - translate_clip, z);
         vector<Surface> bottom_surfaces = bottom.get_surfaces();
+        bottom_surfaces.front().set_name("bottom_first");
+        bottom_surfaces.back().set_name("bottom_second");
         surfaces.insert(surfaces.end(), bottom_surfaces.begin(), bottom_surfaces.end());
+    }
+}
+
+// If width factor and height factor are 1.0f, then texture will be stretched to full dimensions of triangle face
+// If width factor and height factor are 1.0f, then texture will be stretched to full dimensions of rectangle face
+void Pyramid::set_texture_properties(const string &texture_name, const float &width_factor, const float &height_factor,
+                                     const string &face)
+{
+    for (auto &surf : surfaces)
+    {
+        if (face == "front" && surf.get_name() == "front")
+        {
+            // Aligned at top edge
+            surf.set_texture_properties(texture_name,
+                                        Eigen::Vector2f(0.5f * width_factor, 0.0f),
+                                        Eigen::Vector2f(1.0f * width_factor, 1.0f * height_factor),
+                                        Eigen::Vector2f(0.0f, 1.0f * height_factor));
+        }
+        else if (face == "rear" && surf.get_name() == "rear")
+        {
+            // Aligned at top edge
+            surf.set_texture_properties(texture_name,
+                                        Eigen::Vector2f(0.0f, 1.0f * height_factor),
+                                        Eigen::Vector2f(1.0f * width_factor, 1.0f * height_factor),
+                                        Eigen::Vector2f(0.5f * width_factor, 0.0f));
+        }
+        else if (face == "left" && surf.get_name() == "left")
+        {
+            // Aligned at top edge
+            surf.set_texture_properties(texture_name,
+                                        Eigen::Vector2f(1.0f * width_factor, 1.0f * height_factor),
+                                        Eigen::Vector2f(0.0f, 1.0f * height_factor),
+                                        Eigen::Vector2f(0.5f * width_factor, 0.0f));
+        }
+        else if (face == "right" && surf.get_name() == "right")
+        {
+            // Aligned at top edge
+            surf.set_texture_properties(texture_name,
+                                        Eigen::Vector2f(0.5f * width_factor, 0.0f),
+                                        Eigen::Vector2f(1.0f * width_factor, 1.0f * height_factor),
+                                        Eigen::Vector2f(0.0f, 1.0f * height_factor));
+        }
+
+        else if (face == "bottom")
+        {
+            if (surf.get_name() == "bottom_first")
+            {
+                surf.set_texture_properties(texture_name,
+                                            Eigen::Vector2f(1.0f * width_factor, 0.0f),
+                                            Eigen::Vector2f(1.0f * width_factor, 1.0f * height_factor),
+                                            Eigen::Vector2f(0.0f, 1.0f * height_factor));
+            }
+            else if (surf.get_name() == "bottom_second")
+            {
+                surf.set_texture_properties(texture_name,
+                                            Eigen::Vector2f(0.0f, 1.0f * height_factor),
+                                            Eigen::Vector2f(0.0f, 0.0f),
+                                            Eigen::Vector2f(1.0f * width_factor, 0.0f));
+            }
+        }
     }
 }

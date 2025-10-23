@@ -58,46 +58,72 @@ void Boat::make_shape()
         // Boat base
         rect_prisms.push_back(RectPrism(0.0f, 0.75f, 0.0f, 4.5f, 1.5f, 2.25f, {BROWN, BROWN, {}, {}, NIGHTBROWN, {}},
                                         false, {"left", "right", "bottom"}));
+        rect_prisms.back().set_texture_properties("boat", 1.0f, 5.0f, "front");
+        rect_prisms.back().set_texture_properties("boat", 1.0f, 5.0f, "rear");
 
         // Bow (front) wedge (left, right, slope, top)
         triangles.push_back(Surface(Eigen::Vector4f(2.25f, 1.5f, -1.125f, 1.0f),
                                     Eigen::Vector4f(2.25f, 0.0f, -1.125f, 1.0f),
                                     Eigen::Vector4f(3.375f, 1.5f, -1.125f, 1.0f), {BROWN}));
+        triangles.back().set_texture_properties("boat", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(0.0f, 5.0f), Eigen::Vector2f(1.0f, 0.0f));
+
         triangles.push_back(Surface(Eigen::Vector4f(3.375f, 1.5f, 1.125f, 1.0f),
                                     Eigen::Vector4f(2.25f, 0.0f, 1.125f, 1.0f),
                                     Eigen::Vector4f(2.25f, 1.5f, 1.125f, 1.0f), {BROWN}));
-        quads.push_back(Quad({2.25f, 0.0f, -1.125f}, {2.25f, 0.0f, 1.125f}, {3.375f, 1.5f, 1.125f}, {3.375f, 1.5f, -1.125f}, {DKBROWN}));
+        triangles.back().set_texture_properties("boat", Eigen::Vector2f(1.0f, 0.0f), Eigen::Vector2f(0.0f, 5.0f), Eigen::Vector2f(0.0f, 0.0f));
+
+        quads.push_back(Quad({2.25f, 0.0f, 1.125f}, {3.375f, 1.5f, 1.125f}, {3.375f, 1.5f, -1.125f}, {2.25f, 0.0f, -1.125f}, {DKBROWN}));
+        quads.back().set_texture_properties("boat_dark", Eigen::Vector2f(0.0f, 5.0f), Eigen::Vector2f(0.0f, 0.0f),
+                                            Eigen::Vector2f(1.0f, 0.0f), Eigen::Vector2f(1.0f, 5.0f));
+
         quads.push_back(Quad({2.25f, 1.5f, 1.125f}, {2.25f, 1.5f, -1.125f}, {3.375f, 1.5f, -1.125f}, {3.375f, 1.5f, 1.125f}, {NIGHTBROWN}));
 
         // Stern (rear) wedge (left, right, slope, top)
         triangles.push_back(Surface(Eigen::Vector4f(-3.375f, 1.5f, -1.125f, 1.0f),
                                     Eigen::Vector4f(-2.25f, 0.0f, -1.125f, 1.0f),
                                     Eigen::Vector4f(-2.25f, 1.5f, -1.125f, 1.0f), {BROWN}));
+        triangles.back().set_texture_properties("boat", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(1.0f, 5.0f), Eigen::Vector2f(1.0f, 0.0f));
+
         triangles.push_back(Surface(Eigen::Vector4f(-2.25f, 1.5f, 1.125f, 1.0f),
                                     Eigen::Vector4f(-2.25f, 0.0f, 1.125f, 1.0f),
                                     Eigen::Vector4f(-3.375f, 1.5f, 1.125f, 1.0f), {BROWN}));
-        quads.push_back(Quad({-3.375f, 1.5f, -1.125f}, {-3.375f, 1.5f, 1.125f}, {-2.25f, 0.0f, 1.125f}, {-2.25f, 0.0f, -1.125f}, {DKBROWN}));
+        triangles.back().set_texture_properties("boat", Eigen::Vector2f(1.0f, 0.0f), Eigen::Vector2f(1.0f, 5.0f), Eigen::Vector2f(0.0f, 0.0f));
+
+        quads.push_back(Quad({-2.25f, 0.0f, -1.125f}, {-3.375f, 1.5f, -1.125f}, {-3.375f, 1.5f, 1.125f}, {-2.25f, 0.0f, 1.125f}, {DKBROWN}));
+        quads.back().set_texture_properties("boat_dark", Eigen::Vector2f(0.0f, 5.0f), Eigen::Vector2f(0.0f, 0.0f),
+                                            Eigen::Vector2f(1.0f, 0.0f), Eigen::Vector2f(1.0f, 5.0f));
+
         quads.push_back(Quad({-3.375f, 1.5f, 1.125f}, {-3.375f, 1.5f, -1.125f}, {-2.25f, 1.5f, -1.125f}, {-2.25f, 1.5f, 1.125f}, {NIGHTBROWN}));
 
         // mast
         rect_prisms.push_back(RectPrism(1.0f, 4.0f, 0.0f, 0.2f, 5.0f, 0.2f,
                                         {DKGRAY, DKGRAY, NIGHTGRAY, NIGHTGRAY, GRAY, {}}, false, {"bottom"}));
+        rect_prisms.back().set_texture_properties("metal", 1.0f, 1.0f, "front");
+        rect_prisms.back().set_texture_properties("metal", 1.0f, 1.0f, "rear");
+        rect_prisms.back().set_texture_properties("metal", 1.0f, 1.0f, "left");
+        rect_prisms.back().set_texture_properties("metal", 1.0f, 1.0f, "right");
 
         // headsail (left and right)
         triangles.push_back(Surface(Eigen::Vector4f(1.1f, 6.3f, 0.0f, 1.0f),
                                     Eigen::Vector4f(2.8f, 1.9f, 0.0f, 1.0f),
                                     Eigen::Vector4f(1.1f, 1.9f, -0.1f, 1.0f), {WHITE}));
+        triangles.back().set_texture_properties("cloth", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(5.0f, 6.0f), Eigen::Vector2f(0.0f, 6.0f));
+
         triangles.push_back(Surface(Eigen::Vector4f(1.1f, 1.9f, 0.1f, 1.0f),
                                     Eigen::Vector4f(2.8f, 1.9f, 0.0f, 1.0f),
                                     Eigen::Vector4f(1.1f, 6.3f, 0.0f, 1.0f), {WHITE}));
+        triangles.back().set_texture_properties("cloth", Eigen::Vector2f(0.0f, 6.0f), Eigen::Vector2f(5.0f, 6.0f), Eigen::Vector2f(0.0f, 0.0f));
 
         // mainsail (left and right)
         triangles.push_back(Surface(Eigen::Vector4f(0.9f, 1.9f, -0.1f, 1.0f),
                                     Eigen::Vector4f(-2.8f, 1.9f, 0.0f, 1.0f),
                                     Eigen::Vector4f(0.9f, 6.3f, 0.0f, 1.0f), {WHITE}));
+        triangles.back().set_texture_properties("cloth", Eigen::Vector2f(5.0f, 6.0f), Eigen::Vector2f(0.0f, 6.0f), Eigen::Vector2f(5.0f, 0.0f));
+
         triangles.push_back(Surface(Eigen::Vector4f(0.9f, 6.3f, 0.0f, 1.0f),
                                     Eigen::Vector4f(-2.8f, 1.9f, 0.0f, 1.0f),
                                     Eigen::Vector4f(0.9f, 1.9f, 0.1f, 1.0f), {WHITE}));
+        triangles.back().set_texture_properties("cloth", Eigen::Vector2f(5.0f, 0.0f), Eigen::Vector2f(0.0f, 6.0f), Eigen::Vector2f(5.0f, 6.0f));
 
         // Populate the surfaces vector with all surfaces
         vector<Surface> shape_surfaces;

@@ -81,6 +81,9 @@ int main(int argc, char *argv[])
     // Move initial position relative to origin
     engine.move_view(Eigen::Vector3f(-4.0f, 0.0f, 1.5f), 0.0f, 0.0f);
 
+    // // View of airplane
+    // engine.move_view(Eigen::Vector3f(-2.63169956f, -1.12747788f, 17.5182972f), 6.85870695f, 127.83371f);
+
     // Set mouse behavior and initialize event
     SDL_SetWindowRelativeMouseMode(window, true);
     SDL_Event event;
@@ -202,6 +205,7 @@ int main(int argc, char *argv[])
             // Update animations
             TEXTURES.at("water").update_animation();
             TEXTURES.at("waterfall").update_animation();
+            TEXTURES.at("cloth").update_animation();
 
             // Draw surfaces
             engine.draw_surfaces(*renderer, all_surfaces);

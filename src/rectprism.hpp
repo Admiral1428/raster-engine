@@ -17,6 +17,8 @@ public:
     RectPrism(const RectPrism &p);
     RectPrism &operator=(const RectPrism &);
     void make_shape() override;
+    void set_texture_properties(const string &texture_name, const float &width_factor, const float &height_factor,
+                                const string &face);
 };
 
 #endif

@@ -13,6 +13,7 @@ public:
     Rect(const Rect &p);
     Rect &operator=(const Rect &);
     void make_shape() override;
+    void set_texture_properties(const string &texture_name, const float &width_factor, const float &height_factor);
 };
 
 #endif
