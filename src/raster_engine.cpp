@@ -1,4 +1,5 @@
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_mixer.h>
 #include <Eigen/Dense>
 #include <iostream>
 #include <array>
@@ -13,6 +14,7 @@
 #include "airplane.hpp"
 #include "prop.hpp"
 #include "map_textures.hpp"
+#include "map_sounds.hpp"
 
 using std::array;
 
@@ -50,6 +52,27 @@ int main(int argc, char *argv[])
     if (!(SDL_Init(SDL_INIT_VIDEO)))
     {
         SDL_Log("Could not initialize SDL: %s", SDL_GetError());
+        return 1;
+    }
+
+    // Initialize audio
+    if (SDL_Init(SDL_INIT_AUDIO) < 0)
+    {
+        SDL_Log("Could not initialize Audio: %s", SDL_GetError());
+        return 1;
+    }
+    if (MIX_Init() < 0)
+    {
+        SDL_Log("MIX_Init failed: %s", SDL_GetError());
+        SDL_Quit();
+        return 1;
+    }
+    MIX_Mixer *mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
+    if (!mixer || mixer == NULL)
+    {
+        SDL_Log("Could not create sound mixer device: %s", SDL_GetError());
+        MIX_Quit();
+        SDL_Quit();
         return 1;
     }
 
@@ -96,8 +119,11 @@ int main(int argc, char *argv[])
     Boat boat(-32.0f, -3.0f, 60.0f, "small", 0.0f, 90.0f, 0.0f, "roll-pitch-yaw", -2.0f);
     Airplane airplane(-30.0f, 20.0f, 0.0f, "small", 0.0f, 90.0f, -30.0f, "roll-pitch-yaw", -15.0f);
 
+    // Boat movement value for sound purposes
+    float boat_dz;
+
     // Moving propeller location based on the static airplane defined in the map class
-    Prop prop(-5.0f, -1.25f, 18.5f, "small", 0.0f, -240.0f, 16.0f, "yaw-pitch-roll", 540.0f);
+    Prop prop(-5.0f, -1.25f, 18.5f, "small", 0.0f, -240.0f, 16.0f, "yaw-pitch-roll", 720.0f);
 
     // Initialize vector to contain all surfaces
     vector<Surface> all_surfaces;
@@ -105,8 +131,9 @@ int main(int argc, char *argv[])
     // Move initial position relative to origin
     engine.move_view(Eigen::Vector3f(-4.0f, 0.0f, 1.5f), 0.0f, 0.0f);
 
-    // // View of airplane
-    // engine.move_view(Eigen::Vector3f(-2.63169956f, -1.12747788f, 17.5182972f), 6.85870695f, 127.83371f);
+    // Load and start sounds
+    load_sounds(*mixer);
+    start_sounds();
 
     // Set mouse behavior and initialize event
     SDL_SetWindowRelativeMouseMode(window, true);
@@ -220,6 +247,18 @@ int main(int argc, char *argv[])
         airplane_surfaces = airplane.get_surfaces();
         prop_surfaces = prop.get_surfaces();
 
+        // move flying airplane sound
+        move_sound("airplane_flying", 0.0f, 0.0f, 0.0f,
+                   0.0f, -15.0f * frame_dt, 0.0f, "roll-pitch-yaw");
+
+        // move boat sound
+        boat_dz = boat.get_speed() * frame_dt;
+        move_sound("boat", 0.0f, 0.0f, boat_dz,
+                   0.0f, 0.0f, 0.0f, "roll-pitch-yaw");
+
+        // calculate new sound gains using player location
+        set_sound_gains(engine.get_eye());
+
         need_redraw = true;
 
         if (need_redraw)
@@ -259,6 +298,10 @@ int main(int argc, char *argv[])
     }
 
     // Clean up
+    destroy_sounds();
+    MIX_DestroyMixer(mixer);
+    MIX_Quit();
+
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();

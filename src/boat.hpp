@@ -25,6 +25,7 @@ public:
     Boat &operator=(const Boat &);
     void make_shape() override;
     void move(const float &frame_dt);
+    float get_speed();
 };
 
 #endif
