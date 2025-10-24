@@ -74,18 +74,23 @@ void process_input(array<bool, SDL_SCANCODE_COUNT> &key_states, const vector<flo
 }
 
 void process_f_key_down(array<bool, SDL_SCANCODE_COUNT> &key_states, Renderer &engine, SDL_Renderer &renderer,
-                        bool &need_redraw, array<bool, 13> &f_keys_pressed, Uint64 &last_debug_time, int &cur_res_index,
-                        int &render_mode_index)
+                        SDL_Window &window, bool &need_redraw, array<bool, 13> &f_keys_pressed, Uint64 &last_debug_time,
+                        int &cur_res_index, int &render_mode_index, bool &show_title)
 {
     if (key_states[SDL_SCANCODE_F1] && !f_keys_pressed[1])
     {
-        engine.cycle_fov();
-        need_redraw = true;
+        show_title = true;
         f_keys_pressed[1] = true;
-
-        last_debug_time = SDL_GetPerformanceCounter();
     }
     else if (key_states[SDL_SCANCODE_F2] && !f_keys_pressed[2])
+    {
+        engine.cycle_fov();
+        need_redraw = true;
+
+        f_keys_pressed[2] = true;
+        last_debug_time = SDL_GetPerformanceCounter();
+    }
+    else if (key_states[SDL_SCANCODE_F3] && !f_keys_pressed[3])
     {
         if (cur_res_index < RENDER_RES_OPTS.size() - 1)
         {
@@ -101,9 +106,11 @@ void process_f_key_down(array<bool, SDL_SCANCODE_COUNT> &key_states, Renderer &e
 
         engine.set_width_height(new_width, new_height);
         SDL_SetRenderLogicalPresentation(&renderer, new_width, new_height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+
+        f_keys_pressed[3] = true;
         last_debug_time = SDL_GetPerformanceCounter();
     }
-    else if (key_states[SDL_SCANCODE_F3] && !f_keys_pressed[3])
+    else if (key_states[SDL_SCANCODE_F4] && !f_keys_pressed[4])
     {
         if (render_mode_index < RENDER_MODES.size() - 1)
         {
@@ -115,25 +122,49 @@ void process_f_key_down(array<bool, SDL_SCANCODE_COUNT> &key_states, Renderer &e
         }
         engine.set_render_mode(RENDER_MODES[render_mode_index]);
 
+        f_keys_pressed[4] = true;
         last_debug_time = SDL_GetPerformanceCounter();
+    }
+    else if (key_states[SDL_SCANCODE_F12] && !f_keys_pressed[12])
+    {
+        Uint32 flags = SDL_GetWindowFlags(&window);
+
+        if (flags & SDL_WINDOW_FULLSCREEN)
+        {
+            // Return to windowed mode
+            SDL_SetWindowFullscreen(&window, false);
+        }
+        else
+        {
+            // Set fullscreen state
+            SDL_SetWindowFullscreen(&window, true);
+        }
+
+        f_keys_pressed[12] = true;
     }
 }
 
-void process_f_key_up(array<bool, SDL_SCANCODE_COUNT> &key_states, array<bool, 13> &f_keys_pressed)
+void process_f_key_up(const SDL_Event &event, array<bool, 13> &f_keys_pressed)
 {
-    if (key_states[SDL_SCANCODE_F1])
+    if (event.key.scancode == SDL_SCANCODE_F1)
     {
         f_keys_pressed[1] = false;
     }
-
-    if (key_states[SDL_SCANCODE_F2])
+    else if (event.key.scancode == SDL_SCANCODE_F2)
     {
         f_keys_pressed[2] = false;
     }
-
-    if (key_states[SDL_SCANCODE_F3])
+    else if (event.key.scancode == SDL_SCANCODE_F3)
     {
         f_keys_pressed[3] = false;
+    }
+    else if (event.key.scancode == SDL_SCANCODE_F4)
+    {
+        f_keys_pressed[4] = false;
+    }
+    else if (event.key.scancode == SDL_SCANCODE_F12)
+    {
+        f_keys_pressed[12] = false;
     }
 }
 

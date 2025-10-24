@@ -16,6 +16,30 @@
 
 using std::array;
 
+void run_title(SDL_Renderer &_renderer)
+{
+    SDL_Texture *image_texture = IMG_LoadTexture(&_renderer, "../assets/images/main_title_screen.png");
+    SDL_RenderClear(&_renderer);                              // Clear the renderer
+    SDL_RenderTexture(&_renderer, image_texture, NULL, NULL); // Render texture to full window
+    SDL_RenderPresent(&_renderer);                            // Present the rendered content to the screen
+
+    bool quit_title = false;
+
+    SDL_Event title_event;
+
+    while (!quit_title)
+    {
+        SDL_WaitEvent(&title_event);
+        if (title_event.type == SDL_EVENT_KEY_DOWN || title_event.type == SDL_EVENT_QUIT)
+        {
+            quit_title = true;
+        }
+    }
+
+    SDL_DestroyTexture(image_texture);
+    image_texture = NULL;
+}
+
 int main(int argc, char *argv[])
 {
     // Eigen::Vector4fers to window and renderer
@@ -103,6 +127,9 @@ int main(int argc, char *argv[])
     // Debug info timing, initialize as 6 seconds prior
     Uint64 last_debug_time = SDL_GetPerformanceCounter() - (6 * perf_freq);
 
+    // Title screen flag
+    bool show_title = true;
+
     // Main game loop
     while (!quit)
     {
@@ -155,18 +182,25 @@ int main(int argc, char *argv[])
                 {
                     key_states[event.key.scancode] = true;
                 }
-                process_f_key_down(key_states, engine, *renderer, need_redraw,
+                process_f_key_down(key_states, engine, *renderer, *window, need_redraw,
                                    f_keys_pressed, last_debug_time, cur_res_index,
-                                   render_mode_index);
+                                   render_mode_index, show_title);
             }
             else if (event.type == SDL_EVENT_KEY_UP)
             {
-                process_f_key_up(key_states, f_keys_pressed);
+                process_f_key_up(event, f_keys_pressed);
                 if (event.key.scancode < SDL_SCANCODE_COUNT)
                 {
                     key_states[event.key.scancode] = false;
                 }
             }
+        }
+
+        // show title screen
+        if (show_title)
+        {
+            run_title(*renderer);
+            show_title = false;
         }
 
         // reset mouse delta
