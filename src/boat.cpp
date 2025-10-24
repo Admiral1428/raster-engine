@@ -160,8 +160,8 @@ void Boat::move(const float &frame_dt)
     // modify coordinates to track position
     z += speed * frame_dt;
 
-    // turn boat around if edge of map
-    if ((z < -185.0f && speed < 0.0f) || (z > 185.0f && speed > 0.0f))
+    // turn boat around after given distance
+    if ((z < -150.0f && speed < 0.0f) || (z > 150.0f && speed > 0.0f))
     {
         // reverse direction
         speed = -speed;
@@ -173,4 +173,9 @@ void Boat::move(const float &frame_dt)
         // move back
         translate(x, y, z);
     }
+}
+
+float Boat::get_speed()
+{
+    return speed;
 }

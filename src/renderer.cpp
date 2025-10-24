@@ -438,3 +438,8 @@ string Renderer::get_render_mode()
 {
     return render_mode;
 }
+
+Eigen::Vector3f Renderer::get_eye()
+{
+    return eye;
+}

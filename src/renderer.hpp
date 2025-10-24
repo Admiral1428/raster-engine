@@ -71,6 +71,7 @@ public:
     void move_view(const Eigen::Vector3f &dloc, const float &dpitch, const float &dyaw);
     void set_render_mode(const string &mode);
     string get_render_mode();
+    Eigen::Vector3f get_eye();
 };
 
 #endif
