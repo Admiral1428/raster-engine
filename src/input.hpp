@@ -18,9 +18,9 @@ void mouse_check(Uint64 &last_mouse_time, const float &perf_freq, vector<float> 
 void process_input(array<bool, SDL_SCANCODE_COUNT> &key_states, const vector<float> &mouse_delta,
                    const float &frame_dt, Renderer &engine, bool &need_redraw);
 void process_f_key_down(array<bool, SDL_SCANCODE_COUNT> &key_states, Renderer &engine, SDL_Renderer &renderer,
-                        bool &need_redraw, array<bool, 13> &f_keys_pressed, Uint64 &last_debug_time, int &cur_res_index,
-                        int &render_mode_index);
-void process_f_key_up(array<bool, SDL_SCANCODE_COUNT> &key_states, array<bool, 13> &f_keys_pressed);
+                        SDL_Window &window, bool &need_redraw, array<bool, 13> &f_keys_pressed, Uint64 &last_debug_time,
+                        int &cur_res_index, int &render_mode_index, bool &show_title);
+void process_f_key_up(const SDL_Event &event, array<bool, 13> &f_keys_pressed);
 void draw_settings_info(Renderer &engine, SDL_Renderer &renderer, SDL_Window &window, const float &frame_dt);
 
 #endif
