@@ -8,6 +8,7 @@
 #include "surface.hpp"
 #include "renderer.hpp"
 #include "rectprism.hpp"
+#include "octprism.hpp"
 #include "input.hpp"
 #include "map.hpp"
 #include "boat.hpp"
@@ -118,6 +119,24 @@ int main(int argc, char *argv[])
     vector<Surface> prop_surfaces;
     Boat boat(-32.0f, -3.0f, 60.0f, "small", 0.0f, 90.0f, 0.0f, "roll-pitch-yaw", -2.0f);
     Airplane airplane(-30.0f, 20.0f, 0.0f, "small", 0.0f, 90.0f, -30.0f, "roll-pitch-yaw", -15.0f);
+
+    // Initialize sun and moon objects
+    vector<Surface> sun_surfaces;
+    vector<Surface> moon_surfaces;
+    float day_night_angle = 90.0f;
+    float day_night_rot_rate = 5.0f;
+    OctPrism sun(0.0f, 0.0f, 0.0f, 80.0f, 80.0f, 1.0f,
+                 {YELLOW}, false, {"rear", "outer"});
+    sun.set_texture_properties("sun");
+    sun.rotate(0.0f, -90.0f, 0.0f, "roll-pitch-yaw");
+    sun.translate(800.0f, -3.0f, 0.0f);
+    sun.rotate(0.0f, 0.0f, day_night_angle, "roll-pitch-yaw");
+    OctPrism moon(0.0f, 0.0f, 0.0f, 80.0f, 80.0f, 10.0f,
+                  {WHITE}, false, {"rear", "outer"});
+    moon.set_texture_properties("moon");
+    moon.rotate(0.0f, 90.0f, 0.0f, "roll-pitch-yaw");
+    moon.translate(-800.0f, -3.0f, 0.0f);
+    moon.rotate(0.0f, 0.0f, day_night_angle, "roll-pitch-yaw");
 
     // Boat movement value for sound purposes
     float boat_dz;
@@ -247,6 +266,13 @@ int main(int argc, char *argv[])
         airplane_surfaces = airplane.get_surfaces();
         prop_surfaces = prop.get_surfaces();
 
+        // move sun and moon
+        day_night_angle = fmod(day_night_angle + frame_dt * day_night_rot_rate, 360.0f);
+        sun.rotate(0.0f, 0.0f, frame_dt * day_night_rot_rate, "roll-pitch-yaw");
+        moon.rotate(0.0f, 0.0f, frame_dt * day_night_rot_rate, "roll-pitch-yaw");
+        sun_surfaces = sun.get_surfaces();
+        moon_surfaces = moon.get_surfaces();
+
         // move flying airplane sound
         move_sound("airplane_flying", 0.0f, 0.0f, 0.0f,
                    0.0f, -15.0f * frame_dt, 0.0f, "roll-pitch-yaw");
@@ -274,6 +300,8 @@ int main(int argc, char *argv[])
             all_surfaces.insert(all_surfaces.end(), boat_surfaces.begin(), boat_surfaces.end());
             all_surfaces.insert(all_surfaces.end(), airplane_surfaces.begin(), airplane_surfaces.end());
             all_surfaces.insert(all_surfaces.end(), prop_surfaces.begin(), prop_surfaces.end());
+            all_surfaces.insert(all_surfaces.end(), sun_surfaces.begin(), sun_surfaces.end());
+            all_surfaces.insert(all_surfaces.end(), moon_surfaces.begin(), moon_surfaces.end());
 
             // Update animations
             TEXTURES.at("water").update_animation();
@@ -281,12 +309,12 @@ int main(int argc, char *argv[])
             TEXTURES.at("cloth").update_animation();
 
             // Draw surfaces
-            engine.draw_surfaces(*renderer, all_surfaces);
+            engine.draw_surfaces(*renderer, all_surfaces, day_night_angle);
 
             // Draw settings if recently changed
             if (debug_dt < 5.0f)
             {
-                draw_settings_info(engine, *renderer, *window, frame_dt);
+                draw_settings_info(engine, *renderer, *window, frame_dt, day_night_angle);
             }
 
             // Update the screen

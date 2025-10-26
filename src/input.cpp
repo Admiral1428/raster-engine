@@ -168,12 +168,22 @@ void process_f_key_up(const SDL_Event &event, array<bool, 13> &f_keys_pressed)
     }
 }
 
-void draw_settings_info(Renderer &engine, SDL_Renderer &renderer, SDL_Window &window, const float &frame_dt)
+void draw_settings_info(Renderer &engine, SDL_Renderer &renderer, SDL_Window &window, const float &frame_dt,
+                        const float &day_night_angle)
 {
+    if (day_night_angle > 180.0f && day_night_angle < 360.0f)
+    {
+        SDL_SetRenderDrawColor(&renderer, 255, 255, 255, 255); // WHITE text
+    }
+    else
+    {
+        SDL_SetRenderDrawColor(&renderer, 0, 0, 0, 255); // BLACK text
+    }
+
     // Field of view
     string fov_string = "Field of view = " + to_string(engine.get_fov());
     const char *fov_c_str = fov_string.c_str();
-    SDL_SetRenderDrawColor(&renderer, 0, 0, 0, 255); // BLACK text
+
     SDL_RenderDebugText(&renderer, 0, 0, fov_c_str);
 
     // Render resolution

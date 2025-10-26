@@ -63,4 +63,7 @@ void load_textures()
     TEXTURES.emplace("plane_glass", Texture({"../assets/textures/RE_Plane_Glass.png"}, 0.0f));
     TEXTURES.emplace("plane_glass_side", Texture({"../assets/textures/RE_Plane_Glass_Side.png"}, 0.0f));
     TEXTURES.emplace("plane_engine", Texture({"../assets/textures/RE_Plane_Engine.png"}, 0.0f));
+
+    TEXTURES.emplace("sun", Texture({"../assets/textures/RE_Sun.png"}, 0.0f));
+    TEXTURES.emplace("moon", Texture({"../assets/textures/RE_Moon.png"}, 0.0f));
 }

@@ -21,6 +21,7 @@
 
 using std::abs;
 using std::array;
+using std::clamp;
 using std::fill;
 using std::fmod;
 using std::max;
@@ -61,7 +62,7 @@ public:
     vector<Eigen::Matrix4f> calc_rot_matrices();
     void calc_view_matrix();
     vector<Eigen::Vector3f> get_view_directions();
-    void draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces);
+    void draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces, const float &day_night_angle);
     void set_width_height(const float &w, const float &h);
     Uint32 convert_color(const Color &c);
     void cycle_fov();
@@ -72,6 +73,8 @@ public:
     void set_render_mode(const string &mode);
     string get_render_mode();
     Eigen::Vector3f get_eye();
+    float color_interp(const float &start, const float &end, const float &p);
+    Color get_sky_color(float angle);
 };
 
 #endif
