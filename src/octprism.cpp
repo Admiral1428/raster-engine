@@ -9,6 +9,7 @@ OctPrism::OctPrism(const float &_x, const float &_y, const float &_z, const floa
 
 OctPrism::OctPrism(const OctPrism &r) : Shape(r)
 {
+    vertices = r.vertices;
     make_shape();
 }
 
@@ -17,6 +18,7 @@ OctPrism &OctPrism::operator=(const OctPrism &r)
     if (this != &r)
     {
         Shape::operator=(r);
+        vertices = r.vertices;
         make_shape();
     }
     return *this;
@@ -32,41 +34,40 @@ void OctPrism::make_shape()
     // x, y, z all at shape center
 
     // Define 8 vertices in clockwise order
-    vector<vector<float>> ver;
-    ver.push_back({0.5f * width * (2.0f - sqrt(2.0f)), 0.5f * height}); // top right
-    ver.push_back({0.5f * width, 0.5f * height * (2.0f - sqrt(2.0f))});
-    ver.push_back({0.5f * width, -0.5f * height * (2.0f - sqrt(2.0f))});
-    ver.push_back({0.5f * width * (2.0f - sqrt(2.0f)), -0.5f * height});
-    ver.push_back({-0.5f * width * (2.0f - sqrt(2.0f)), -0.5f * height});
-    ver.push_back({-0.5f * width, -0.5f * height * (2.0f - sqrt(2.0f))});
-    ver.push_back({-0.5f * width, 0.5f * height * (2.0f - sqrt(2.0f))});
-    ver.push_back({-0.5f * width * (2.0f - sqrt(2.0f)), 0.5f * height}); // top left
+    vertices.push_back({0.5f * width * (2.0f - sqrt(2.0f)), 0.5f * height}); // top right
+    vertices.push_back({0.5f * width, 0.5f * height * (2.0f - sqrt(2.0f))});
+    vertices.push_back({0.5f * width, -0.5f * height * (2.0f - sqrt(2.0f))});
+    vertices.push_back({0.5f * width * (2.0f - sqrt(2.0f)), -0.5f * height});
+    vertices.push_back({-0.5f * width * (2.0f - sqrt(2.0f)), -0.5f * height});
+    vertices.push_back({-0.5f * width, -0.5f * height * (2.0f - sqrt(2.0f))});
+    vertices.push_back({-0.5f * width, 0.5f * height * (2.0f - sqrt(2.0f))});
+    vertices.push_back({-0.5f * width * (2.0f - sqrt(2.0f)), 0.5f * height}); // top left
 
     // Create 8 triangles
     Surface tri_01(Eigen::Vector4f(0.0f, 0.0f, 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[0][0], ver[0][1], 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[1][0], ver[1][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
+                   Eigen::Vector4f(vertices[0][0], vertices[0][1], 0.0f, 1.0f),
+                   Eigen::Vector4f(vertices[1][0], vertices[1][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
     Surface tri_12(Eigen::Vector4f(0.0f, 0.0f, 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[1][0], ver[1][1], 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[2][0], ver[2][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
+                   Eigen::Vector4f(vertices[1][0], vertices[1][1], 0.0f, 1.0f),
+                   Eigen::Vector4f(vertices[2][0], vertices[2][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
     Surface tri_23(Eigen::Vector4f(0.0f, 0.0f, 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[2][0], ver[2][1], 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[3][0], ver[3][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
+                   Eigen::Vector4f(vertices[2][0], vertices[2][1], 0.0f, 1.0f),
+                   Eigen::Vector4f(vertices[3][0], vertices[3][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
     Surface tri_34(Eigen::Vector4f(0.0f, 0.0f, 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[3][0], ver[3][1], 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[4][0], ver[4][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
+                   Eigen::Vector4f(vertices[3][0], vertices[3][1], 0.0f, 1.0f),
+                   Eigen::Vector4f(vertices[4][0], vertices[4][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
     Surface tri_45(Eigen::Vector4f(0.0f, 0.0f, 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[4][0], ver[4][1], 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[5][0], ver[5][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
+                   Eigen::Vector4f(vertices[4][0], vertices[4][1], 0.0f, 1.0f),
+                   Eigen::Vector4f(vertices[5][0], vertices[5][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
     Surface tri_56(Eigen::Vector4f(0.0f, 0.0f, 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[5][0], ver[5][1], 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[6][0], ver[6][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
+                   Eigen::Vector4f(vertices[5][0], vertices[5][1], 0.0f, 1.0f),
+                   Eigen::Vector4f(vertices[6][0], vertices[6][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
     Surface tri_67(Eigen::Vector4f(0.0f, 0.0f, 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[6][0], ver[6][1], 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[7][0], ver[7][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
+                   Eigen::Vector4f(vertices[6][0], vertices[6][1], 0.0f, 1.0f),
+                   Eigen::Vector4f(vertices[7][0], vertices[7][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
     Surface tri_70(Eigen::Vector4f(0.0f, 0.0f, 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[7][0], ver[7][1], 0.0f, 1.0f),
-                   Eigen::Vector4f(ver[0][0], ver[0][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
+                   Eigen::Vector4f(vertices[7][0], vertices[7][1], 0.0f, 1.0f),
+                   Eigen::Vector4f(vertices[0][0], vertices[0][1], 0.0f, 1.0f), {colors[0]}, diminish_light);
 
     // front
     auto check_front = find(skip_surfaces.begin(), skip_surfaces.end(), "front");
@@ -149,29 +150,29 @@ void OctPrism::make_shape()
     if (check_outer == skip_surfaces.end())
     {
         // rectangle between vertices, front and rear
-        Quad rect_01({ver[0][0], ver[0][1], 0.5f * depth}, {ver[0][0], ver[0][1], -0.5f * depth},
-                     {ver[1][0], ver[1][1], -0.5f * depth}, {ver[1][0], ver[1][1], 0.5f * depth}, {colors[1]}, diminish_light);
+        Quad rect_01({vertices[0][0], vertices[0][1], 0.5f * depth}, {vertices[0][0], vertices[0][1], -0.5f * depth},
+                     {vertices[1][0], vertices[1][1], -0.5f * depth}, {vertices[1][0], vertices[1][1], 0.5f * depth}, {colors[1]}, diminish_light);
 
-        Quad rect_12({ver[1][0], ver[1][1], 0.5f * depth}, {ver[1][0], ver[1][1], -0.5f * depth},
-                     {ver[2][0], ver[2][1], -0.5f * depth}, {ver[2][0], ver[2][1], 0.5f * depth}, {colors[1]}, diminish_light);
+        Quad rect_12({vertices[1][0], vertices[1][1], 0.5f * depth}, {vertices[1][0], vertices[1][1], -0.5f * depth},
+                     {vertices[2][0], vertices[2][1], -0.5f * depth}, {vertices[2][0], vertices[2][1], 0.5f * depth}, {colors[1]}, diminish_light);
 
-        Quad rect_23({ver[2][0], ver[2][1], 0.5f * depth}, {ver[2][0], ver[2][1], -0.5f * depth},
-                     {ver[3][0], ver[3][1], -0.5f * depth}, {ver[3][0], ver[3][1], 0.5f * depth}, {colors[1]}, diminish_light);
+        Quad rect_23({vertices[2][0], vertices[2][1], 0.5f * depth}, {vertices[2][0], vertices[2][1], -0.5f * depth},
+                     {vertices[3][0], vertices[3][1], -0.5f * depth}, {vertices[3][0], vertices[3][1], 0.5f * depth}, {colors[1]}, diminish_light);
 
-        Quad rect_34({ver[3][0], ver[3][1], 0.5f * depth}, {ver[3][0], ver[3][1], -0.5f * depth},
-                     {ver[4][0], ver[4][1], -0.5f * depth}, {ver[4][0], ver[4][1], 0.5f * depth}, {colors[1]}, diminish_light);
+        Quad rect_34({vertices[3][0], vertices[3][1], 0.5f * depth}, {vertices[3][0], vertices[3][1], -0.5f * depth},
+                     {vertices[4][0], vertices[4][1], -0.5f * depth}, {vertices[4][0], vertices[4][1], 0.5f * depth}, {colors[1]}, diminish_light);
 
-        Quad rect_45({ver[4][0], ver[4][1], 0.5f * depth}, {ver[4][0], ver[4][1], -0.5f * depth},
-                     {ver[5][0], ver[5][1], -0.5f * depth}, {ver[5][0], ver[5][1], 0.5f * depth}, {colors[1]}, diminish_light);
+        Quad rect_45({vertices[4][0], vertices[4][1], 0.5f * depth}, {vertices[4][0], vertices[4][1], -0.5f * depth},
+                     {vertices[5][0], vertices[5][1], -0.5f * depth}, {vertices[5][0], vertices[5][1], 0.5f * depth}, {colors[1]}, diminish_light);
 
-        Quad rect_56({ver[5][0], ver[5][1], 0.5f * depth}, {ver[5][0], ver[5][1], -0.5f * depth},
-                     {ver[6][0], ver[6][1], -0.5f * depth}, {ver[6][0], ver[6][1], 0.5f * depth}, {colors[1]}, diminish_light);
+        Quad rect_56({vertices[5][0], vertices[5][1], 0.5f * depth}, {vertices[5][0], vertices[5][1], -0.5f * depth},
+                     {vertices[6][0], vertices[6][1], -0.5f * depth}, {vertices[6][0], vertices[6][1], 0.5f * depth}, {colors[1]}, diminish_light);
 
-        Quad rect_67({ver[6][0], ver[6][1], 0.5f * depth}, {ver[6][0], ver[6][1], -0.5f * depth},
-                     {ver[7][0], ver[7][1], -0.5f * depth}, {ver[7][0], ver[7][1], 0.5f * depth}, {colors[1]}, diminish_light);
+        Quad rect_67({vertices[6][0], vertices[6][1], 0.5f * depth}, {vertices[6][0], vertices[6][1], -0.5f * depth},
+                     {vertices[7][0], vertices[7][1], -0.5f * depth}, {vertices[7][0], vertices[7][1], 0.5f * depth}, {colors[1]}, diminish_light);
 
-        Quad rect_70({ver[7][0], ver[7][1], 0.5f * depth}, {ver[7][0], ver[7][1], -0.5f * depth},
-                     {ver[0][0], ver[0][1], -0.5f * depth}, {ver[0][0], ver[0][1], 0.5f * depth}, {colors[1]}, diminish_light);
+        Quad rect_70({vertices[7][0], vertices[7][1], 0.5f * depth}, {vertices[7][0], vertices[7][1], -0.5f * depth},
+                     {vertices[0][0], vertices[0][1], -0.5f * depth}, {vertices[0][0], vertices[0][1], 0.5f * depth}, {colors[1]}, diminish_light);
 
         // shift surfaces
         rect_01.translate(x, y, z);
@@ -207,4 +208,34 @@ void OctPrism::make_shape()
         vector<Surface> rect_70_surfaces = rect_70.get_surfaces();
         surfaces.insert(surfaces.end(), rect_70_surfaces.begin(), rect_70_surfaces.end());
     }
+}
+
+void OctPrism::set_texture_properties(const string &texture_name)
+{
+    // this is intended to set texture properties for the front face only
+
+    surfaces[0].set_texture_properties(texture_name, Eigen::Vector2f(0.5f, 0.5f),
+                                       Eigen::Vector2f(0.5f + vertices[0][0] / width, 0.5f - vertices[0][1] / height),
+                                       Eigen::Vector2f(0.5f + vertices[1][0] / width, 0.5f - vertices[1][1] / height));
+    surfaces[1].set_texture_properties(texture_name, Eigen::Vector2f(0.5f, 0.5f),
+                                       Eigen::Vector2f(0.5f + vertices[1][0] / width, 0.5f - vertices[1][1] / height),
+                                       Eigen::Vector2f(0.5f + vertices[2][0] / width, 0.5f - vertices[2][1] / height));
+    surfaces[2].set_texture_properties(texture_name, Eigen::Vector2f(0.5f, 0.5f),
+                                       Eigen::Vector2f(0.5f + vertices[2][0] / width, 0.5f - vertices[2][1] / height),
+                                       Eigen::Vector2f(0.5f + vertices[3][0] / width, 0.5f - vertices[3][1] / height));
+    surfaces[3].set_texture_properties(texture_name, Eigen::Vector2f(0.5f, 0.5f),
+                                       Eigen::Vector2f(0.5f + vertices[3][0] / width, 0.5f - vertices[3][1] / height),
+                                       Eigen::Vector2f(0.5f + vertices[4][0] / width, 0.5f - vertices[4][1] / height));
+    surfaces[4].set_texture_properties(texture_name, Eigen::Vector2f(0.5f, 0.5f),
+                                       Eigen::Vector2f(0.5f + vertices[4][0] / width, 0.5f - vertices[4][1] / height),
+                                       Eigen::Vector2f(0.5f + vertices[5][0] / width, 0.5f - vertices[5][1] / height));
+    surfaces[5].set_texture_properties(texture_name, Eigen::Vector2f(0.5f, 0.5f),
+                                       Eigen::Vector2f(0.5f + vertices[5][0] / width, 0.5f - vertices[5][1] / height),
+                                       Eigen::Vector2f(0.5f + vertices[6][0] / width, 0.5f - vertices[6][1] / height));
+    surfaces[6].set_texture_properties(texture_name, Eigen::Vector2f(0.5f, 0.5f),
+                                       Eigen::Vector2f(0.5f + vertices[6][0] / width, 0.5f - vertices[6][1] / height),
+                                       Eigen::Vector2f(0.5f + vertices[7][0] / width, 0.5f - vertices[7][1] / height));
+    surfaces[7].set_texture_properties(texture_name, Eigen::Vector2f(0.5f, 0.5f),
+                                       Eigen::Vector2f(0.5f + vertices[7][0] / width, 0.5f - vertices[7][1] / height),
+                                       Eigen::Vector2f(0.5f + vertices[0][0] / width, 0.5f - vertices[0][1] / height));
 }

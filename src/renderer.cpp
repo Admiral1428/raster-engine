@@ -127,10 +127,13 @@ vector<Eigen::Vector3f> Renderer::get_view_directions()
     return {new_forward_dir, new_left_dir};
 }
 
-void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
+void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces, const float &day_night_angle)
 {
     // initialize z buffer with 1.0 depth values
     z_buffer.setConstant(1.0f);
+
+    // get sky color
+    Color sky_color = get_sky_color(day_night_angle);
 
     // initialize pixel buffer to sky blue
     if (render_mode == "Triangles_Black_White")
@@ -139,7 +142,7 @@ void Renderer::draw_surfaces(SDL_Renderer &renderer, vector<Surface> &surfaces)
     }
     else
     {
-        pixel_grid.setConstant(convert_color(BACK_COLOR));
+        pixel_grid.setConstant(convert_color(sky_color));
     }
 
     // Initialize pixel grid as SDL texture
@@ -442,4 +445,74 @@ string Renderer::get_render_mode()
 Eigen::Vector3f Renderer::get_eye()
 {
     return eye;
+}
+
+float Renderer::color_interp(const float &start, const float &end, const float &p)
+{
+    return start + p * (end - start);
+}
+
+Color Renderer::get_sky_color(float angle)
+{
+    // Normalize angle to within 0, 360 range
+    angle = fmod(angle, 360.0f);
+    if (angle < 0)
+    {
+        angle += 360.0f;
+    }
+
+    Color start_color, end_color;
+    float p;
+
+    // Determine interpolation segment based on the angle.
+    if (angle >= 30 && angle < 150)
+    {
+        // Constant SKY_BLUE from 30 to 150 degrees
+        return SKY_BLUE;
+    }
+    else if (angle >= 210 && angle < 330)
+    {
+        // Constant NIGHTBLUE from 210 to 330 degrees
+        return NIGHTBLUE;
+    }
+    else if (angle >= 0 && angle < 30)
+    {
+        // Interpolate SALMON (0) to SKY_BLUE (30)
+        start_color = SALMON;
+        end_color = SKY_BLUE;
+        p = angle / 30.0f;
+    }
+    else if (angle >= 150 && angle < 180)
+    {
+        // Interpolate SKY_BLUE (150) to SALMON (180)
+        start_color = SKY_BLUE;
+        end_color = SALMON;
+        p = (angle - 150.0f) / 30.0f;
+    }
+    else if (angle >= 180 && angle < 210)
+    {
+        // Interpolate SALMON (180) to NIGHTBLUE (210)
+        start_color = SALMON;
+        end_color = NIGHTBLUE;
+        p = (angle - 180.0f) / 30.0f;
+    }
+    else // angle >= 330 && angle < 360 (or 0)
+    {
+        // Interpolate NIGHTBLUE (330) to SALMON (360/0)
+        start_color = NIGHTBLUE;
+        end_color = SALMON;
+        p = (angle - 330.0f) / 30.0f;
+    }
+
+    // Clamp the percentage to ensure it is between 0.0 and 1.0.
+    p = clamp(p, 0.0f, 1.0f);
+
+    // Interpolate each color channel.
+    Color result;
+    result.r = color_interp(start_color.r, end_color.r, p);
+    result.g = color_interp(start_color.g, end_color.g, p);
+    result.b = color_interp(start_color.b, end_color.b, p);
+    result.a = color_interp(start_color.a, end_color.a, p);
+
+    return result;
 }

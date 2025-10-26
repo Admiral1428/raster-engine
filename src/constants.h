@@ -71,6 +71,7 @@ const Color DKBROWN = {101, 67, 33, 255};
 const Color NIGHTBROWN = {50, 34, 16, 255};
 const Color TAN = {210, 180, 140, 255};
 const Color SKY_BLUE = {135, 206, 235, 255};
+const Color SALMON = {250, 128, 114, 255};
 const Color INVALID_COLOR = {0, 0, 0, 0};
 // Background color for screen
 const Color BACK_COLOR = SKY_BLUE;
