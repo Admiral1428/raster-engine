@@ -12,7 +12,7 @@ Map::Map()
     shapes_runway.reserve(1);
     shapes_hangar.reserve(1);
     shapes_triangle.reserve(31);
-    shapes_quad.reserve(36);
+    shapes_quad.reserve(37);
 
     // small trees along river
     shapes_tree.push_back(Tree(6.5f, -2.0f, -4.0f, "small"));
@@ -119,9 +119,13 @@ Map::Map()
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-37.0f, -3.0f, -15.0f, 1.0f), Eigen::Vector4f(-60.0f, -3.0f, -50.0f, 1.0f), Eigen::Vector4f(-37.0f, -3.0f, -50.0f, 1.0f), BLUE, true));
     shapes_triangle.back().set_texture_properties("water", Eigen::Vector2f(23.0f * ofac, 35.0f * ofac), Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(23.0f * ofac, 0.0f));
 
-    shapes_quad.push_back(Quad({-37.0f, -3.0f, 40.0f}, {-37.0f, -3.0f, -50.0f}, {-25.0f, -3.0f, -50.0f}, {-25.0f, -3.0f, 40.0f}, {BLUE}, true));
-    shapes_quad.back().set_texture_properties("water", Eigen::Vector2f(0.0f, 90.0f * ofac), Eigen::Vector2f(0.0f, 0.0f),
-                                              Eigen::Vector2f(12.0f * ofac, 0.0f), Eigen::Vector2f(12.0f * ofac, 90.0f * ofac));
+    shapes_quad.push_back(Quad({-37.0f, -3.0f, 40.0f}, {-37.0f, -3.0f, 0.0f}, {-25.0f, -3.0f, 0.0f}, {-25.0f, -3.0f, 40.0f}, {BLUE}, true));
+    shapes_quad.back().set_texture_properties("water", Eigen::Vector2f(0.0f, 40.0f * ofac), Eigen::Vector2f(0.0f, 0.0f),
+                                              Eigen::Vector2f(12.0f * ofac, 0.0f), Eigen::Vector2f(12.0f * ofac, 40.0f * ofac));
+
+    shapes_quad.push_back(Quad({-37.0f, -3.0f, 0.0f}, {-37.0f, -3.0f, -50.0f}, {-25.0f, -3.0f, -50.0f}, {-25.0f, -3.0f, 0.0f}, {BLUE}, true));
+    shapes_quad.back().set_texture_properties("water", Eigen::Vector2f(0.0f, 50.0f * ofac), Eigen::Vector2f(0.0f, 0.0f),
+                                              Eigen::Vector2f(12.0f * ofac, 0.0f), Eigen::Vector2f(12.0f * ofac, 50.0f * ofac));
 
     shapes_quad.push_back(Quad({-25.0f, -3.0f, -11.0f}, {-16.0f, -3.0f, -11.0f}, {-16.0f, -3.0f, -8.0f}, {-25.0f, -3.0f, -8.0f}, {BLUE}, true));
     shapes_quad.back().set_texture_properties("water", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(9.0f * ofac, 0.0f),
@@ -245,7 +249,7 @@ Map::Map()
     shapes_quad.back().set_texture_properties("rock", Eigen::Vector2f(0.0f, 10.0f), Eigen::Vector2f(0.0f, 0.0f),
                                               Eigen::Vector2f(3.0f, 0.25f), Eigen::Vector2f(3.0f, 10.0f));
 
-    shapes_quad.push_back(Quad({25.0f, -2.0f, -16.0f}, {26.0f, 18.0f, -16.0f}, {26.0f, 18.0f, -13.0f}, {25.0f, -2.0f, -13.0f}, {BLUE}, false));
+    shapes_quad.push_back(Quad({25.0f, -2.0f, -16.05f}, {26.0f, 18.0f, -16.05f}, {26.0f, 18.0f, -12.95f}, {25.0f, -2.0f, -12.95f}, {BLUE}, false));
     shapes_quad.back().set_texture_properties("waterfall", Eigen::Vector2f(0.0f, 6.0f), Eigen::Vector2f(0.0f, 0.0f),
                                               Eigen::Vector2f(1.0f, 0.0f), Eigen::Vector2f(1.0f, 6.0f));
 
