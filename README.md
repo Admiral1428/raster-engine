@@ -1,7 +1,7 @@
 # raster-engine
 *Raster Engine* is 3D graphics engine built from scratch using C++, employing CPU-based software rasterization. 
 
-[![Raster Engine on YouTube](https://img.youtube.com/vi/_y8U2036gHo/0.jpg)](https://youtu.be/_y8U2036gHo)
+[![Raster Engine on YouTube](https://img.youtube.com/vi/8gWjE3Mqe1k/0.jpg)](https://youtu.be/8gWjE3Mqe1k)
 
 The purpose of this project was to improve my C++ skills and to gain a fundamental understanding of 3D graphics principles. The [*SDL3 library*](https://github.com/libsdl-org/SDL/releases) was used to achieve basic window creation and pixel manipulation, but no other external libraries for graphical rendering were utilized. By coding each step of the rendering pipeline from the ground up, I was able to better grasp the mathematical principles which are the basis for modern graphics APIs which use hardware-accelerated techniques on today's powerful GPUs.
 
