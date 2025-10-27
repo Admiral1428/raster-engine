@@ -12,7 +12,7 @@ Map::Map()
     shapes_runway.reserve(1);
     shapes_hangar.reserve(1);
     shapes_triangle.reserve(31);
-    shapes_quad.reserve(36);
+    shapes_quad.reserve(37);
 
     // small trees along river
     shapes_tree.push_back(Tree(6.5f, -2.0f, -4.0f, "small"));
@@ -67,10 +67,10 @@ Map::Map()
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-24.0f, -2.0f, -60.0f, 1.0f), Eigen::Vector4f(25.0f, -2.0f, -26.0, 1.0f), Eigen::Vector4f(-24.0f, -2.0f, -26.0f, 1.0f), GREEN, true));
     shapes_triangle.back().set_texture_properties("grass", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(49.0f, 34.0f), Eigen::Vector2f(0.0f, 34.0f));
 
-    shapes_triangle.push_back(Surface(Eigen::Vector4f(-24.0f, -2.0f, -26.0f, 1.0f), Eigen::Vector4f(-14.0f, -2.0f, -26.0f, 1.0f), Eigen::Vector4f(-14.0f, -2.0f, -12.0f, 1.0f), GREEN, true));
+    shapes_triangle.push_back(Surface(Eigen::Vector4f(-24.0f, -2.0f, -26.0f, 1.0f), Eigen::Vector4f(-14.0f, -2.0f, -26.0f, 1.0f), Eigen::Vector4f(-15.0f, -2.0f, -11.5f, 1.0f), GREEN, true));
     shapes_triangle.back().set_texture_properties("grass", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(10.0f, 0.0f), Eigen::Vector2f(10.0f, 14.0f));
 
-    shapes_quad.push_back(Quad({-14.0f, -2.0f, -26.0f}, {10.0f, -2.0f, -26.0f}, {10.0f, -2.0f, -12.0f}, {-14.0f, -2.0f, -12.0f}, {GREEN}, true));
+    shapes_quad.push_back(Quad({-14.0f, -2.0f, -26.0f}, {10.0f, -2.0f, -26.0f}, {10.0f, -2.0f, -12.0f}, {-15.0f, -2.0f, -11.5f}, {GREEN}, true));
     shapes_quad.back().set_texture_properties("grass", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(24.0f, 0.0f),
                                               Eigen::Vector2f(24.0f, 14.0f), Eigen::Vector2f(0.0f, 14.0f));
 
@@ -82,10 +82,10 @@ Map::Map()
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-24.0f, -2.0f, 10.0f, 1.0f), Eigen::Vector4f(25.0f, -2.0f, 10.0f, 1.0f), Eigen::Vector4f(-24.0f, -2.0f, 60.0f, 1.0f), GREEN, true));
     shapes_triangle.back().set_texture_properties("grass", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(49.0f, 0.0f), Eigen::Vector2f(0.0f, 50.0f));
 
-    shapes_triangle.push_back(Surface(Eigen::Vector4f(-14.0f, -2.0f, -7.0f, 1.0f), Eigen::Vector4f(-14.0f, -2.0f, 10.0f, 1.0f), Eigen::Vector4f(-24.0f, -2.0f, 10.0f, 1.0f), GREEN, true));
+    shapes_triangle.push_back(Surface(Eigen::Vector4f(-15.0f, -2.0f, -7.5f, 1.0f), Eigen::Vector4f(-14.0f, -2.0f, 10.0f, 1.0f), Eigen::Vector4f(-24.0f, -2.0f, 10.0f, 1.0f), GREEN, true));
     shapes_triangle.back().set_texture_properties("grass", Eigen::Vector2f(10.0f, 0.0f), Eigen::Vector2f(10.0f, 17.0f), Eigen::Vector2f(0.0f, 17.0f));
 
-    shapes_quad.push_back(Quad({-14.0f, -2.0f, -7.0f}, {25.0f, -2.0f, -7.0f}, {25.0f, -2.0f, 10.0f}, {-14.0f, -2.0f, 10.0f}, {GREEN}, true));
+    shapes_quad.push_back(Quad({-15.0f, -2.0f, -7.5f}, {25.0f, -2.0f, -7.0f}, {25.0f, -2.0f, 10.0f}, {-14.0f, -2.0f, 10.0f}, {GREEN}, true));
     shapes_quad.back().set_texture_properties("grass", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(39.0f, 0.0f),
                                               Eigen::Vector2f(39.0f, 17.0f), Eigen::Vector2f(0.0f, 17.0f));
 
@@ -119,9 +119,13 @@ Map::Map()
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-37.0f, -3.0f, -15.0f, 1.0f), Eigen::Vector4f(-60.0f, -3.0f, -50.0f, 1.0f), Eigen::Vector4f(-37.0f, -3.0f, -50.0f, 1.0f), BLUE, true));
     shapes_triangle.back().set_texture_properties("water", Eigen::Vector2f(23.0f * ofac, 35.0f * ofac), Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(23.0f * ofac, 0.0f));
 
-    shapes_quad.push_back(Quad({-37.0f, -3.0f, 40.0f}, {-37.0f, -3.0f, -50.0f}, {-25.0f, -3.0f, -50.0f}, {-25.0f, -3.0f, 40.0f}, {BLUE}, true));
-    shapes_quad.back().set_texture_properties("water", Eigen::Vector2f(0.0f, 90.0f * ofac), Eigen::Vector2f(0.0f, 0.0f),
-                                              Eigen::Vector2f(12.0f * ofac, 0.0f), Eigen::Vector2f(12.0f * ofac, 90.0f * ofac));
+    shapes_quad.push_back(Quad({-37.0f, -3.0f, 40.0f}, {-37.0f, -3.0f, 0.0f}, {-25.0f, -3.0f, 0.0f}, {-25.0f, -3.0f, 40.0f}, {BLUE}, true));
+    shapes_quad.back().set_texture_properties("water", Eigen::Vector2f(0.0f, 40.0f * ofac), Eigen::Vector2f(0.0f, 0.0f),
+                                              Eigen::Vector2f(12.0f * ofac, 0.0f), Eigen::Vector2f(12.0f * ofac, 40.0f * ofac));
+
+    shapes_quad.push_back(Quad({-37.0f, -3.0f, 0.0f}, {-37.0f, -3.0f, -50.0f}, {-25.0f, -3.0f, -50.0f}, {-25.0f, -3.0f, 0.0f}, {BLUE}, true));
+    shapes_quad.back().set_texture_properties("water", Eigen::Vector2f(0.0f, 50.0f * ofac), Eigen::Vector2f(0.0f, 0.0f),
+                                              Eigen::Vector2f(12.0f * ofac, 0.0f), Eigen::Vector2f(12.0f * ofac, 50.0f * ofac));
 
     shapes_quad.push_back(Quad({-25.0f, -3.0f, -11.0f}, {-16.0f, -3.0f, -11.0f}, {-16.0f, -3.0f, -8.0f}, {-25.0f, -3.0f, -8.0f}, {BLUE}, true));
     shapes_quad.back().set_texture_properties("water", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(9.0f * ofac, 0.0f),
@@ -168,28 +172,28 @@ Map::Map()
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-25.0f, -3.0f, -26.0f, 1.0f), Eigen::Vector4f(-24.0f, -2.0f, -26.0f, 1.0f), Eigen::Vector4f(-25.0f, -3.0f, -25.5f, 1.0f), YELLOW, false));
     shapes_triangle.back().set_texture_properties("sand", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(2.0f, 0.0f), Eigen::Vector2f(0.0f, 1.0f));
 
-    shapes_quad.push_back(Quad({-25.0f, -3.0f, -25.5f}, {-24.0f, -2.0f, -26.0f}, {-14.0f, -2.0f, -12.0f}, {-16.0f, -3.0f, -11.0f}, {YELLOW}, false));
+    shapes_quad.push_back(Quad({-25.0f, -3.0f, -25.5f}, {-24.0f, -2.0f, -26.0f}, {-15.0f, -2.0f, -11.5f}, {-16.0f, -3.0f, -11.0f}, {YELLOW}, false));
     shapes_quad.back().set_texture_properties("sand", Eigen::Vector2f(0.0f, 1.0f * bfac), Eigen::Vector2f(0.0f, 0.0f),
                                               Eigen::Vector2f(5.0f * bfac, 0.0f), Eigen::Vector2f(4.8f * bfac, 1.0f * bfac));
 
-    shapes_triangle.push_back(Surface(Eigen::Vector4f(-16.0f, -3.0f, -11.0f, 1.0f), Eigen::Vector4f(-14.0f, -2.0f, -12.0f, 1.0f), Eigen::Vector4f(-12.5f, -2.5f, -11.0f, 1.0f), BROWN, false));
+    shapes_triangle.push_back(Surface(Eigen::Vector4f(-16.0f, -3.0f, -11.0f, 1.0f), Eigen::Vector4f(-15.0f, -2.0f, -11.5f, 1.0f), Eigen::Vector4f(-12.5f, -2.5f, -11.0f, 1.0f), BROWN, false));
     shapes_triangle.back().set_texture_properties("dirt", Eigen::Vector2f(0.0f, 1.0f), Eigen::Vector2f(1.0f, 0.0f), Eigen::Vector2f(2.0f, 1.0f));
 
-    shapes_triangle.push_back(Surface(Eigen::Vector4f(-14.0f, -2.0f, -12.0f, 1.0f), Eigen::Vector4f(-12.5f, -2.0f, -12.0f, 1.0f), Eigen::Vector4f(-12.5f, -2.5f, -11.0f, 1.0f), BROWN, false));
+    shapes_triangle.push_back(Surface(Eigen::Vector4f(-15.0f, -2.0f, -11.5f, 1.0f), Eigen::Vector4f(-12.5f, -2.0f, -12.0f, 1.0f), Eigen::Vector4f(-12.5f, -2.5f, -11.0f, 1.0f), BROWN, false));
     shapes_triangle.back().set_texture_properties("dirt", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(2.0f, 0.0f), Eigen::Vector2f(2.0f, 1.0f));
 
     // mid bottom beach surfaces
     shapes_triangle.push_back(Surface(Eigen::Vector4f(-25.0f, -3.0f, 9.5f, 1.0f), Eigen::Vector4f(-24.0f, -2.0f, 10.0f, 1.0f), Eigen::Vector4f(-25.0f, -3.0f, 10.0f, 1.0f), YELLOW, false));
     shapes_triangle.back().set_texture_properties("sand", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(2.0f, 1.0f), Eigen::Vector2f(0.0f, 1.0f));
 
-    shapes_quad.push_back(Quad({-16.0f, -3.0f, -8.0f}, {-14.0f, -2.0f, -7.0f}, {-24.0f, -2.0f, 10.0f}, {-25.0f, -3.0f, 9.5f}, {YELLOW}, false));
+    shapes_quad.push_back(Quad({-16.0f, -3.0f, -8.0f}, {-15.0f, -2.0f, -7.5f}, {-24.0f, -2.0f, 10.0f}, {-25.0f, -3.0f, 9.5f}, {YELLOW}, false));
     shapes_quad.back().set_texture_properties("sand", Eigen::Vector2f(4.8f * bfac, 0.0f), Eigen::Vector2f(5.0f * bfac, 1.0f * bfac),
                                               Eigen::Vector2f(0.0f, 1.0f * bfac), Eigen::Vector2f(0.0f, 0.0f));
 
-    shapes_triangle.push_back(Surface(Eigen::Vector4f(-16.0f, -3.0f, -8.0f, 1.0f), Eigen::Vector4f(-12.5f, -2.5f, -8.0f, 1.0f), Eigen::Vector4f(-14.0f, -2.0f, -7.0f, 1.0f), BROWN, false));
+    shapes_triangle.push_back(Surface(Eigen::Vector4f(-16.0f, -3.0f, -8.0f, 1.0f), Eigen::Vector4f(-12.5f, -2.5f, -8.0f, 1.0f), Eigen::Vector4f(-15.0f, -2.0f, -7.5f, 1.0f), BROWN, false));
     shapes_triangle.back().set_texture_properties("dirt", Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(2.0f, 0.0f), Eigen::Vector2f(1.0f, 1.0f));
 
-    shapes_triangle.push_back(Surface(Eigen::Vector4f(-12.5f, -2.5f, -8.0f, 1.0f), Eigen::Vector4f(-12.5f, -2.0f, -7.0f, 1.0f), Eigen::Vector4f(-14.0f, -2.0f, -7.0f, 1.0f), BROWN, false));
+    shapes_triangle.push_back(Surface(Eigen::Vector4f(-12.5f, -2.5f, -8.0f, 1.0f), Eigen::Vector4f(-12.5f, -2.0f, -7.0f, 1.0f), Eigen::Vector4f(-15.0f, -2.0f, -7.5f, 1.0f), BROWN, false));
     shapes_triangle.back().set_texture_properties("dirt", Eigen::Vector2f(2.0f, 0.0f), Eigen::Vector2f(2.0f, 1.0f), Eigen::Vector2f(0.0f, 1.0f));
 
     // beach waterfall
@@ -236,6 +240,7 @@ Map::Map()
     shapes_triangle.back().set_texture_properties("grass", Eigen::Vector2f(0.0f, 5.0f), Eigen::Vector2f(14.0f, 0.0f), Eigen::Vector2f(14.0f, 5.0f));
 
     // waterfall
+
     shapes_quad.push_back(Quad({25.0f, -2.0f, -22.0f}, {25.0f, -2.0f, -26.0f}, {26.0f, 20.0, -26.0f}, {26.0f, 20.0f, -22.0f}, {TAN}, false));
     shapes_quad.back().set_texture_properties("rock", Eigen::Vector2f(2.0f, 11.0f), Eigen::Vector2f(0.0f, 11.0f),
                                               Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(2.0f, 0.0f));
@@ -244,7 +249,7 @@ Map::Map()
     shapes_quad.back().set_texture_properties("rock", Eigen::Vector2f(0.0f, 10.0f), Eigen::Vector2f(0.0f, 0.0f),
                                               Eigen::Vector2f(3.0f, 0.25f), Eigen::Vector2f(3.0f, 10.0f));
 
-    shapes_quad.push_back(Quad({25.0f, -2.0f, -16.0f}, {26.0f, 18.0f, -16.0f}, {26.0f, 18.0f, -13.0f}, {25.0f, -2.0f, -13.0f}, {BLUE}, false));
+    shapes_quad.push_back(Quad({25.0f, -2.0f, -16.05f}, {26.0f, 18.0f, -16.05f}, {26.0f, 18.0f, -12.95f}, {25.0f, -2.0f, -12.95f}, {BLUE}, false));
     shapes_quad.back().set_texture_properties("waterfall", Eigen::Vector2f(0.0f, 6.0f), Eigen::Vector2f(0.0f, 0.0f),
                                               Eigen::Vector2f(1.0f, 0.0f), Eigen::Vector2f(1.0f, 6.0f));
 
@@ -314,77 +319,77 @@ Map::Map()
     shapes_triangle.back().set_texture_properties("sand", Eigen::Vector2f(6.0f, 1.0f), Eigen::Vector2f(0.0f, 2.0f), Eigen::Vector2f(0.0f, 0.0f));
 
     // island mountains
-    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 15.0f, 10.0f, 15.0f, {DKGREEN, DKGREEN, NIGHTGREEN, NIGHTGREEN, BLACK}, false, {"bottom"}));
+    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 15.0f, 10.0f, 15.0f, {DKGREEN, DKGREEN, DKGREEN, DKGREEN, BLACK}, false, {"bottom"}));
     shapes_pyramid.back().rotate(0.0f, 45.0f, 0.0f, "roll-pitch-yaw");
     shapes_pyramid.back().translate(-52.0f, -2.99, 20.0f);
     shapes_pyramid.back().set_texture_properties("grass", 4.0f, 2.0f, "front");
     shapes_pyramid.back().set_texture_properties("grass", 4.0f, 2.0f, "rear");
-    shapes_pyramid.back().set_texture_properties("grass_dark", 4.0f, 2.0f, "left");
-    shapes_pyramid.back().set_texture_properties("grass_dark", 4.0f, 2.0f, "right");
+    shapes_pyramid.back().set_texture_properties("grass", 4.0f, 2.0f, "left");
+    shapes_pyramid.back().set_texture_properties("grass", 4.0f, 2.0f, "right");
 
-    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 15.0f, 16.0f, 15.0f, {DKGREEN, DKGREEN, NIGHTGREEN, NIGHTGREEN, BLACK}, false, {"bottom"}));
+    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 15.0f, 16.0f, 15.0f, {DKGREEN, DKGREEN, DKGREEN, DKGREEN, BLACK}, false, {"bottom"}));
     shapes_pyramid.back().rotate(0.0f, 45.0f, 0.0f, "roll-pitch-yaw");
     shapes_pyramid.back().translate(-58.0f, -2.99, 5.0f);
     shapes_pyramid.back().set_texture_properties("grass", 4.0f, 5.0f, "front");
     shapes_pyramid.back().set_texture_properties("grass", 4.0f, 5.0f, "rear");
-    shapes_pyramid.back().set_texture_properties("grass_dark", 4.0f, 5.0f, "left");
-    shapes_pyramid.back().set_texture_properties("grass_dark", 4.0f, 5.0f, "right");
+    shapes_pyramid.back().set_texture_properties("grass", 4.0f, 5.0f, "left");
+    shapes_pyramid.back().set_texture_properties("grass", 4.0f, 5.0f, "right");
 
-    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 15.0f, 13.0f, 15.0f, {DKGREEN, DKGREEN, NIGHTGREEN, NIGHTGREEN, BLACK}, false, {"bottom"}));
+    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 15.0f, 13.0f, 15.0f, {DKGREEN, DKGREEN, DKGREEN, DKGREEN, BLACK}, false, {"bottom"}));
     shapes_pyramid.back().rotate(0.0f, 45.0f, 0.0f, "roll-pitch-yaw");
     shapes_pyramid.back().translate(-53.0f, -2.99, -10.0f);
     shapes_pyramid.back().set_texture_properties("grass", 4.0f, 3.0f, "front");
     shapes_pyramid.back().set_texture_properties("grass", 4.0f, 3.0f, "rear");
-    shapes_pyramid.back().set_texture_properties("grass_dark", 4.0f, 3.0f, "left");
-    shapes_pyramid.back().set_texture_properties("grass_dark", 4.0f, 3.0f, "right");
+    shapes_pyramid.back().set_texture_properties("grass", 4.0f, 3.0f, "left");
+    shapes_pyramid.back().set_texture_properties("grass", 4.0f, 3.0f, "right");
 
-    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 20.0f, 15.0f, 20.0f, {DKGREEN, DKGREEN, NIGHTGREEN, NIGHTGREEN, BLACK}, false, {"bottom"}));
+    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 20.0f, 15.0f, 20.0f, {DKGREEN, DKGREEN, DKGREEN, DKGREEN, BLACK}, false, {"bottom"}));
     shapes_pyramid.back().rotate(0.0f, 45.0f, 0.0f, "roll-pitch-yaw");
     shapes_pyramid.back().translate(-65.0f, -2.99, -24.0f);
     shapes_pyramid.back().set_texture_properties("grass", 5.0f, 3.0f, "front");
     shapes_pyramid.back().set_texture_properties("grass", 5.0f, 3.0f, "rear");
-    shapes_pyramid.back().set_texture_properties("grass_dark", 5.0f, 3.0f, "left");
-    shapes_pyramid.back().set_texture_properties("grass_dark", 5.0f, 3.0f, "right");
+    shapes_pyramid.back().set_texture_properties("grass", 5.0f, 3.0f, "left");
+    shapes_pyramid.back().set_texture_properties("grass", 5.0f, 3.0f, "right");
 
-    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 15.0f, {DKBROWN, DKBROWN, NIGHTBROWN, NIGHTBROWN, BLACK}, false, {"bottom"}));
+    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 15.0f, {DKBROWN, DKBROWN, DKBROWN, DKBROWN, BLACK}, false, {"bottom"}));
     shapes_pyramid.back().rotate(0.0f, 45.0f, 0.0f, "roll-pitch-yaw");
     shapes_pyramid.back().translate(-67.0f, -2.99, 13.0f);
     shapes_pyramid.back().set_texture_properties("mountain", 1.0f, 1.0f, "front");
     shapes_pyramid.back().set_texture_properties("mountain", 1.0f, 1.0f, "rear");
-    shapes_pyramid.back().set_texture_properties("mountain_dark", 1.0f, 1.0f, "left");
-    shapes_pyramid.back().set_texture_properties("mountain_dark", 1.0f, 1.0f, "right");
+    shapes_pyramid.back().set_texture_properties("mountain", 1.0f, 1.0f, "left");
+    shapes_pyramid.back().set_texture_properties("mountain", 1.0f, 1.0f, "right");
 
-    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 20.0f, 30.0f, 20.0f, {DKBROWN, DKBROWN, NIGHTBROWN, NIGHTBROWN, BLACK}, false, {"bottom"}));
+    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 20.0f, 30.0f, 20.0f, {DKBROWN, DKBROWN, DKBROWN, DKBROWN, BLACK}, false, {"bottom"}));
     shapes_pyramid.back().rotate(0.0f, 45.0f, 0.0f, "roll-pitch-yaw");
     shapes_pyramid.back().translate(-70.0f, -2.99, 0.0f);
     shapes_pyramid.back().set_texture_properties("mountain", 1.0f, 1.0f, "front");
     shapes_pyramid.back().set_texture_properties("mountain", 1.0f, 1.0f, "rear");
-    shapes_pyramid.back().set_texture_properties("mountain_dark", 1.0f, 1.0f, "left");
-    shapes_pyramid.back().set_texture_properties("mountain_dark", 1.0f, 1.0f, "right");
+    shapes_pyramid.back().set_texture_properties("mountain", 1.0f, 1.0f, "left");
+    shapes_pyramid.back().set_texture_properties("mountain", 1.0f, 1.0f, "right");
 
-    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 22.0f, 28.0f, 22.0f, {DKBROWN, DKBROWN, NIGHTBROWN, NIGHTBROWN, BLACK}, false, {"bottom"}));
+    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 22.0f, 28.0f, 22.0f, {DKBROWN, DKBROWN, DKBROWN, DKBROWN, BLACK}, false, {"bottom"}));
     shapes_pyramid.back().rotate(0.0f, 45.0f, 0.0f, "roll-pitch-yaw");
     shapes_pyramid.back().translate(-75.0f, -2.99, -15.0f);
     shapes_pyramid.back().set_texture_properties("mountain", 1.0f, 1.0f, "front");
     shapes_pyramid.back().set_texture_properties("mountain", 1.0f, 1.0f, "rear");
-    shapes_pyramid.back().set_texture_properties("mountain_dark", 1.0f, 1.0f, "left");
-    shapes_pyramid.back().set_texture_properties("mountain_dark", 1.0f, 1.0f, "right");
+    shapes_pyramid.back().set_texture_properties("mountain", 1.0f, 1.0f, "left");
+    shapes_pyramid.back().set_texture_properties("mountain", 1.0f, 1.0f, "right");
 
-    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 15.0f, 38.0f, 15.0f, {WHITE, WHITE, GRAY, GRAY, BLACK}, false, {"bottom"}));
+    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 15.0f, 38.0f, 15.0f, {WHITE, WHITE, WHITE, WHITE, BLACK}, false, {"bottom"}));
     shapes_pyramid.back().rotate(0.0f, 45.0f, 0.0f, "roll-pitch-yaw");
     shapes_pyramid.back().translate(-76.0f, -2.99, 7.5f);
     shapes_pyramid.back().set_texture_properties("snow", 3.0f, 9.0f, "front");
     shapes_pyramid.back().set_texture_properties("snow", 3.0f, 9.0f, "rear");
-    shapes_pyramid.back().set_texture_properties("snow_dark", 3.0f, 9.0f, "left");
-    shapes_pyramid.back().set_texture_properties("snow_dark", 3.0f, 9.0f, "right");
+    shapes_pyramid.back().set_texture_properties("snow", 3.0f, 9.0f, "left");
+    shapes_pyramid.back().set_texture_properties("snow", 3.0f, 9.0f, "right");
 
-    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 15.0f, 44.0f, 15.0f, {WHITE, WHITE, GRAY, GRAY, BLACK}, false, {"bottom"}));
+    shapes_pyramid.push_back(Pyramid(0.0f, 0.0f, 0.0f, 15.0f, 44.0f, 15.0f, {WHITE, WHITE, WHITE, WHITE, BLACK}, false, {"bottom"}));
     shapes_pyramid.back().rotate(0.0f, 45.0f, 0.0f, "roll-pitch-yaw");
     shapes_pyramid.back().translate(-78.0f, -2.99, -4.0f);
     shapes_pyramid.back().set_texture_properties("snow", 3.0f, 11.0f, "front");
     shapes_pyramid.back().set_texture_properties("snow", 3.0f, 11.0f, "rear");
-    shapes_pyramid.back().set_texture_properties("snow_dark", 3.0f, 11.0f, "left");
-    shapes_pyramid.back().set_texture_properties("snow_dark", 3.0f, 11.0f, "right");
+    shapes_pyramid.back().set_texture_properties("snow", 3.0f, 11.0f, "left");
+    shapes_pyramid.back().set_texture_properties("snow", 3.0f, 11.0f, "right");
 }
 
 Map::~Map() {}

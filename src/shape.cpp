@@ -57,3 +57,19 @@ vector<Surface> &Shape::get_surfaces()
 {
     return surfaces;
 }
+
+void Shape::set_min_brightness(const float &val)
+{
+    for (auto &surface : surfaces)
+    {
+        surface.set_min_brightness(val);
+    }
+}
+
+void Shape::set_max_brightness(const float &val)
+{
+    for (auto &surface : surfaces)
+    {
+        surface.set_max_brightness(val);
+    }
+}

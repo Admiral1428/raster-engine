@@ -12,28 +12,6 @@ void normalize_point(Eigen::Vector4f &c)
     }
 }
 
-// normalize to get unit vector
-void normalize_to_unit_vector(Eigen::Vector3f &c)
-{
-    Eigen::Vector3f result;
-    // Calculate the magnitude
-    float magnitude = sqrt(c(0) * c(0) + c(1) * c(1) + c(2) * c(2));
-
-    if (magnitude > 0.0f)
-    {
-        result(0) = c(0) / magnitude;
-        result(1) = c(1) / magnitude;
-        result(2) = c(2) / magnitude;
-    }
-    else // divide by zero case
-    {
-        result(0) = 0.0f;
-        result(1) = 0.0f;
-        result(2) = 0.0f;
-    }
-    c = result;
-}
-
 void rasterize_point(Eigen::Vector4f &c, const int &width, const int &height)
 {
     float x = (c(0) + 1) * 0.5 * width;
@@ -247,6 +225,6 @@ Eigen::Vector3f get_normal_vector(const Eigen::Vector4f &c0, const Eigen::Vector
     Eigen::Vector3f vec_02(c2(0) - c0(0), c2(1) - c0(1), c2(2) - c0(2));
 
     Eigen::Vector3f normal = vec_01.cross(vec_02);
-    normalize_to_unit_vector(normal);
+    normal.normalize();
     return (normal);
 }

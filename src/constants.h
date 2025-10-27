@@ -39,7 +39,7 @@ inline vector<Resolution> RENDER_RES_OPTS = {res_00, res_01, res_02, res_03, res
 // Tolerances for rendering
 const float TOL_VISIBLE{1e-3};       // tolerance check for triangle being visible
 const float TOL_IN_TRIANGLE{1e-3};   // tolerance check for coordinate in triangle
-const float TOL_SHIFT_SURFACE{1e-6}; // tolerance used to offset surfaces to avoid z-fighting
+const float TOL_SHIFT_SURFACE{0.0f}; // tolerance used to offset surfaces to avoid z-fighting
 const float TOL_TEXTURE_WRAP{1e-6};  // tolerance used for texture wrapping
 // Diminished lighting options
 const float Z_BRIGHT = 0.95;
@@ -81,6 +81,7 @@ const float MOUSE_SENS_FACTOR = 0.1f;
 const float TRANSLATE_SPEED = 5.00f; // game world units per second
 const float ROTATE_SPEED = 60.0f;    // degrees per second
 // Render modes
-const vector<string> RENDER_MODES = {"Textures", "Colors", "Triangles", "Triangles_Black_White"};
+const vector<string> RENDER_MODES = {"Textures_Lighting", "Textures", "Colors_Lighting",
+                                     "Colors", "Triangles", "Triangles_Black_White"};
 
 #endif

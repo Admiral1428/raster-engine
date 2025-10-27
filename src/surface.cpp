@@ -17,6 +17,8 @@ Surface::Surface(const Surface &s)
     uv0 = s.uv0;
     uv1 = s.uv1;
     uv2 = s.uv2;
+    min_brightness = s.min_brightness;
+    max_brightness = s.max_brightness;
 }
 
 Surface::~Surface() {}
@@ -35,6 +37,8 @@ Surface &Surface::operator=(const Surface &s)
         uv0 = s.uv0;
         uv1 = s.uv1;
         uv2 = s.uv2;
+        min_brightness = s.min_brightness;
+        max_brightness = s.max_brightness;
     }
     return *this;
 }
@@ -172,4 +176,26 @@ string &Surface::get_texture_name()
 bool &Surface::get_diminish_light()
 {
     return diminish_light;
+}
+
+void Surface::set_min_brightness(const float &val)
+{
+    // Ensure value falls within 0 to 1 by clamping
+    min_brightness = clamp(val, 0.0f, 1.0f);
+}
+
+void Surface::set_max_brightness(const float &val)
+{
+    // Ensure value falls within 0 to 1 by clamping
+    max_brightness = clamp(val, 0.0f, 1.0f);
+}
+
+float &Surface::get_min_brightness()
+{
+    return min_brightness;
+}
+
+float &Surface::get_max_brightness()
+{
+    return max_brightness;
 }

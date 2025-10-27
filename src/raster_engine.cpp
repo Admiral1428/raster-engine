@@ -16,6 +16,8 @@
 #include "prop.hpp"
 #include "map_textures.hpp"
 #include "map_sounds.hpp"
+#include "point.hpp"
+#include "light.hpp"
 
 using std::array;
 
@@ -118,25 +120,32 @@ int main(int argc, char *argv[])
     vector<Surface> airplane_surfaces;
     vector<Surface> prop_surfaces;
     Boat boat(-32.0f, -3.0f, 60.0f, "small", 0.0f, 90.0f, 0.0f, "roll-pitch-yaw", -2.0f);
+
     Airplane airplane(-30.0f, 20.0f, 0.0f, "small", 0.0f, 90.0f, -30.0f, "roll-pitch-yaw", -15.0f);
 
     // Initialize sun and moon objects
+    float day_night_angle = 0.0f;
     vector<Surface> sun_surfaces;
     vector<Surface> moon_surfaces;
-    float day_night_angle = 90.0f;
-    float day_night_rot_rate = 5.0f;
+    float day_night_rot_rate = 2.0f;
     OctPrism sun(0.0f, 0.0f, 0.0f, 80.0f, 80.0f, 1.0f,
                  {YELLOW}, false, {"rear", "outer"});
     sun.set_texture_properties("sun");
-    sun.rotate(0.0f, -90.0f, 0.0f, "roll-pitch-yaw");
-    sun.translate(800.0f, -3.0f, 0.0f);
-    sun.rotate(0.0f, 0.0f, day_night_angle, "roll-pitch-yaw");
-    OctPrism moon(0.0f, 0.0f, 0.0f, 80.0f, 80.0f, 10.0f,
+    sun.set_min_brightness(1.0f);
+    sun.rotate(0.0f, 180.0f, 0.0f, "roll-pitch-yaw");
+    sun.translate(-200.0f, -3.0f, 800.0f);
+    OctPrism moon(-200.0f, -3.0f, -800.0f, 80.0f, 80.0f, 10.0f,
                   {WHITE}, false, {"rear", "outer"});
     moon.set_texture_properties("moon");
-    moon.rotate(0.0f, 90.0f, 0.0f, "roll-pitch-yaw");
-    moon.translate(-800.0f, -3.0f, 0.0f);
-    moon.rotate(0.0f, 0.0f, day_night_angle, "roll-pitch-yaw");
+    moon.set_min_brightness(1.0f);
+
+    /* Initialize far away light sources (simulate moon and sun light
+    further away than actual sun and moon objects are) */
+    Light sun_light_source(Eigen::Vector3f(0.0f, 0.0f, 1e6f), Eigen::Vector2f(0.25f, 2.5f), Eigen::Vector2f(0.0f, 1e6f));
+    Light moon_light_source(Eigen::Vector3f(0.0f, 0.0f, -1e6f), Eigen::Vector2f(0.25f, 2.0f), Eigen::Vector2f(0.0f, 1e6f));
+
+    // Initialize the actual light source used at a given time
+    Light light_source;
 
     // Boat movement value for sound purposes
     float boat_dz;
@@ -148,33 +157,34 @@ int main(int argc, char *argv[])
     vector<Surface> all_surfaces;
 
     // Move initial position relative to origin
-    engine.move_view(Eigen::Vector3f(-4.0f, 0.0f, 1.5f), 0.0f, 0.0f);
+    engine.move_view(Eigen::Vector3f(-4.01f, 0.01f, 1.51f), 0.01f, 0.01f);
 
     // Load and start sounds
     load_sounds(*mixer);
     start_sounds();
+
+    // Set title screen flag
+    bool show_title = true;
 
     // Set mouse behavior and initialize event
     SDL_SetWindowRelativeMouseMode(window, true);
     SDL_Event event;
 
     // Mouse input variables
-    bool window_focused;
+    bool window_focused = true;
     vector<float> mouse_delta;
     Uint64 last_mouse_time = SDL_GetPerformanceCounter();
 
     // Frame timing
-    Uint64 last_frame_time = last_mouse_time;
+    Uint64 last_frame_time = SDL_GetPerformanceCounter();
     const float perf_freq = static_cast<float>(SDL_GetPerformanceFrequency());
     Uint64 current_frame_time;
     float frame_dt;
     float debug_dt;
 
-    // Debug info timing, initialize as 6 seconds prior
+    // Debug info timing, initialize as 6 seconds prior, and set flag
     Uint64 last_debug_time = SDL_GetPerformanceCounter() - (6 * perf_freq);
-
-    // Title screen flag
-    bool show_title = true;
+    bool show_info = false;
 
     // Main game loop
     while (!quit)
@@ -230,7 +240,7 @@ int main(int argc, char *argv[])
                 }
                 process_f_key_down(key_states, engine, *renderer, *window, need_redraw,
                                    f_keys_pressed, last_debug_time, cur_res_index,
-                                   render_mode_index, show_title);
+                                   render_mode_index, show_title, show_info);
             }
             else if (event.type == SDL_EVENT_KEY_UP)
             {
@@ -246,6 +256,8 @@ int main(int argc, char *argv[])
         if (show_title)
         {
             run_title(*renderer);
+            // Reset last frame so that game movement essentially pauses
+            last_frame_time = SDL_GetPerformanceCounter();
             show_title = false;
         }
 
@@ -266,12 +278,25 @@ int main(int argc, char *argv[])
         airplane_surfaces = airplane.get_surfaces();
         prop_surfaces = prop.get_surfaces();
 
-        // move sun and moon
+        // move sun and moon and their light sources
         day_night_angle = fmod(day_night_angle + frame_dt * day_night_rot_rate, 360.0f);
-        sun.rotate(0.0f, 0.0f, frame_dt * day_night_rot_rate, "roll-pitch-yaw");
-        moon.rotate(0.0f, 0.0f, frame_dt * day_night_rot_rate, "roll-pitch-yaw");
+        sun.rotate(-frame_dt * day_night_rot_rate, 0.0f, 0.0f, "roll-pitch-yaw");
+        moon.rotate(-frame_dt * day_night_rot_rate, 0.0f, 0.0f, "roll-pitch-yaw");
+        sun_light_source.rotate(-frame_dt * day_night_rot_rate, 0.0f, 0.0f, "roll-pitch-yaw");
+        moon_light_source.rotate(-frame_dt * day_night_rot_rate, 0.0f, 0.0f, "roll-pitch-yaw");
+
         sun_surfaces = sun.get_surfaces();
         moon_surfaces = moon.get_surfaces();
+
+        // get postition of light vector (center of the sun or moon)
+        if (day_night_angle > 180.0f && day_night_angle < 360.0f)
+        {
+            light_source = moon_light_source;
+        }
+        else
+        {
+            light_source = sun_light_source;
+        }
 
         // move flying airplane sound
         move_sound("airplane_flying", 0.0f, 0.0f, 0.0f,
@@ -309,10 +334,10 @@ int main(int argc, char *argv[])
             TEXTURES.at("cloth").update_animation();
 
             // Draw surfaces
-            engine.draw_surfaces(*renderer, all_surfaces, day_night_angle);
+            engine.draw_surfaces(*renderer, all_surfaces, day_night_angle, light_source);
 
-            // Draw settings if recently changed
-            if (debug_dt < 5.0f)
+            // Draw settings if recently changed or flag true
+            if (debug_dt < 5.0f || show_info)
             {
                 draw_settings_info(engine, *renderer, *window, frame_dt, day_night_angle);
             }
