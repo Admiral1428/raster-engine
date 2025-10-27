@@ -97,11 +97,16 @@ float get_brightness(Light &light_source, const Eigen::Vector4f &p0,
     Eigen::Vector2f brightness_factors = light_source.get_brightness_factors();
     Eigen::Vector2f height_thresholds = light_source.get_height_thresholds();
 
-    // linear interpolation using height
-    float brightness_factor = brightness_factors(0) +
-                              (brightness_factors(1) - brightness_factors(0)) *
-                                  (light_pos(1) - height_thresholds(0)) /
-                                  (height_thresholds(1) - height_thresholds(0));
+    // If user set the min and max brightness to the same value, don't do global scaling
+    float brightness_factor = 1.0f;
+    if (min_brightness != max_brightness)
+    {
+        // linear interpolation using height
+        brightness_factor = brightness_factors(0) +
+                            (brightness_factors(1) - brightness_factors(0)) *
+                                (light_pos(1) - height_thresholds(0)) /
+                                (height_thresholds(1) - height_thresholds(0));
+    }
 
     // vector from light to center of surface
     Eigen::Vector3f light_to_surface(average_vec(0) - light_pos(0),
