@@ -3,12 +3,14 @@
 
 #include <vector>
 #include <numbers>
+#include <algorithm>
 #include <string>
 #include <stdexcept>
 #include <Eigen/Dense>
 #include "constants.h"
 #include "point.hpp"
 
+using std::clamp;
 using std::invalid_argument;
 using std::string;
 using std::vector;
@@ -28,6 +30,8 @@ private:
     Eigen::Vector2f uv0 = Eigen::Vector2f::Zero(); // texture coordinates
     Eigen::Vector2f uv1 = Eigen::Vector2f::Zero();
     Eigen::Vector2f uv2 = Eigen::Vector2f::Zero();
+    float min_brightness = 0.3f;
+    float max_brightness = 1.0f;
 
 public:
     Surface(); // default constructor (initializes object to default state with no arguments)
@@ -48,6 +52,10 @@ public:
     string &get_name();
     string &get_texture_name();
     bool &get_diminish_light();
+    void set_min_brightness(const float &val);
+    void set_max_brightness(const float &val);
+    float &get_min_brightness();
+    float &get_max_brightness();
 };
 
 #endif

@@ -38,6 +38,8 @@ public:
     void translate(const float &dx, const float &dy, const float &dz);
     void rotate(const float &roll, const float &pitch, const float &yaw, const string &order);
     vector<Surface> &get_surfaces();
+    void set_min_brightness(const float &val);
+    void set_max_brightness(const float &val);
 };
 
 #endif

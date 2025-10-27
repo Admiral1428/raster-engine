@@ -51,39 +51,39 @@ void Tree::make_shape()
     if (size == "small")
     {
         // trunk and leaves
-        rect_prisms.push_back(RectPrism(0.0f, 1.0f, 0.0f, 0.5f, 2.0f, 0.5f, {BROWN, BROWN, DKBROWN, DKBROWN, {}, {}},
+        rect_prisms.push_back(RectPrism(0.0f, 1.0f, 0.0f, 0.5f, 2.0f, 0.5f, {BROWN, BROWN, BROWN, BROWN, {}, {}},
                                         false, {"top", "bottom"}));
         rect_prisms.back().set_texture_properties("wood", 1.0f, 4.0f, "front");
         rect_prisms.back().set_texture_properties("wood", 1.0f, 4.0f, "rear");
         rect_prisms.back().set_texture_properties("wood", 1.0f, 4.0f, "left");
         rect_prisms.back().set_texture_properties("wood", 1.0f, 4.0f, "right");
 
-        pyramids.push_back(Pyramid(0.0f, 2.0f, 0.0f, 2.0f, 2.0f, 2.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK}));
+        pyramids.push_back(Pyramid(0.0f, 2.0f, 0.0f, 2.0f, 2.0f, 2.0f, {MEDGREEN, MEDGREEN, MEDGREEN, MEDGREEN, BLACK}));
         pyramids.back().set_texture_properties("leaves", 2.0f, 2.0f, "front");
         pyramids.back().set_texture_properties("leaves", 2.0f, 2.0f, "rear");
-        pyramids.back().set_texture_properties("leaves_bright", 2.0f, 2.0f, "left");
-        pyramids.back().set_texture_properties("leaves_bright", 2.0f, 2.0f, "right");
+        pyramids.back().set_texture_properties("leaves", 2.0f, 2.0f, "left");
+        pyramids.back().set_texture_properties("leaves", 2.0f, 2.0f, "right");
     }
     else if (size == "medium")
     {
         // trunk and leaves
-        rect_prisms.push_back(RectPrism(0.0f, 2.0f, 0.0f, 0.75f, 4.0f, 0.75f, {BROWN, BROWN, DKBROWN, DKBROWN, {}, {}},
+        rect_prisms.push_back(RectPrism(0.0f, 2.0f, 0.0f, 0.75f, 4.0f, 0.75f, {BROWN, BROWN, BROWN, BROWN, {}, {}},
                                         false, {"top", "bottom"}));
         rect_prisms.back().set_texture_properties("wood", 1.0f, 4.0f / 0.75f, "front");
         rect_prisms.back().set_texture_properties("wood", 1.0f, 4.0f / 0.75f, "rear");
         rect_prisms.back().set_texture_properties("wood", 1.0f, 4.0f / 0.75f, "left");
         rect_prisms.back().set_texture_properties("wood", 1.0f, 4.0f / 0.75f, "right");
 
-        pyramids.push_back(Pyramid(0.0f, 4.0f, 0.0f, 3.0f, 3.0f, 3.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK}));
+        pyramids.push_back(Pyramid(0.0f, 4.0f, 0.0f, 3.0f, 3.0f, 3.0f, {MEDGREEN, MEDGREEN, MEDGREEN, MEDGREEN, BLACK}));
         pyramids.back().set_texture_properties("leaves", 3.0f, 3.0f, "front");
         pyramids.back().set_texture_properties("leaves", 3.0f, 3.0f, "rear");
-        pyramids.back().set_texture_properties("leaves_bright", 3.0f, 3.0f, "left");
-        pyramids.back().set_texture_properties("leaves_bright", 3.0f, 3.0f, "right");
+        pyramids.back().set_texture_properties("leaves", 3.0f, 3.0f, "left");
+        pyramids.back().set_texture_properties("leaves", 3.0f, 3.0f, "right");
     }
     else if (size == "large")
     {
         // trunk
-        rect_prisms.push_back(RectPrism(0.0f, 1.0f, 0.0f, 1.0f, 2.0f, 1.0f, {BROWN, BROWN, DKBROWN, DKBROWN, {}, {}},
+        rect_prisms.push_back(RectPrism(0.0f, 1.0f, 0.0f, 1.0f, 2.0f, 1.0f, {BROWN, BROWN, BROWN, BROWN, {}, {}},
                                         false, {"top", "bottom"}));
 
         rect_prisms.back().set_texture_properties("wood", 1.0f, 2.0f, "front");
@@ -92,23 +92,23 @@ void Tree::make_shape()
         rect_prisms.back().set_texture_properties("wood", 1.0f, 2.0f, "right");
 
         // leaves (low, mid, high)
-        pyramids.push_back(Pyramid(0.0f, 2.0f, 0.0f, 4.0f, 4.0f, 4.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK}));
+        pyramids.push_back(Pyramid(0.0f, 2.0f, 0.0f, 4.0f, 4.0f, 4.0f, {MEDGREEN, MEDGREEN, MEDGREEN, MEDGREEN, BLACK}));
         pyramids.back().set_texture_properties("leaves", 4.0f, 4.0f, "front");
         pyramids.back().set_texture_properties("leaves", 4.0f, 4.0f, "rear");
-        pyramids.back().set_texture_properties("leaves_bright", 4.0f, 4.0f, "left");
-        pyramids.back().set_texture_properties("leaves_bright", 4.0f, 4.0f, "right");
+        pyramids.back().set_texture_properties("leaves", 4.0f, 4.0f, "left");
+        pyramids.back().set_texture_properties("leaves", 4.0f, 4.0f, "right");
 
-        pyramids.push_back(Pyramid(0.0f, 4.0f, 0.0f, 3.0f, 3.0f, 3.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK}));
+        pyramids.push_back(Pyramid(0.0f, 4.0f, 0.0f, 3.0f, 3.0f, 3.0f, {MEDGREEN, MEDGREEN, MEDGREEN, MEDGREEN, BLACK}));
         pyramids.back().set_texture_properties("leaves", 3.0f, 3.0f, "front");
         pyramids.back().set_texture_properties("leaves", 3.0f, 3.0f, "rear");
-        pyramids.back().set_texture_properties("leaves_bright", 3.0f, 3.0f, "left");
-        pyramids.back().set_texture_properties("leaves_bright", 3.0f, 3.0f, "right");
+        pyramids.back().set_texture_properties("leaves", 3.0f, 3.0f, "left");
+        pyramids.back().set_texture_properties("leaves", 3.0f, 3.0f, "right");
 
-        pyramids.push_back(Pyramid(0.0f, 5.75f, 0.0f, 2.0f, 2.0f, 2.0f, {DKGREEN, DKGREEN, MEDGREEN, MEDGREEN, BLACK}));
+        pyramids.push_back(Pyramid(0.0f, 5.75f, 0.0f, 2.0f, 2.0f, 2.0f, {MEDGREEN, MEDGREEN, MEDGREEN, MEDGREEN, BLACK}));
         pyramids.back().set_texture_properties("leaves", 2.0f, 2.0f, "front");
         pyramids.back().set_texture_properties("leaves", 2.0f, 2.0f, "rear");
-        pyramids.back().set_texture_properties("leaves_bright", 2.0f, 2.0f, "left");
-        pyramids.back().set_texture_properties("leaves_bright", 2.0f, 2.0f, "right");
+        pyramids.back().set_texture_properties("leaves", 2.0f, 2.0f, "left");
+        pyramids.back().set_texture_properties("leaves", 2.0f, 2.0f, "right");
     }
 
     // Populate the surfaces vector with all surfaces
