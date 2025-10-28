@@ -255,7 +255,7 @@ Several function keys were mapped to enable dynamic modification of the field of
 
 <br><br>
 
-The next major update to the engine was implementing texture mapping. A *Texture* class was defined to create an `SDL_Surface` object, loading a custom texture image. The `SDL_ReadSurfacePixel` function was used to read the color value at a desired horizontal $u$ and vertical $v$ coordinate, with wrapping if necessary. The following sample texture shows the $(u, v)$ coordinates for the four corners, and how the red triangle would map to the left side of this texture:
+The next major update to the engine was implementing texture mapping. A *Texture* class was defined to create an `SDL_Surface` object, loading a custom texture image. All textures were created by-hand using [*LibreSprite*](https://libresprite.github.io/#!/). The `SDL_ReadSurfacePixel` function was used to read the color value at a desired horizontal $u$ and vertical $v$ coordinate, with wrapping if necessary. The following sample texture shows the $(u, v)$ coordinates for the four corners, and how the red triangle would map to the left side of this texture:
 
 <br>
 
@@ -284,3 +284,111 @@ In the new parallel `for` loop, the same computations are performed, but instead
 <br>
 <video src="https://github.com/user-attachments/assets/14342580-a99f-4822-ae97-c130a4e17662" width="1920" height="1080" controls></video>
 <br><br>
+
+To implement sounds into the game world, a *Sound* class was created to store world position and properties such as maximum gain, minimum distance for full gain, and maximum distance before silence. The `SDL_mixer` audio library was used to load custom sound files and perform mixing, adjusting volume based on distance criteria. A logarithmic falloff was applied when the sound source was between the minimum and maximum distances relative to the player. Sounds for the flying airplane and sailing boat were moved in world space using appropriate rotation matrices and translation increments, matching the behavior of their corresponding geometric objects.
+
+The penultimate update to the engine was the implementation of a day-night cycle. To simulate this effect, sun and moon objects were created using textured octagonal prisms and animated in orbital paths through rotational transformations. The background color was interpolated between sky blue, salmon, and dark blue based on the rotation angle, creating a smooth transition that reflects the time of day.
+
+<br>
+<video src="https://github.com/user-attachments/assets/04213d9e-49dc-444f-9459-dc4933d7e412" width="1920" height="1080" controls></video>
+<br><br>
+
+The final update to the engine introduced diffuse lighting to simulate illumination from the sun and moon. The lighting model is based on Lambert's cosine law, where the brightness of a surface depends on the cosine of the angle between the surface's normal vector $N$ and the vector $L$ pointing from the center of the surface toward the light source:
+
+$$\text{cos}(\theta) = N \cdot L$$
+
+A *Light* class was used to store light position, brightness factors, and a set of height thresholds for interpolating between those factors. These values were used to produce varying levels of contrast depending on the height of the light source - simulating more uniform brightness of mid-day versus the stronger constrast seen at dawn and dusk. 
+
+The light sources were positioned at the same angles as the sun and moon objects, but placed at a much greater distance. This extra distance ensured that multiple surfaces on the same plane received consistent lighting, since sunlight and moonlight are effectively directional and originate from an infinite distance. The following sketch illustrates this behavior: the green light object produces surface-to-light vectors with similar angles, resulting in consistent illumination across these surfaces. In contrast, the closer red light source does not, as the angles vary between surfaces which leads to uneven lighting.
+
+<br>
+
+<img width="1991" height="705" alt="image" src="https://github.com/user-attachments/assets/b6b555d4-b640-49fe-8e6f-a3d1c78f90ea" />
+
+<br><br>
+
+The following timelapses showcase how the lighting model responds to changes in light position and angle:
+
+<br>
+<video src="https://github.com/user-attachments/assets/5d354614-5838-4d2b-81a3-3a8e5ebe2e44" width="1920" height="1080" controls></video>
+<br>
+<video src="https://github.com/user-attachments/assets/739680aa-cd4b-4d47-99f6-e52414af68ea" width="1920" height="1080" controls></video>
+<br><br>
+
+## Compilation
+
+The following batch file was used for compilation. The `cppbuild` command within the project's `tasks.json` file was modified to reference this batch file.
+
+```
+@echo off
+set SOURCE_FILE=%1
+set EXECUTABLE_NAME=%~n1.exe
+
+REM --- Define build settings ---
+REM Set paths to your SDL3 installation
+set SDL_INCLUDE_DIR=C:\Projects\raster-engine\SDL\include
+set SDL_LIB_DIR=C:\Projects\raster-engine\SDL3-x64\lib
+
+REM Set paths for Eigen
+set EIGEN_INCLUDE_DIR=C:\Projects\raster-engine\eigen-3.4.1
+
+REM Specify the C++ standard
+set CPP_STANDARD=-std=c++23
+
+REM Common compile flags for object files
+set CXXFLAGS=-g %CPP_STANDARD% -O3 -DNDEBUG -march=native -I"%SDL_INCLUDE_DIR%" -I"%EIGEN_INCLUDE_DIR%"
+set LDFLAGS=-L"%SDL_LIB_DIR%" -lmingw32 -lSDL3 -lSDL3_image -lSDL3_mixer -mwindows
+
+REM --- Compilation ---
+echo Compiling object files...
+
+REM List of all source files
+set SOURCES=%SOURCE_FILE% lighting.cpp clipping.cpp point.cpp renderer.cpp surface.cpp input.cpp map.cpp shape.cpp rectprism.cpp rect.cpp pyramid.cpp quad.cpp tree.cpp house.cpp bridge.cpp boat.cpp airplane.cpp octprism.cpp runway.cpp hangar.cpp prop.cpp texture.cpp map_textures.cpp sound.cpp map_sounds.cpp light.cpp
+
+REM Compile each source file to an object file
+for %%f in (%SOURCES%) do (
+    echo Compiling %%f...
+    g++ -c "%%f" %CXXFLAGS%
+    if !errorlevel! neq 0 (
+        echo.
+        echo --- Compilation of %%f failed! ---
+        goto :end
+    )
+)
+
+REM --- Linking ---
+echo.
+echo Linking executable...
+
+REM List all generated object files for linking
+set OBJECTS=%~n1.o lighting.o clipping.o point.o surface.o renderer.o input.o map.o shape.o rectprism.o rect.o pyramid.o quad.o tree.o house.o bridge.o boat.o airplane.o octprism.o runway.o hangar.o prop.o texture.o map_textures.o sound.o map_sounds.o light.o
+
+REM Link all object files to create the executable
+g++ %OBJECTS% -o "%EXECUTABLE_NAME%" %CXXFLAGS% %LDFLAGS%
+
+IF %ERRORLEVEL% NEQ 0 (
+    echo.
+    echo --- Linking failed! ---
+) else (
+    echo.
+    echo --- Compilation and linking successful! ---
+)
+
+:end
+```
+
+## Features Wishlist
+
+This project was extremely rewarding and deepened my understanding of the graphics rendering pipeline at a fundamental level, while also strengthening my C++ skills.
+
+With additional time, I would implement the following features:
+
+1. **Further performance optimizations** to improve playability on lower-end systems
+2. **Additional light sources**, such as runway lights or exterior house lamps
+3. **Real-time shadow calculations** for dynamic lighting realism
+4. **External file storage** for map asset definitions to improve modularity and scalability
+5. **A map editor** for streamlined world building and asset placement
+6. **Directional sound behavior** and **Doppler effect** for immersive audio
+7. **Interactive gameplay mechanics** to enhance user engagement
+8. **Player collision detection** with map geometry for physical realism
+9. **Real-time physics simulations** to support dynamic interactions and environmental effects
