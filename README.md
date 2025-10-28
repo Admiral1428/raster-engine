@@ -8,25 +8,29 @@
 ## Installation
 
 * Download the latest .zip file from the *Releases* page.
-* Unzip the file and run the provided executable (`raster_engine.exe`) on a Windows PC, located in the `bin` folder.
+* Ensure machine has Windows installation and latest [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-supported-redistributable-version).
+* Unzip the file and run the provided executable (`raster_engine.exe`), located in the `bin` folder.
+* For CPUs with that do not support the Advanced Vector Extensions (AVX) instructions set, use `raster_engine_legacy.exe`.
 
-## Overview
+## Engine Overview
 
 The purpose of this project was to improve my C++ skills and to gain a fundamental understanding of 3D graphics principles using a low-level approach.
 
-The [*SDL3 library*](https://github.com/libsdl-org/SDL/releases) was used to handle window creation and pixel manipulation, but all rendering logic was implemented manually. By coding each step of the rendering pipeline from the ground up, I gained a clear understanding of the mathematical and algorithmic principles behind modern graphics APIs. These APIs rely on hardware-accelerated techniques powered by today’s GPUs. These hardware abstraction layers have been central to game engines since the late 1990s, but the low-level approach of a software renderer gave me a deeper understanding of the graphics pipleine.
+The [*SDL3 library*](https://github.com/libsdl-org/SDL/releases) was used to handle window creation and pixel manipulation, but all rendering logic was implemented manually. By coding each step of the rendering pipeline from the ground up, I gained a clear understanding of the mathematical and algorithmic principles behind modern graphics APIs. These APIs rely on hardware-accelerated techniques powered by today’s GPUs. These hardware abstraction layers have been central to game engines since the late 1990s, but the low-level approach of a software renderer gave me a deeper understanding of the graphics pipeline.
 
 My goal was to create an engine which could render triangular surfaces at any position and orientation, account for surface intersection and depth with z-buffering, map textures to surfaces, calculate basic diffuse lighting, and play basic sound effects in specific locations throughout the 3D space. 
 
 Initially, I considered making a more primitive engine using ray-casting techniques, as seen in early 3D games such as *Hovertank 3-D (1991)*, *Catacomb 3-D (1992)* and *Wolfenstein 3D (1992)*. However ray-casting imposes limitations on map design and geometry, as it cannot represent diagonal walls, sloped surfaces, or multiple vertical levels. Fewer limitations were present in "2.5D" engines used to power *Doom (1993)* and *Duke Nukem 3D (1995)*. But the engine for *Quake (1996)* had both software and hardware-based solutions to represent its full 3D world and objects, without relying on 2D sprites. I aimed to achieve this early level of full 3D fidelity, excluding complex gameplay mechanics, by building my custom engine.
 
-## Development
+## Initial Window Creation
 
-After spending several weeks refreshing my knoweldge of C++ fundamentals, I began by creating a basic window, plotting triangle vertices with white pixels, and connecting them with red edges using Bresenham's line algorithm:
+After spending several weeks refreshing my knowledge of C++ fundamentals, I began by creating a basic window, plotting triangle vertices with white pixels, and connecting them with red edges using Bresenham's line algorithm:
 
 <br>
 <img width="960" height="540" alt="09-29-25_1800" src="https://github.com/user-attachments/assets/2fba9f00-90b3-4893-92c3-50760a9728b1" />
 <br><br>
+
+## Surface Projection
 
 To represent a triangle in 3D space with vertices in any position and orientation, the next step was to use a projection transformation matrix to convert these $x$, $y$, $z$ coordinates into 2D camera space. This process introduced me to the concept of the viewing frustum, defined by six clipping planes - near, far, left, right, top, and bottom - and the use of a 4th coordinate $w$ to enable unified matrix operations. By specifying the horizontal field of view, aspect ratio (*width* / *height*), near ($n$), and far ($f$) clipping planes, I constructed the projection matrix, which ultimately transforms the homogeneous coordinates to normalized device coordinates (*ndc*):
 
@@ -78,7 +82,9 @@ The [*Eigen library*]((https://github.com/PX4/eigen)) was used for all matrix an
 <img width="960" height="960" alt="10-01-25_1115" src="https://github.com/user-attachments/assets/d79be8a5-6659-4595-aced-f0c273826e08" />
 <br><br>
 
-At this stage, the approach still relied on Bresenham's line algorithm to draw edges between triangle vertices. To fill the surface, I initially attempted to use these calculated edges to identify which pixels lay within the triangle. However, I soon realized that to handle depth and intersection correctly, it was necessary to compute the z-depth of all points within the triangle. This led me to calculate the barycentric coordinates $\alpha$, $\beta$, and $\gamma$ for each point $r_p$ within the bounding box defined by the triangle vertices $0$, $1$, and $2$.
+## Surface Filling
+
+At this stage, the approach still relied on Bresenham's line algorithm to draw edges between triangle vertices. To fill the surface, I initially attempted to use these calculated edges to identify which pixels lay within the triangle. However, I soon realized that to handle depth and intersection correctly, it was necessary to compute the z-depth of all points within the triangle. This led me to calculate the Barycentric coordinates $\alpha$, $\beta$, and $\gamma$ for each point $r_p$ within the bounding box defined by the triangle vertices $0$, $1$, and $2$.
 
 $$v_0 = r_1 - r_0$$
 $$v_1 = r_2 - r_0$$
@@ -92,7 +98,7 @@ $$\gamma = {{(v_0 \cdot v_0) * (v_2 \cdot v_1) - (v_0 \cdot v_1) * (v_2 \cdot v_
 
 $$\alpha = 1 - \beta - \gamma$$
 
-Pixels inside the triangle were identified by checking which Barycentric coordinates were greater than zero - using a practical tolerance of $$-1 \times 10^{-3}$$. A z-depth buffer was initialized across all screen pixels with a default value of $1.0$ (the far clipping plane). The *ndc* z-depth for each relvant pixel was then computed by interpolating the homogeneous vertex positions using the corresponding barycentric weights:
+Pixels inside the triangle were identified by checking which Barycentric coordinates were greater than zero - using a practical tolerance of $$-1 \times 10^{-3}$$. A z-depth buffer was initialized across all screen pixels with a default value of $1.0$ (the far clipping plane). The *ndc* z-depth for each relevant pixel was then computed by interpolating the homogeneous vertex positions using the corresponding barycentric weights:
 
 $$\left({{z} \over {w}}\right)_{ndc} = \alpha \left({{z'_0} \over {w'_0}}\right) +  \beta \left({{z'_1} \over {w'_1}}\right) +  \gamma \left({{z'_2} \over {w'_2}}\right) $$ 
 
@@ -101,6 +107,8 @@ By iterating over each surface and rendering pixels whose *z-ndc* depth was lowe
 <br>
 <img width="960" height="960" alt="10-02-25_1730" src="https://github.com/user-attachments/assets/e83bbfd0-b027-4bf6-b298-d0be2db073c3" />
 <br><br>
+
+## Geometry and Clipping
 
 Since the ultimate goal of the project was to support more complex geometry beyond simple triangles and cubes, new classes were introduced to construct rectangular prisms and pyramids of arbitrary dimensions. This enabled the creation of a basic scene featuring a grass surface, two trees, and a cloud. The update also added a diminished lighting effect—similar to the one used in *Doom (1993)* — where surface brightness decreases as a function of z-depth from the camera:
 
@@ -124,7 +132,7 @@ For each of the six clipping planes, the algorithm determines whether each verte
 * Remove $p_1$ from the list of remaining points, and repeat the process if more than three points remain.
 * When only three points remain, this forms the final triangle.
 
-The following animation demonstrates the clipping behvaior, with each newly formed triangle shown in a different color for illustration purposes. A maximum of five sub-triangles can result from the clipping process. Once the original triangle fully crosses behind the near clipping plane, it is no longer rendered.
+The following animation behavior the clipping behavior, with each newly formed triangle shown in a different color for illustration purposes. A maximum of five sub-triangles can result from the clipping process. Once the original triangle fully crosses behind the near clipping plane, it is no longer rendered.
 
 <br>
 
@@ -139,6 +147,8 @@ In this second example, the original triangle is aligned with the y-z plane and 
 ![triangle_clip_near_plane](https://github.com/user-attachments/assets/263bb798-df27-4e78-b831-2c2906e8bcea)
 
 <br>
+
+## Camera and Controls
 
 With clipping fully implemented, the next step was to implement camera movement and a first-person control scheme. A view matrix was constructed based on the following rotation and translation matrices, using a camera pitch angle $\theta$, yaw angle $\psi$, and *eye* position $x_{eye}$, $y_{eye}$, $z_{eye}$:
 
@@ -187,7 +197,7 @@ z' \\
 w'
 \end{bmatrix}$$
 
-To implement forward, backward, and left / right strafing right movement controls, a *forward* vector of $[0, 0,-1]$ and a *left* vector of $[-1, 0, 0]$ were multiplied by 3x3 rotation matrices derived from the camera's pitch and yaw angles. This produced adjusted unit vectors aligned with the camera orientation. These controls were mapped to the `W`, `S`, `A`, and `D` keys.
+To implement forward, backward, and left / right strafing right movement controls, a *forward* vector of $[0, 0,-1]^T$ and a *left* vector of $[-1, 0, 0]^T$ were multiplied by 3x3 rotation matrices derived from the camera's pitch and yaw angles. This produced adjusted unit vectors aligned with the camera orientation. These controls were mapped to the `W`, `S`, `A`, and `D` keys.
 
 To ensure movement at a consistent speed regardless of framerate, the translation speed was multiplied by the frame's delta time. The resulting translation distance was then scaled by the appropriate unit vector to compute the corresponding $\Delta x$, $\Delta y$, and $\Delta z$ adjustments to the camera eye position. 
 
@@ -197,17 +207,21 @@ Camera rotation in the vertical and horizontal directions was mapped to the arro
 <video src="https://github.com/user-attachments/assets/e0b9aa25-6a42-46c4-92c4-238dc887bf29" width="1200" height="900" controls></video>
 <br><br>
 
+## Performance Optimizations
+
 The first performance optimization involved implementing back-face culling, where a surface is rendered only if it faces the camera. This check uses the dot product between the surface normal vector (evaluated before the projection transformation) and a vector from the camera position to the first vertex of the triangle.
 
 <br>
 <video src="https://github.com/user-attachments/assets/958ea38a-dd6c-4f7c-9948-58a30db190c8" width="1200" height="900" controls></video>
 <br><br>
 
-The second performance optimization involved computing barycentric coordinates, triangle inclusion checks, and z-depth values using vectorized math, rather than scalar per-pixel calcluations within nested `for` loops. The x-coordinates of each pixel were stored in a $p_x$ vector, and the y-coordinates in a $p_y$ vector. These vectors were then manipulated using the optimized operations provided by the Eigen template library. 
+The second performance optimization involved computing Barycentric coordinates, triangle inclusion checks, and z-depth values using vectorized math, rather than scalar per-pixel calculations within nested `for` loops. The x-coordinates of each pixel were stored in a $p_x$ vector, and the y-coordinates in a $p_y$ vector. These vectors were then manipulated using the optimized operations provided by the Eigen template library. 
 
-This optimization also invovled using the auto type where appropriate, minimizing division operations, and eliminating other redundant calculations.
+This optimization also involved using the auto type where appropriate, minimizing division operations, and eliminating other redundant calculations.
 
-The next step was to begin building a more detailed map environment, featuring a waterfall, canyon, river, beachfront, ocean, and mountain island. A *Shape* superclass was used in this process, with subclasses for a rectangle, rectangular prism, pyramid, and quadrilateral. These geometries could be translated and rotated into position in world space to allow for easier world-building. However, this required sketching the desired environment by hand and speciying coordinates and transformations manually. Some example sketches are shown below, in addition to the video depicting the first version of the detailed world map.
+## World Building
+
+The next step was to begin building a more detailed map environment, featuring a waterfall, canyon, river, beachfront, ocean, and mountain island. A *Shape* superclass was used in this process, with subclasses for a rectangle, rectangular prism, pyramid, and quadrilateral. These geometries could be translated and rotated into position in world space to allow for easier world-building. However, this required sketching the desired environment by hand and specifying coordinates and transformations manually. Some example sketches are shown below, in addition to the video depicting the first version of the detailed world map.
 
 <br>
 
@@ -225,13 +239,13 @@ The next series of updates added further map details, including a bridge, house,
 <video src="https://github.com/user-attachments/assets/b6489036-77bf-479e-9bb4-740966cafb05" width="1200" height="900" controls></video>
 <br>
 
-To introduce dynamic behavior into the map, a boat object was created with a `move` method that performs translaation along the z-axis. Similar to the camera movement system, the boat was assigned a fixed speed value, which was multiplied by the frame's detla time to compute the translation disatnce - ensuring consistent movement speed regardless of framerate.
+To introduce dynamic behavior into the map, a boat object was created with a `move` method that performs translation along the z-axis. Similar to the camera movement system, the boat was assigned a fixed speed value, which was multiplied by the frame's delta time to compute the translation distance - ensuring consistent movement speed regardless of framerate.
 
 <br>
 <video src="https://github.com/user-attachments/assets/0de527e5-ab02-4951-b638-21b2f3653ded" width="1200" height="900" controls></video>
 <br>
 
-The most ambitious geometry in the map was an *Airplane* object, constructed using a combination of rectangular prisms, triangles, quadrilaterals, pyrmaids, and a new class for an octogonal prism (used to approximate a cylinder). The following screenshot shows the underlying triangular mesh on the left, the final geometry on the right (including texture mapping, which is described later), and the source code used to build up this shape. 
+The most ambitious geometry in the map was an *Airplane* object, constructed using a combination of rectangular prisms, triangles, quadrilaterals, pyramids, and a new class for an octagonal prism (used to approximate a cylinder). The following screenshot shows the underlying triangular mesh on the left, the final geometry on the right (including texture mapping, which is described later), and the source code used to build up this shape. 
 
 <br>
 
@@ -239,11 +253,13 @@ The most ambitious geometry in the map was an *Airplane* object, constructed usi
 
 <br><br>
 
-One airplane is parked on the ground next to newly added *Hangar* and *Runway* objects. A *Prop* object, representing a propeller, is seen rotating on this airplane - achieved through appopriate translation and rotation relative to both the world origin and airplane's position. Another airplane is flying above the islands, animated by rotation around a shifted y-axis to create an orbiting motion.
+One airplane is parked on the ground next to newly added *Hangar* and *Runway* objects. A *Prop* object, representing a propeller, is seen rotating on this airplane - achieved through appropriate translation and rotation relative to both the world origin and airplane's position. Another airplane is flying above the islands, animated by rotation around a shifted y-axis to create an orbiting motion.
 
 <br>
 <video src="https://github.com/user-attachments/assets/a3e11884-cf88-4ccd-aa84-a259f39dad3c" width="1200" height="900" controls></video>
 <br><br>
+
+## Further Optimizations and Texture Mapping
 
 An important next update was decoupling the render resolution from the window resolution, achieved using the `SDL_LOGICAL_PRESENTATION_LETTERBOX` option. This allowed the window to be resized without compromising performance on high-resolution screens, while maintaining the correct aspect ratio.
 
@@ -263,7 +279,7 @@ The next major update to the engine was implementing texture mapping. A *Texture
 
 <br>
 
-After the desired $(u, v)$ coordinates have been assigned to each vertex $0$, $1$, $2$ of a given triangle, the interpolated $(u, v)$ coordinates for a given point on the triangle is achieved using the previously computed Barycentric coordinates and perpective correction:
+After the desired $(u, v)$ coordinates have been assigned to each vertex $0$, $1$, $2$ of a given triangle, the interpolated $(u, v)$ coordinates for a given point on the triangle are found using the previously computed Barycentric coordinates and perspective correction:
 
 $$u' = \alpha \left({u_0} \over {w_0}\right) + \beta \left({u_1} \over {w_1}\right) + \gamma \left({u_2} \over {w_2}\right)$$
 $$v' = \alpha \left({v_0} \over {w_0}\right) + \beta \left({v_1} \over {w_1}\right) + \gamma \left({v_2} \over {w_2}\right)$$
@@ -285,6 +301,8 @@ In the new parallel `for` loop, the same computations are performed, but instead
 <video src="https://github.com/user-attachments/assets/14342580-a99f-4822-ae97-c130a4e17662" width="1920" height="1080" controls></video>
 <br><br>
 
+## Audio and Lighting
+
 To implement sounds into the game world, a *Sound* class was created to store world position and properties such as maximum gain, minimum distance for full gain, and maximum distance before silence. The `SDL_mixer` audio library was used to load custom sound files and perform mixing, adjusting volume based on distance criteria. A logarithmic falloff was applied when the sound source was between the minimum and maximum distances relative to the player. Sounds for the flying airplane and sailing boat were moved in world space using appropriate rotation matrices and translation increments, matching the behavior of their corresponding geometric objects.
 
 The penultimate update to the engine was the implementation of a day-night cycle. To simulate this effect, sun and moon objects were created using textured octagonal prisms and animated in orbital paths through rotational transformations. The background color was interpolated between sky blue, salmon, and dark blue based on the rotation angle, creating a smooth transition that reflects the time of day.
@@ -297,7 +315,7 @@ The final update to the engine introduced diffuse lighting to simulate illuminat
 
 $$\text{cos}(\theta) = N \cdot L$$
 
-A *Light* class was used to store light position, brightness factors, and a set of height thresholds for interpolating between those factors. These values were used to produce varying levels of contrast depending on the height of the light source - simulating more uniform brightness of mid-day versus the stronger constrast seen at dawn and dusk. 
+A *Light* class was used to store light position, brightness factors, and a set of height thresholds for interpolating between those factors. These values were used to produce varying levels of contrast depending on the height of the light source - simulating more uniform brightness of mid-day versus the stronger contrast seen at dawn and dusk. 
 
 The light sources were positioned at the same angles as the sun and moon objects, but placed at a much greater distance. This extra distance ensured that multiple surfaces on the same plane received consistent lighting, since sunlight and moonlight are effectively directional and originate from an infinite distance. The following sketch illustrates this behavior: the green light object produces surface-to-light vectors with similar angles, resulting in consistent illumination across these surfaces. In contrast, the closer red light source does not, as the angles vary between surfaces which leads to uneven lighting.
 
@@ -317,64 +335,101 @@ The following timelapses showcase how the lighting model responds to changes in 
 
 ## Compilation
 
-The following batch file was used for compilation. The `cppbuild` command within the project's `tasks.json` file was modified to reference this batch file.
+The following batch file was used for compilation. The `cppbuild` command within the project's `tasks.json` file was modified to reference this batch file. 
+
+Note that this batch file produces both `raster_engine.exe` and `raster_engine_legacy.exe`.
 
 ```
 @echo off
+setlocal enabledelayedexpansion
+
 set SOURCE_FILE=%1
 set EXECUTABLE_NAME=%~n1.exe
+set EXECUTABLE_NAME_LEGACY=%~n1_legacy.exe
 
 REM --- Define build settings ---
-REM Set paths to your SDL3 installation
 set SDL_INCLUDE_DIR=C:\Projects\raster-engine\SDL\include
 set SDL_LIB_DIR=C:\Projects\raster-engine\SDL3-x64\lib
-
-REM Set paths for Eigen
 set EIGEN_INCLUDE_DIR=C:\Projects\raster-engine\eigen-3.4.1
-
-REM Specify the C++ standard
 set CPP_STANDARD=-std=c++23
 
-REM Common compile flags for object files
-set CXXFLAGS=-g %CPP_STANDARD% -O3 -DNDEBUG -march=native -I"%SDL_INCLUDE_DIR%" -I"%EIGEN_INCLUDE_DIR%"
+REM Define output directories for object files
+set BUILD_DIR=.
+set OBJ_DIR_STANDARD=%BUILD_DIR%\standard
+set OBJ_DIR_LEGACY=%BUILD_DIR%\legacy
+
+REM Common compile flags for standard object files
+set CXXFLAGS_STANDARD=-g %CPP_STANDARD% -O3 -DNDEBUG -march=native -I"%SDL_INCLUDE_DIR%" -I"%EIGEN_INCLUDE_DIR%"
+
+REM Common compile flags for legacy object files
+set CXXFLAGS_LEGACY=-g %CPP_STANDARD% -O3 -DNDEBUG -msse2 -mfpmath=sse -I"%SDL_INCLUDE_DIR%" -I"%EIGEN_INCLUDE_DIR%"
+
+REM Linker flags
 set LDFLAGS=-L"%SDL_LIB_DIR%" -lmingw32 -lSDL3 -lSDL3_image -lSDL3_mixer -mwindows
 
-REM --- Compilation ---
-echo Compiling object files...
-
-REM List of all source files
+REM --- List all source files ---
 set SOURCES=%SOURCE_FILE% lighting.cpp clipping.cpp point.cpp renderer.cpp surface.cpp input.cpp map.cpp shape.cpp rectprism.cpp rect.cpp pyramid.cpp quad.cpp tree.cpp house.cpp bridge.cpp boat.cpp airplane.cpp octprism.cpp runway.cpp hangar.cpp prop.cpp texture.cpp map_textures.cpp sound.cpp map_sounds.cpp light.cpp
 
-REM Compile each source file to an object file
+REM --- Clean previous build files and set up directories ---
+echo Cleaning previous build...
+if exist "%OBJ_DIR_STANDARD%" rmdir /s /q "%OBJ_DIR_STANDARD%"
+if exist "%OBJ_DIR_LEGACY%" rmdir /s /q "%OBJ_DIR_LEGACY%"
+mkdir "%OBJ_DIR_STANDARD%"
+mkdir "%OBJ_DIR_LEGACY%"
+
+REM --- Build STANDARD executable ---
+echo.
+echo === Building Standard Executable ===
+
+echo Compiling standard object files...
+set OBJECTS_STANDARD=
 for %%f in (%SOURCES%) do (
-    echo Compiling %%f...
-    g++ -c "%%f" %CXXFLAGS%
-    if !errorlevel! neq 0 (
-        echo.
-        echo --- Compilation of %%f failed! ---
+    echo Compiling %%f with standard flags...
+    g++ -c "%%f" %CXXFLAGS_STANDARD% -o "%OBJ_DIR_STANDARD%\%%~nf.o"
+    if !ERRORLEVEL! neq 0 (
+        echo --- Compilation of %%f failed for standard build! ---
         goto :end
     )
+    set OBJECTS_STANDARD=!OBJECTS_STANDARD! "%OBJ_DIR_STANDARD%\%%~nf.o"
 )
 
-REM --- Linking ---
+echo Linking standard executable...
+g++ %OBJECTS_STANDARD% -o "%BUILD_DIR%\%EXECUTABLE_NAME%" %LDFLAGS%
+if !ERRORLEVEL! neq 0 (
+    echo --- Linking failed for standard executable! ---
+    goto :end
+)
+
+REM --- Build LEGACY executable ---
 echo.
-echo Linking executable...
+echo === Building Legacy Executable ===
 
-REM List all generated object files for linking
-set OBJECTS=%~n1.o lighting.o clipping.o point.o surface.o renderer.o input.o map.o shape.o rectprism.o rect.o pyramid.o quad.o tree.o house.o bridge.o boat.o airplane.o octprism.o runway.o hangar.o prop.o texture.o map_textures.o sound.o map_sounds.o light.o
-
-REM Link all object files to create the executable
-g++ %OBJECTS% -o "%EXECUTABLE_NAME%" %CXXFLAGS% %LDFLAGS%
-
-IF %ERRORLEVEL% NEQ 0 (
-    echo.
-    echo --- Linking failed! ---
-) else (
-    echo.
-    echo --- Compilation and linking successful! ---
+echo Compiling legacy object files...
+set OBJECTS_LEGACY=
+for %%f in (%SOURCES%) do (
+    echo Compiling %%f with legacy flags...
+    g++ -c "%%f" %CXXFLAGS_LEGACY% -o "%OBJ_DIR_LEGACY%\%%~nf.o"
+    if !ERRORLEVEL! neq 0 (
+        echo --- Compilation of %%f failed for legacy build! ---
+        goto :end
+    )
+    set OBJECTS_LEGACY=!OBJECTS_LEGACY! "%OBJ_DIR_LEGACY%\%%~nf.o"
 )
+
+echo Linking legacy executable...
+g++ %OBJECTS_LEGACY% -o "%BUILD_DIR%\%EXECUTABLE_NAME_LEGACY%" %LDFLAGS%
+if !ERRORLEVEL! neq 0 (
+    echo --- Linking failed for legacy executable! ---
+    goto :end
+)
+
+echo.
+echo --- Compilation and linking successful for both executables! ---
+echo Standard executable: %BUILD_DIR%\%EXECUTABLE_NAME%
+echo Legacy executable: %BUILD_DIR%\%EXECUTABLE_NAME_LEGACY%
 
 :end
+endlocal
 ```
 
 ## Features Wishlist
@@ -384,11 +439,21 @@ This project was extremely rewarding and deepened my understanding of the graphi
 With additional time, I would implement the following features:
 
 1. **Further performance optimizations** to improve playability on lower-end systems
-2. **Additional light sources**, such as runway lights or exterior house lamps
-3. **Real-time shadow calculations** for dynamic lighting realism
-4. **External file storage** for map asset definitions to improve modularity and scalability
-5. **A map editor** for streamlined world building and asset placement
-6. **Directional sound behavior** and **Doppler effect** for immersive audio
-7. **Interactive gameplay mechanics** to enhance user engagement
-8. **Player collision detection** with map geometry for physical realism
-9. **Real-time physics simulations** to support dynamic interactions and environmental effects
+2. **Rendering bug fixes**, such as occasional gaps between surfaces
+3. **Additional light sources**, such as runway lights or exterior house lamps
+4. **Real-time shadow calculations** for dynamic lighting realism
+5. **External file storage** for map asset definitions to improve modularity and scalability
+6. **A map editor** for streamlined world building and asset placement
+7. **Directional sound behavior** and **Doppler effect** for immersive audio
+8. **Interactive gameplay mechanics** to enhance user engagement
+9. **Player collision detection** with map geometry for physical realism
+10. **Real-time physics simulations** to support dynamic interactions and environmental effects
+
+## References
+
+The following resources were a helpful guide when learning the mathematical and algorithmic concepts behind the rendering pipeline:
+
+* https://www.elissablack.com/ray-the-raycasting-engine/
+* https://www.gabrielgambetta.com/computer-graphics-from-scratch/
+* https://www.scratchapixel.com/index.html
+* https://www.3dgep.com/understanding-the-view-matrix/
