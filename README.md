@@ -245,7 +245,7 @@ To introduce dynamic behavior into the map, a boat object was created with a `mo
 <video src="https://github.com/user-attachments/assets/0de527e5-ab02-4951-b638-21b2f3653ded" width="1200" height="900" controls></video>
 <br>
 
-The most ambitious geometry in the map was an *Airplane* object, constructed using a combination of rectangular prisms, triangles, quadrilaterals, pyramids, and a new class for an octagonal prism (used to approximate a cylinder). The following screenshot shows the underlying triangular mesh on the left, the final geometry on the right (including texture mapping, which is described later), and the source code used to build up this shape. 
+The most ambitious geometric challenge was creating an airplane object, due to the variety of primitive shapes required. These included a combination of rectangular prisms, triangles, quadrilaterals, pyramids, and octagonal prisms (used to approximate a cylinder). This screenshot shows the underlying triangular mesh on the left, the final geometry on the right (including texture mapping, which is described later), and the source code used to build up this object.
 
 <br>
 
