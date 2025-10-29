@@ -1,6 +1,17 @@
 # raster-engine
 *Raster Engine* is 3D graphics engine built from scratch using C++, employing CPU-based software rasterization. The virtual environment consists of two distinct islands in an ocean setting, with assets crafted meticulously by hand. These assets include a canyon, waterfall, flowing river, mountains, house, airport, bridge, trees, airplane, and a boat. 
 
+## Core features
+* View/projection matrix transformations
+* Triangle clipping, z-buffer depth checks
+* Back-face culling, vectorization, and parallel processing for performance
+* Texture mapping with hand-drawn assets
+* Diffuse lighting and dynamic sound placement
+* Intuitive player movement via mouse and keyboard controls
+* Custom shape classes for hand-crafted geometry
+* Dynamic elements: flying airplane, sailing boat, rotating propeller, day-night cycle
+* No graphics APIs, no GPU acceleration, no external assets
+
 ## Video Demo
 
 [![Raster Engine on YouTube](https://img.youtube.com/vi/8gWjE3Mqe1k/0.jpg)](https://youtu.be/8gWjE3Mqe1k)
@@ -16,7 +27,7 @@
 
 The purpose of this project was to improve my C++ skills and to gain a fundamental understanding of 3D graphics principles using a low-level approach.
 
-The [*SDL3 library*](https://github.com/libsdl-org/SDL/releases) was used to handle window creation and pixel manipulation, but all rendering logic was implemented manually. By coding each step of the rendering pipeline from the ground up, I gained a clear understanding of the mathematical and algorithmic principles behind modern graphics application programming interfaces (APIs). These APIs rely on hardware-accelerated techniques powered by today’s GPUs. These hardware abstraction layers have been central to 3D game engines on the PC since the late 1990s, using early APIs such as *OpenGL 1.0 (1992)*, *3dfx Glide 2.0 (1997)*, and *Microsoft DirectX 5.0 (1997)*. But the low-level approach of a software renderer gave me a deeper understanding of the foundational techniques used in early hardware-accelerated pipelines.
+The [*SDL3 library*](https://github.com/libsdl-org/SDL/releases) was used to handle window creation and pixel-level rendering, but all surface rendering logic was implemented manually. By coding each step of the rendering pipeline from the ground up, I gained a clear understanding of the mathematical and algorithmic principles behind modern graphics application programming interfaces (APIs). These APIs rely on hardware-accelerated techniques powered by today’s GPUs. These hardware abstraction layers have been central to 3D game engines on the PC since the late 1990s, using early APIs such as *OpenGL 1.0 (1992)*, *3dfx Glide 2.0 (1997)*, and *Microsoft DirectX 5.0 (1997)*. But the low-level approach of a software renderer gave me a deeper understanding of the foundational techniques used in early hardware-accelerated pipelines.
 
 My goal was to create an engine which could render triangular surfaces at any position and orientation, account for surface intersection and depth with z-buffering, map textures to surfaces, calculate basic diffuse lighting, and play basic sound effects in specific locations throughout the 3D space. 
 
