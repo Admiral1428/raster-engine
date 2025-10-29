@@ -1,7 +1,11 @@
 # raster-engine
 *Raster Engine* is 3D graphics engine built from scratch using C++, employing CPU-based software rasterization. The virtual environment consists of two distinct islands in an ocean setting, with assets crafted meticulously by hand. These assets include a canyon, waterfall, flowing river, mountains, house, airport, bridge, trees, airplane, and a boat. 
 
-## Core features
+## Video Demo
+
+[![Raster Engine on YouTube](https://img.youtube.com/vi/8gWjE3Mqe1k/0.jpg)](https://youtu.be/8gWjE3Mqe1k)
+
+## Core Features
 * View/projection matrix transformations
 * Triangle clipping, z-buffer depth checks
 * Back-face culling, vectorization, and parallel processing for performance
@@ -11,10 +15,6 @@
 * Custom shape classes for hand-crafted geometry
 * Dynamic elements: flying airplane, sailing boat, rotating propeller, day-night cycle
 * No graphics APIs, no GPU acceleration, no external assets
-
-## Video Demo
-
-[![Raster Engine on YouTube](https://img.youtube.com/vi/8gWjE3Mqe1k/0.jpg)](https://youtu.be/8gWjE3Mqe1k)
 
 ## Installation
 
