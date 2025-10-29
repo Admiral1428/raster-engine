@@ -24,7 +24,7 @@ Initially, I considered making a more primitive engine using ray-casting techniq
 
 ## Initial Window Creation
 
-After spending several weeks refreshing my knowledge of C++ fundamentals, I began by creating a basic window, plotting triangle vertices with white pixels, and connecting them with red edges using Bresenham's line algorithm:
+After spending several weeks refreshing my knowledge of C++ fundamentals, I began by creating a basic window, plotting triangle vertices with white pixels, and connecting them with red edges using [Bresenham's line algorithm](https://www.ercankoclar.com/wp-content/uploads/2016/12/Bresenhams-Algorithm.pdf):
 
 <br>
 <img width="960" height="540" alt="09-29-25_1800" src="https://github.com/user-attachments/assets/2fba9f00-90b3-4893-92c3-50760a9728b1" />
@@ -132,7 +132,7 @@ For each of the six clipping planes, the algorithm determines whether each verte
 * Remove $p_1$ from the list of remaining points, and repeat the process if more than three points remain.
 * When only three points remain, this forms the final triangle.
 
-The following animation behavior the clipping behavior, with each newly formed triangle shown in a different color for illustration purposes. A maximum of five sub-triangles can result from the clipping process. Once the original triangle fully crosses behind the near clipping plane, it is no longer rendered.
+The following animation demonstrates the clipping behavior, with each newly formed triangle shown in a different color for illustration purposes. A maximum of five sub-triangles can result from the clipping process. Once the original triangle fully crosses behind the near clipping plane, it is no longer rendered.
 
 <br>
 
@@ -197,7 +197,7 @@ z' \\
 w'
 \end{bmatrix}$$
 
-To implement forward, backward, and left / right strafing right movement controls, a *forward* vector of $[0, 0,-1]^T$ and a *left* vector of $[-1, 0, 0]^T$ were multiplied by 3x3 rotation matrices derived from the camera's pitch and yaw angles. This produced adjusted unit vectors aligned with the camera orientation. These controls were mapped to the `W`, `S`, `A`, and `D` keys.
+To implement forward, backward, and left / right strafing movement controls, a *forward* vector of $[0, 0,-1]^T$ and a *left* vector of $[-1, 0, 0]^T$ were multiplied by 3x3 rotation matrices derived from the camera's pitch and yaw angles. This produced adjusted unit vectors aligned with the camera orientation. These controls were mapped to the `W`, `S`, `A`, and `D` keys.
 
 To ensure movement at a consistent speed regardless of framerate, the translation speed was multiplied by the frame's delta time. The resulting translation distance was then scaled by the appropriate unit vector to compute the corresponding $\Delta x$, $\Delta y$, and $\Delta z$ adjustments to the camera eye position. 
 
@@ -440,14 +440,15 @@ With additional time, I would implement the following features:
 
 1. **Further performance optimizations** to improve playability on lower-end systems
 2. **Rendering bug fixes**, such as occasional gaps between surfaces
-3. **Additional light sources**, such as runway lights or exterior house lamps
-4. **Real-time shadow calculations** for dynamic lighting realism
-5. **External file storage** for map asset definitions to improve modularity and scalability
-6. **A map editor** for streamlined world building and asset placement
-7. **Directional sound behavior** and **Doppler effect** for immersive audio
-8. **Interactive gameplay mechanics** to enhance user engagement
-9. **Player collision detection** with map geometry for physical realism
-10. **Real-time physics simulations** to support dynamic interactions and environmental effects
+3. **Improved triangle-mode rendering** by using Bresenham’s line algorithm
+4. **Additional light sources**, such as runway lights or exterior house lamps
+5. **Real-time shadow calculations** for dynamic lighting realism
+6. **External file storage** for map asset definitions to improve modularity and scalability
+7. **A map editor** for streamlined world building and asset placement
+8. **Directional sound behavior** and **Doppler effect** for immersive audio
+9. **Interactive gameplay mechanics** to enhance user engagement
+10. **Player collision detection** with map geometry for physical realism
+11. **Real-time physics simulations** to support dynamic interactions and environmental effects
 
 ## References
 
