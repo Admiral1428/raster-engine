@@ -47,7 +47,7 @@ void run_title(SDL_Renderer &_renderer)
 
 int main(int argc, char *argv[])
 {
-    // Eigen::Vector4fers to window and renderer
+    // Pointers to window and renderer
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
 
