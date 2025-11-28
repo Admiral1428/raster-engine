@@ -449,17 +449,19 @@ This project was extremely rewarding and deepened my understanding of the graphi
 
 With additional time, I would implement the following features:
 
-1. **Further performance optimizations** to improve playability on lower-end systems
-2. **Rendering bug fixes**, such as occasional gaps between surfaces
-3. **Improved triangle-mode rendering** by using Bresenham’s line algorithm
-4. **Additional light sources**, such as runway lights or exterior house lamps
-5. **Real-time shadow calculations** for dynamic lighting realism
-6. **External file storage** for map asset definitions to improve modularity and scalability
-7. **A map editor** for streamlined world building and asset placement
-8. **Directional sound behavior** and **Doppler effect** for immersive audio
-9. **Interactive gameplay mechanics** to enhance user engagement
-10. **Player collision detection** with map geometry for physical realism
-11. **Real-time physics simulations** to support dynamic interactions and environmental effects
+1. **Increased modularity** by further dividing the main function and renderer class into additional helper functions and classes
+2. **Directory organization** by moving supporting files and classes into subfolders
+3. **Further performance optimizations** to improve playability on lower-end systems
+4. **Rendering bug fixes**, such as occasional gaps between surfaces
+5. **Improved triangle-mode rendering** by using Bresenham’s line algorithm
+6. **Additional light sources**, such as runway lights or exterior house lamps
+7. **Real-time shadow calculations** for dynamic lighting realism
+8. **External file storage** for map asset definitions to improve modularity and scalability
+9. **A map editor** for streamlined world building and asset placement
+10. **Directional sound behavior** and **Doppler effect** for immersive audio
+11. **Interactive gameplay mechanics** to enhance user engagement
+12. **Player collision detection** with map geometry for physical realism
+13. **Real-time physics simulations** to support dynamic interactions and environmental effects
 
 ## References
 
